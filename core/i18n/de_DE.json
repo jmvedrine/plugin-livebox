@@ -1,0 +1,40 @@
+{
+    "plugins\/livebox\/desktop\/php\/livebox.php": {
+        "Général": "Allgemein",
+        "Nom de la livebox": "Livebox Name",
+        "Objet parent": "Elternobjekt",
+        "Aucun": "Keine",
+        "Catégorie": "Kategorie",
+        "Activer": "Aktivieren",
+        "Accéder à la carte": "Auf die Karte zugreifen",
+        "Visible": "Sichtbar",
+        "IP de la livebox": "Livebox IP",
+        "Compte de la livebox": "Livebox Konto",
+        "Password de la livebox": "Livebox Passwort",
+        "Indicateurs": "Indikatoren",
+        "Nom": "Name",
+        "Icône-action": "Aktion-Symbol",
+        "Sous-Type": "Unter-Typ",
+        "Paramètres": "Parameter",
+        "Action": "Aktion",
+        "Sauvegarder": "Speichern",
+        "Ajouter une livebox": "Ajouter une livebox",
+        "Rechercher": "Rechercher",
+        "Gestion": "Gestion",
+        "Configuration": "Configuration",
+        "Mes Livebox": "Mes Livebox",
+        "Supprimer": "Supprimer"
+    },
+    "plugins\/livebox\/core\/class\/livebox.class.php": {
+        "La livebox ne repond pas a la demande de cookie.": "La livebox ne repond pas a la demande de cookie.",
+        "La livebox ne repond pas.": "La livebox ne repond pas.",
+        "Le compte est incorrecte.": "Le compte est incorrecte."
+    },
+    "plugins\/livebox\/desktop\/js\/livebox.js": {
+        "Nom": "Nom",
+        "Historiser": "Historiser",
+        "Afficher": "Afficher",
+        "Tester": "Tester",
+        "Accèder à l'interface de la livebox": "Accèder à l'interface de la livebox"
+    }
+}

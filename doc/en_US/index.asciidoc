@@ -1,0 +1,49 @@
+== Monitoring
+
+=== Introduction
+Ce plugin permet de récupérer des informations de la Livebox et de lancer des actions.
+
+==== Compatibility:
+
+- Livebox 2
+- Livebox Play
+
+==== Informations visibles :
+[horizontal]
+- *Etat connexion* : état de la connexion internet (xDSL ou Fibre)
+- *Etat synchro* : état de la synchronisation xDSL ou FTTH
+- *Etat TV* : état du service TV
+- *Etat VoIP* : état du service téléphonie par internet
+- *Débits descendant et montant* : débits de la liaison xDSL upload et download (pas compatible Fibre)
+- *IP Wan* : adresse IP public (IPv4)
+- *IPv6 Wan* : adresse IP public (IPv6)
+- *Numéro de téléphone* : numéro de téléphone VoIP
+- *Etat Wifi* : état du service Wifi. Pour Livebox 2 : uniquement Wifi 2.4Ghz. Pour Livebox Play : état du service Wifi pour les fréquences 2.4Ghz et 5Ghz
+
+==== Actions possibles :
+[horizontal]
+- *Activation/Désactivation du WiFi* : permet d'activer ou de désactiver le WiFi. Pour Livebox 2 : uniquement le Wifi 2.4Ghz. Pour Livebox Play : activation/désactivation par carte WiFi (2.4Ghz et/ou 5Ghz).
+- *Reboot* : permet de redémarrer la Livebox
+- *Sonner* : permet de faire sonner votre téléphone VoIP pendant 5 secondes (pour tester le fonctionnement entre la Livebox et votre téléphone)
+
+==== Historiser activable pour :
+[horizontal]
+- *Etat connexion* : état de la connexion internet (xDSL ou Fibre)
+- *Etat synchro* : état de la synchronisation xDSL ou FTTH
+- *Etat TV* : état du service TV
+- *Etat VoIP* : état du service téléphonie par internet
+- *Etat Wifi* : état du service Wifi. Pour Livebox 2 : uniquement Wifi 2.4Ghz. Pour Livebox Play : état du service Wifi pour les fréquences 2.4Ghz et 5Ghz
+
+image::../images/livebox1.png[align="center"]
+image::../images/livebox_screenshot2.png[align="center"]
+
+'''
+=== Installation/Configuration
+include::configuration.asciidoc[]
+
+'''
+=== FAQ
+include::faq.asciidoc[]
+'''
+=== Changelog
+include::changelog.asciidoc[]

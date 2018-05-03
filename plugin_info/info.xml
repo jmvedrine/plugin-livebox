@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<info>
+    <id>livebox</id>
+    <name>Livebox</name>
+    <description>Plugin pour votre livebox</description>
+    <icon>icon techno-freebox</icon>
+    <licence>AGPL</licence>
+    <author>Thomas Guenneguez et Phifi</author>
+    <installation></installation>
+    <require>1.124.0</require>
+    <version>1.16</version>
+    <category>communication</category>
+</info>
+

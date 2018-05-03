@@ -1,0 +1,8 @@
+{
+	"id" : "livebox",
+	"name" : "Livebox",
+	"licence" : "AGPL",
+	"author" : "Jeedom Legacy",
+	"require" : "1.124.0",
+	"category" : "communication"
+}
