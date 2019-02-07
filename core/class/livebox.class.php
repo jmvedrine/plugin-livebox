@@ -138,7 +138,7 @@ class livebox extends eqLogic {
 			fclose($file);
 			unlink($cookiefile);
 			
-			$cookie1 = explode ('	',$cookie);
+			$cookie1 = explode ("\t",$cookie);
 			$cookies = $cookie1[5].'='.$cookie1[6];
 			$this->_cookies = trim($cookies);
 			log::add('livebox','debug','get cookies done');
@@ -207,7 +207,7 @@ class livebox extends eqLogic {
 				$listpage = array("sysbus/NeMo/Intf/lan:setWLANConfig" => '"mibs":{"penable":{"wifi'.$option[0].'_ath":{"PersistentEnable":'.$option[1].', "Enable":true}}}');
 				break;
 			case "devicelist":
-				$listpage = array("sysbus/Hosts:getDevices" => "");
+				$listpage = array("sysbus/Devices:get" => "");
 				break;
 		}
 		$statuscmd = $this->getCmd(null, 'state');
@@ -256,7 +256,7 @@ class livebox extends eqLogic {
 			$json = json_decode($content, true);
 			if ( $json["status"] == "" )
 			{
-				log::add('livebox','debug','Demande non traite par la livebox');
+				log::add('livebox','warning','Demande non traitee par la livebox. Param: ' .print_r($param,true));
 				return false;				
 			}
 			return $json;
@@ -934,9 +934,9 @@ class livebox extends eqLogic {
 			if ( isset($content["status"]) )
 			{
 				foreach ( $content["status"] as $equipement ) {
-					if ( $equipement["active"] )
+					if ( $equipement["Active"] && $equipement["IPAddressSource"] == "DHCP" )
 					{
-						array_push($devicelist, $equipement["hostName"]);
+						array_push($devicelist, $equipement["Name"]);
 					}
 				}
 			}
