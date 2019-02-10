@@ -40,12 +40,6 @@ $eqLogics = eqLogic::byType('livebox');
         <legend>{{Mes Livebox}}
         </legend>
 		<div class="eqLogicThumbnailContainer">
-			<div class="cursor eqLogicAction" data-action="add" style="background-color : #ffffff; height : 200px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;" >
-				<center>
-				<i class="fa fa-plus-circle" style="font-size : 7em;color:#94ca02;"></i>
-				</center>
-				<span style="font-size : 1.1em;position:relative; top : 23px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;color:#94ca02"><center>Ajouter</center></span>
-			</div>
 			<?php
 			if (count($eqLogics) == 0) {
 				echo "<br/><br/><br/><center><span style='color:#767676;font-size:1.2em;font-weight: bold;'>{{Vous n'avez pas encore de livebox, cliquez sur Ajouter un équipement pour commencer}}</span></center>";
@@ -63,12 +57,23 @@ $eqLogics = eqLogic::byType('livebox');
 		</div>
     </div>
 </div>
-    <div class="col-lg-10 col-md-9 col-sm-8 eqLogic" style="border-left: solid 1px #EEE; padding-left: 25px;">
+    <div class="col-lg-10 col-md-9 col-sm-8 eqLogic" style="border-left: solid 1px #EEE; padding-left: 25px;display: none;">
+    <br />
+  <a class="btn btn-success eqLogicAction pull-right" data-action="save"><i class="fa fa-check-circle"></i> {{Sauvegarder}}</a>
+  <a class="btn btn-danger eqLogicAction pull-right" data-action="remove"><i class="fa fa-minus-circle"></i> {{Supprimer}}</a>
+  <a class="btn btn-default eqLogicAction pull-right" data-action="configure"><i class="fa fa-cogs"></i> {{Configuration avancée}}</a>
+  <ul class="nav nav-tabs" role="tablist">
+   <li role="presentation"><a class="eqLogicAction cursor" aria-controls="home" role="tab" data-action="returnToThumbnailDisplay"><i class="fa fa-arrow-circle-left"></i></a></li>
+   <li role="presentation" class="active"><a href="#eqlogictabin" aria-controls="home" role="tab" data-toggle="tab"><i class="fa fa-tachometer"></i> {{LiveBox}}</a></li>
+   <li role="presentation"><a href="#cmdtab" aria-controls="profile" role="tab" data-toggle="tab"><i class="fa fa-list-alt"></i> {{Commandes}}</a></li>
+ </ul>
+ <div class="tab-content" style="height:calc(100% - 50px);overflow:auto;overflow-x: hidden;">
+  <div role="tabpanel" class="tab-pane active" id="eqlogictabin">
+
         <form class="form-horizontal">
             <fieldset>
                 <legend>
                     {{Général}}
-				   <i class='fa fa-cogs eqLogicAction pull-right cursor expertModeVisible' data-action='configure'></i>
 			   </legend>
                 <div class="form-group">
                     <label class="col-lg-2 control-label">{{Nom de la livebox}}</label>
@@ -131,8 +136,9 @@ $eqLogics = eqLogic::byType('livebox');
                 </div>
             </fieldset> 
         </form>
-
-        <legend>{{Indicateurs}}</legend>
+  </div>
+  <div role="tabpanel" class="tab-pane" id="cmdtab">
+<br />
         <table id="table_cmd" class="table table-bordered table-condensed">
             <thead>
                 <tr>
@@ -148,17 +154,10 @@ $eqLogics = eqLogic::byType('livebox');
 
             </tbody>
         </table>
-
-        <form class="form-horizontal">
-            <fieldset>
-                <div class="form-actions">
-                    <a class="btn btn-danger eqLogicAction" data-action="remove"><i class="fa fa-minus-circle"></i> {{Supprimer}}</a>
-					<a class="btn btn-success eqLogicAction" data-action="save"><i class="fa fa-check-circle"></i> {{Sauvegarder}}</a>
-                </div>
-            </fieldset>
-        </form>
-
-    </div>
+ </div>
+ </div></div>
+		</div>
+	</div>
 </div>
 
 <?php include_file('desktop', 'livebox', 'js', 'livebox'); ?>
