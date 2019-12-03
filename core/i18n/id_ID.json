@@ -1,29 +1,29 @@
 {
     "plugins\/livebox\/desktop\/php\/livebox.php": {
-        "Général": "Général",
+        "Général": "umum",
         "Nom de la livebox": "Nom de la livebox",
-        "Objet parent": "Objet parent",
-        "Aucun": "Aucun",
-        "Catégorie": "Catégorie",
-        "Activer": "Activer",
+        "Objet parent": "obyek orangtua",
+        "Aucun": "tidak",
+        "Catégorie": "kategori",
+        "Activer": "mengaktifkan",
         "Accéder à la carte": "Accéder à la carte",
-        "Visible": "Visible",
+        "Visible": "terlihat",
         "IP de la livebox": "IP de la livebox",
         "Compte de la livebox": "Compte de la livebox",
         "Password de la livebox": "Password de la livebox",
         "Indicateurs": "Indicateurs",
-        "Nom": "Nom",
+        "Nom": "nama",
         "Icône-action": "Icône-action",
-        "Sous-Type": "Sous-Type",
-        "Paramètres": "Paramètres",
-        "Action": "Action",
-        "Sauvegarder": "Sauvegarder",
+        "Sous-Type": "Subtipe",
+        "Paramètres": "pengaturan",
+        "Action": "Tindakan",
+        "Sauvegarder": "menyimpan",
         "Ajouter une livebox": "Ajouter une livebox",
-        "Rechercher": "Rechercher",
-        "Gestion": "Gestion",
-        "Configuration": "Configuration",
+        "Rechercher": "pencarian",
+        "Gestion": "Manajemen",
+        "Configuration": "konfigurasi",
         "Mes Livebox": "Mes Livebox",
-        "Supprimer": "Supprimer"
+        "Supprimer": "menghapus"
     },
     "plugins\/livebox\/core\/class\/livebox.class.php": {
         "La livebox ne repond pas a la demande de cookie.": "La livebox ne repond pas a la demande de cookie.",
@@ -31,10 +31,10 @@
         "Le compte est incorrecte.": "Le compte est incorrecte."
     },
     "plugins\/livebox\/desktop\/js\/livebox.js": {
-        "Nom": "Nom",
-        "Historiser": "Historiser",
-        "Afficher": "Afficher",
-        "Tester": "Tester",
+        "Nom": "nama",
+        "Historiser": "Historicize",
+        "Afficher": "Memenitikan",
+        "Tester": "Coba",
         "Accèder à l'interface de la livebox": "Accèder à l'interface de la livebox"
     }
 }

@@ -1,0 +1,40 @@
+{
+    "plugins\/livebox\/desktop\/php\/livebox.php": {
+        "Général": "一般的な",
+        "Nom de la livebox": "Nom de la livebox",
+        "Objet parent": "親オブジェクト",
+        "Aucun": "いいえ",
+        "Catégorie": "カテゴリ",
+        "Activer": "アクティブ",
+        "Accéder à la carte": "Accéder à la carte",
+        "Visible": "目に見えます",
+        "IP de la livebox": "IP de la livebox",
+        "Compte de la livebox": "Compte de la livebox",
+        "Password de la livebox": "Password de la livebox",
+        "Indicateurs": "Indicateurs",
+        "Nom": "名前",
+        "Icône-action": "Icône-action",
+        "Sous-Type": "サブタイプ",
+        "Paramètres": "設定",
+        "Action": "アクション",
+        "Sauvegarder": "セーブ",
+        "Ajouter une livebox": "Ajouter une livebox",
+        "Rechercher": "検索",
+        "Gestion": "管理",
+        "Configuration": "コンフィギュレーション",
+        "Mes Livebox": "Mes Livebox",
+        "Supprimer": "取り除きます"
+    },
+    "plugins\/livebox\/core\/class\/livebox.class.php": {
+        "La livebox ne repond pas a la demande de cookie.": "La livebox ne repond pas a la demande de cookie.",
+        "La livebox ne repond pas.": "La livebox ne repond pas.",
+        "Le compte est incorrecte.": "Le compte est incorrecte."
+    },
+    "plugins\/livebox\/desktop\/js\/livebox.js": {
+        "Nom": "名前",
+        "Historiser": "historicize",
+        "Afficher": "ディスプレイ",
+        "Tester": "テスト",
+        "Accèder à l'interface de la livebox": "Accèder à l'interface de la livebox"
+    }
+}

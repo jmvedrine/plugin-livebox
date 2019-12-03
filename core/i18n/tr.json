@@ -1,0 +1,40 @@
+{
+    "plugins\/livebox\/desktop\/php\/livebox.php": {
+        "Général": "Genel",
+        "Nom de la livebox": "Live Box Modemin ismi",
+        "Objet parent": "Ana nesne",
+        "Aucun": "Hiçbir",
+        "Catégorie": "Kategori",
+        "Activer": "Etkinleştir",
+        "Accéder à la carte": "Karta el koy",
+        "Visible": "Görülebilir",
+        "IP de la livebox": "Live Box Modemin IP adresi",
+        "Compte de la livebox": "Live box modemin hesabı",
+        "Password de la livebox": "Live Box modemin şifresi",
+        "Indicateurs": "Göstergeler",
+        "Nom": "Soyisim",
+        "Icône-action": "Etki ikonu",
+        "Sous-Type": "alt tipi",
+        "Paramètres": "Ayarlar",
+        "Action": "Eylem",
+        "Sauvegarder": "Kaydet",
+        "Ajouter une livebox": "Ajouter une livebox",
+        "Rechercher": "Arayın",
+        "Gestion": "Yönetim",
+        "Configuration": "Ayarlar",
+        "Mes Livebox": "Mes Livebox",
+        "Supprimer": "Sil"
+    },
+    "plugins\/livebox\/core\/class\/livebox.class.php": {
+        "La livebox ne repond pas a la demande de cookie.": "La livebox ne repond pas a la demande de cookie.",
+        "La livebox ne repond pas.": "La livebox ne repond pas.",
+        "Le compte est incorrecte.": "Le compte est incorrecte."
+    },
+    "plugins\/livebox\/desktop\/js\/livebox.js": {
+        "Nom": "Soyisim",
+        "Historiser": "Tarihe göre sırala",
+        "Afficher": "Göster",
+        "Tester": "Test et",
+        "Accèder à l'interface de la livebox": "Accèder à l'interface de la livebox"
+    }
+}

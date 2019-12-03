@@ -1,29 +1,29 @@
 {
     "plugins\/livebox\/desktop\/php\/livebox.php": {
-        "Général": "Général",
-        "Nom de la livebox": "Nom de la livebox",
-        "Objet parent": "Objet parent",
-        "Aucun": "Aucun",
-        "Catégorie": "Catégorie",
-        "Activer": "Activer",
-        "Accéder à la carte": "Accéder à la carte",
-        "Visible": "Visible",
-        "IP de la livebox": "IP de la livebox",
+        "Général": "generale",
+        "Nom de la livebox": "Nom dela Livebox",
+        "Objet parent": "oggetto padre",
+        "Aucun": "no",
+        "Catégorie": "categoria",
+        "Activer": "attivare",
+        "Accéder à la carte": "Accedi alla mappa",
+        "Visible": "visibile",
+        "IP de la livebox": "IP dela Livebox",
         "Compte de la livebox": "Compte de la livebox",
         "Password de la livebox": "Password de la livebox",
-        "Indicateurs": "Indicateurs",
-        "Nom": "Nom",
+        "Indicateurs": "Indicatori",
+        "Nom": "Nome",
         "Icône-action": "Icône-action",
-        "Sous-Type": "Sous-Type",
-        "Paramètres": "Paramètres",
-        "Action": "Action",
-        "Sauvegarder": "Sauvegarder",
+        "Sous-Type": "Sotto-tipo",
+        "Paramètres": "Parametri",
+        "Action": "Azione",
+        "Sauvegarder": "salvare",
         "Ajouter une livebox": "Ajouter une livebox",
-        "Rechercher": "Rechercher",
-        "Gestion": "Gestion",
-        "Configuration": "Configuration",
+        "Rechercher": "ricercare",
+        "Gestion": "Gestione",
+        "Configuration": "Configurazione",
         "Mes Livebox": "Mes Livebox",
-        "Supprimer": "Supprimer"
+        "Supprimer": "rimuovere"
     },
     "plugins\/livebox\/core\/class\/livebox.class.php": {
         "La livebox ne repond pas a la demande de cookie.": "La livebox ne repond pas a la demande de cookie.",
@@ -31,10 +31,10 @@
         "Le compte est incorrecte.": "Le compte est incorrecte."
     },
     "plugins\/livebox\/desktop\/js\/livebox.js": {
-        "Nom": "Nom",
-        "Historiser": "Historiser",
-        "Afficher": "Afficher",
-        "Tester": "Tester",
+        "Nom": "Nome",
+        "Historiser": "Storicizza",
+        "Afficher": "Mostra",
+        "Tester": "Prova",
         "Accèder à l'interface de la livebox": "Accèder à l'interface de la livebox"
     }
 }

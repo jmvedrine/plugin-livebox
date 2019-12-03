@@ -1,29 +1,29 @@
 {
     "plugins\/livebox\/desktop\/php\/livebox.php": {
-        "Général": "General",
+        "Général": "Main",
         "Nom de la livebox": "Livebox name",
         "Objet parent": "Parent object",
         "Aucun": "None",
         "Catégorie": "Category",
-        "Activer": "Enable",
-        "Accéder à la carte": "Go to the map",
+        "Activer": "Activate",
+        "Accéder à la carte": "Access the map",
         "Visible": "Visible",
-        "IP de la livebox": "IP of livebox",
-        "Compte de la livebox": "Account of the livebox",
-        "Password de la livebox": "Password of livebox",
+        "IP de la livebox": "Livebox IP",
+        "Compte de la livebox": "Livebox account",
+        "Password de la livebox": "Livebox password",
         "Indicateurs": "Indicators",
         "Nom": "Name",
-        "Icône-action": "Icon action",
-        "Sous-Type": "Sub-type",
+        "Icône-action": "Icon-action",
+        "Sous-Type": "Sub-Type",
         "Paramètres": "Settings",
         "Action": "Action",
         "Sauvegarder": "Save",
         "Ajouter une livebox": "Ajouter une livebox",
-        "Rechercher": "Rechercher",
-        "Gestion": "Gestion",
+        "Rechercher": "Search",
+        "Gestion": "Management",
         "Configuration": "Configuration",
         "Mes Livebox": "Mes Livebox",
-        "Supprimer": "Supprimer"
+        "Supprimer": "Delete"
     },
     "plugins\/livebox\/core\/class\/livebox.class.php": {
         "La livebox ne repond pas a la demande de cookie.": "La livebox ne repond pas a la demande de cookie.",
@@ -31,10 +31,10 @@
         "Le compte est incorrecte.": "Le compte est incorrecte."
     },
     "plugins\/livebox\/desktop\/js\/livebox.js": {
-        "Nom": "Nom",
-        "Historiser": "Historiser",
-        "Afficher": "Afficher",
-        "Tester": "Tester",
+        "Nom": "Name",
+        "Historiser": "Historize",
+        "Afficher": "Display",
+        "Tester": "Test",
         "Accèder à l'interface de la livebox": "Accèder à l'interface de la livebox"
     }
 }

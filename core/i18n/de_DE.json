@@ -1,29 +1,29 @@
 {
     "plugins\/livebox\/desktop\/php\/livebox.php": {
         "Général": "Allgemein",
-        "Nom de la livebox": "Livebox Name",
-        "Objet parent": "Elternobjekt",
-        "Aucun": "Keine",
+        "Nom de la livebox": "LiveBox name",
+        "Objet parent": "Eltern-Objekt",
+        "Aucun": "Ohne",
         "Catégorie": "Kategorie",
-        "Activer": "Aktivieren",
-        "Accéder à la carte": "Auf die Karte zugreifen",
+        "Activer": "aktivieren",
+        "Accéder à la carte": "auf die Karte zugreifen",
         "Visible": "Sichtbar",
-        "IP de la livebox": "Livebox IP",
-        "Compte de la livebox": "Livebox Konto",
-        "Password de la livebox": "Livebox Passwort",
+        "IP de la livebox": "Livebox IP Adresse",
+        "Compte de la livebox": "Livebox benutzername",
+        "Password de la livebox": "Livebox passwort",
         "Indicateurs": "Indikatoren",
         "Nom": "Name",
-        "Icône-action": "Aktion-Symbol",
-        "Sous-Type": "Unter-Typ",
+        "Icône-action": "Aktionsymbol",
+        "Sous-Type": "Untertyp",
         "Paramètres": "Parameter",
         "Action": "Aktion",
         "Sauvegarder": "Speichern",
         "Ajouter une livebox": "Ajouter une livebox",
-        "Rechercher": "Rechercher",
-        "Gestion": "Gestion",
-        "Configuration": "Configuration",
+        "Rechercher": "Suchen nach",
+        "Gestion": "Verwaltung",
+        "Configuration": "Konfiguration",
         "Mes Livebox": "Mes Livebox",
-        "Supprimer": "Supprimer"
+        "Supprimer": "Löschen"
     },
     "plugins\/livebox\/core\/class\/livebox.class.php": {
         "La livebox ne repond pas a la demande de cookie.": "La livebox ne repond pas a la demande de cookie.",
@@ -31,10 +31,10 @@
         "Le compte est incorrecte.": "Le compte est incorrecte."
     },
     "plugins\/livebox\/desktop\/js\/livebox.js": {
-        "Nom": "Nom",
-        "Historiser": "Historiser",
-        "Afficher": "Afficher",
-        "Tester": "Tester",
+        "Nom": "Name",
+        "Historiser": "Chronik",
+        "Afficher": "anzeigen",
+        "Tester": "Test",
         "Accèder à l'interface de la livebox": "Accèder à l'interface de la livebox"
     }
 }
