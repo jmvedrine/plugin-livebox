@@ -1,4 +1,4 @@
-Présentation
+Presentation
 ===
 Ce plugin permet de récupérer des informations de la Livebox et de lancer des actions.
 
@@ -47,7 +47,7 @@ Nous allons maintenant paramétrer l'équipement. Pour se faire, cliquer sur **P
 
 Puis définir :
 
-- Objet parent
+- Parent object
 - Catégorie (optionnelle)
 - Activer (coché par défaut)
 - Visible (optionnel si vous ne désirez pas le rendre visible sur le Dashboard)
