@@ -196,15 +196,15 @@ class livebox extends eqLogic {
 				$listpage = array("sysbus/NMC:reboot" => "");
 				break;
 			case "wpspushbutton":
-				$listpage = array("sysbus/NeMo/Intf/lan:setWLANConfig" => '"mibs":{"wlanvap":{"wl0":{"WPS":{"ConfigMethodsEnabled":"PushButton,Label,Ethernet"}}},"wl1":{"WPS":{"ConfigMethodsEnabled":"PushButton,Label,Ethernet"}}}', 
+				$listpage = array("sysbus/NeMo/Intf/lan:setWLANConfig" => '"mibs":{"wlanvap":{"wl0":{"WPS":{"ConfigMethodsEnabled":"PushButton,Label,Ethernet"}}},"eth6":{"WPS":{"ConfigMethodsEnabled":"PushButton,Label,Ethernet"}}}', 
 								"sysbus/NeMo/Intf/wl0/WPS:pushButton" => '',
-								"sysbus/NeMo/Intf/wl1/WPS:pushButton" => '');
+								"sysbus/NeMo/Intf/eth6/WPS:pushButton" => '');
 				break;
 			case "ring":
 				$listpage = array("sysbus/VoiceService/VoiceApplication:ring" => "");
 				break;
 			case "changewifi":
-				$listpage = array("sysbus/NeMo/Intf/lan:setWLANConfig" => '"mibs":{"penable":{"wifi'.$option[0].'_ath":{"PersistentEnable":'.$option[1].', "Enable":true}}}');
+				$listpage = array("sysbus/NeMo/Intf/lan:setWLANConfig" => '"mibs":{"penable":{"'.$option[0].'":{"PersistentEnable":'.$option[1].',"Enable":true}}}');
 				break;
 			case "devicelist":
 				$listpage = array("sysbus/Devices:get" => "");
@@ -254,7 +254,7 @@ class livebox extends eqLogic {
 		else
 		{
 			$json = json_decode($content, true);
-			if ( $json["status"] == "" )
+			if ( $json["status"] == "" && $page !== 'tv')
 			{
 				log::add('livebox','warning','Demande non traitee par la livebox. Param: ' .print_r($param,true));
 				return false;				
@@ -919,10 +919,10 @@ class livebox extends eqLogic {
 						$eqLogic_cmd->event($content["status"]["wlanvap"]["wl0"]["VAPStatus"]);
 					}
 					$eqLogic_cmd = $this->getCmd(null, 'wifi5status');
-					if ($eqLogic_cmd->execCmd() != $eqLogic_cmd->formatValue($content["status"]["wlanvap"]["wl1"]["VAPStatus"])) {
+					if ($eqLogic_cmd->execCmd() != $eqLogic_cmd->formatValue($content["status"]["wlanvap"]["eth6"]["VAPStatus"])) {
 						log::add('livebox','debug','Maj wifi5status');
 						$eqLogic_cmd->setCollectDate('');
-						$eqLogic_cmd->event($content["status"]["wlanvap"]["wl1"]["VAPStatus"]);
+						$eqLogic_cmd->event($content["status"]["wlanvap"]["eth6"]["VAPStatus"]);
 					}
 				}
 			}
@@ -983,21 +983,27 @@ class liveboxCmd extends cmd
 				$page = "wpspushbutton";
 				break;
 			case "wifi2.4on":
+				$option = array("wifi0_bcm", "true");
+				$page = "changewifi";
+				break;
 			case "wifion":
 				$option = array("0", "true");
 				$page = "changewifi";
 				break;
 			case "wifi2.4off":
+				$option = array("wifi0_bcm", "false");
+				$page = "changewifi";
+				break;
 			case "wifioff":
 				$option = array("0", "false");
 				$page = "changewifi";
 				break;
 			case "wifi5on":
-				$option = array("1", "true");
+				$option = array("wifi0_quan", "true");
 				$page = "changewifi";
 				break;
 			case "wifi5off":
-				$option = array("1", "false");
+				$option = array("wifi0_quan", "false");
 				$page = "changewifi";
 				break;
 		}
