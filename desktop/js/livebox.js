@@ -1,3 +1,26 @@
+function printEqLogicHelper(label,name,_eqLogic){
+	var trm = '<tr><td class="col-sm-3"><span style="font-size : 1em;">'+label+'</span></td><td><span class="label label-default" style="font-size : 1em;"> <span class="eqLogicAttr" data-l1key="configuration" data-l2key="'+name+'"></span></span></td></tr>';
+	
+	$('#table_infoseqlogic tbody').append(trm);
+	$('#table_infoseqlogic tbody tr:last').setValues(_eqLogic, '.eqLogicAttr');
+}
+
+// fonction executée par jeedom lors de l'affichage des details d'un eqlogic
+function printEqLogic(_eqLogic) {
+	if (!isset(_eqLogic)) {
+		var _eqLogic = {configuration: {}};
+	}
+	if (!isset(_eqLogic.configuration)) {
+		_eqLogic.configuration = {};
+	}
+	$('#table_infoseqlogic tbody').empty();
+    printEqLogicHelper("{{Fabricant}}","manufacturer",_eqLogic);
+    printEqLogicHelper("{{Type}}","productClass",_eqLogic);
+    printEqLogicHelper("{{Modèle}}","modelName",_eqLogic);
+    printEqLogicHelper("{{Numéro de série}}","serialNumber",_eqLogic);
+    printEqLogicHelper("{{Version hardware}}","hardwareVersion",_eqLogic);
+    printEqLogicHelper("{{Version software}}","softwareVersion",_eqLogic);
+}
 function addCmdToTable(_cmd) {
    if (!isset(_cmd)) {
         var _cmd = {configuration: {}};
@@ -25,15 +48,16 @@ function addCmdToTable(_cmd) {
 		tr += '<input type=hidden class="cmdAttr form-control input-sm" data-l1key="unite" value="">';
         tr += '</td>';
         tr += '<td>';
-		if (_cmd.logicalId == 'state' || _cmd.logicalId == 'tvstatus' || _cmd.logicalId == 'voipstatusH323' || _cmd.logicalId == 'voipstatusSIP' || _cmd.logicalId == 'connectionstate' || _cmd.logicalId == 'wifistatus' || _cmd.logicalId == 'wifi2.4status' || _cmd.logicalId == 'wifi5status' || _cmd.logicalId == 'linkstate' || _cmd.logicalId == 'debitmontant' || _cmd.logicalId == 'debitdescendant' || _cmd.logicalId == 'margebruitmontant' || _cmd.logicalId == 'margebruitdescendant') {
-			tr += '<span><input type="checkbox" class="cmdAttr" data-l1key="isHistorized"/> {{Historiser}}<br/></span>';
+        tr += '<span><label class="checkbox-inline"><input type="checkbox" class="cmdAttr checkbox-inline" data-l1key="isVisible" checked/> {{Afficher}}</label></span>';
+		if (_cmd.subType == 'numeric' || _cmd.subType == 'binary') {
+			tr += '<span><label class="checkbox-inline"><input type="checkbox" class="cmdAttr checkbox-inline" data-l1key="isHistorized"/> {{Historiser}}</label></span>';
 		}
-        tr += '<span><input type="checkbox" class="cmdAttr" data-l1key="isVisible" checked/> {{Afficher}}<br/></span>';
         tr += '</td>';
 //		tr += '<td><i class="fas fa-minus-circle pull-right cmdAction cursor" data-action="remove"></i></td>';		
         tr += '<td>';
         if (is_numeric(_cmd.id)) {
             tr += '<a class="btn btn-default btn-xs cmdAction" data-action="configure"><i class="fas fa-cogs"></i></a> ';
+            tr += '<a class="btn btn-default btn-xs cmdAction" data-action="test"><i class="fa fa-rss"></i> {{Tester}}</a>';
         }
         tr += '</td>';
 		table_cmd = '#table_cmd';

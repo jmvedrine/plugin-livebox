@@ -53,7 +53,9 @@ $eqLogics = eqLogic::byType('livebox');
  </ul>
  <div class="tab-content" style="height:calc(100% - 50px);overflow:auto;overflow-x: hidden;">
   <div role="tabpanel" class="tab-pane active" id="eqlogictabin">
-
+	<br/>
+		<div class="row">
+		<div class="col-sm-6">
         <form class="form-horizontal">
             <fieldset>
                 <legend>
@@ -120,18 +122,32 @@ $eqLogics = eqLogic::byType('livebox');
                 </div>
             </fieldset> 
         </form>
+        </div>
+        <div class="col-sm-6">
+            <form class="form-horizontal">
+                <fieldset>
+                    <table id="table_infoseqlogic" class="table table-condensed" style="border-radius: 10px;">
+                        <thead>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+				</fieldset>
+			</form>
+		</div>
+  </div>
   </div>
   <div role="tabpanel" class="tab-pane" id="cmdtab">
 <br />
         <table id="table_cmd" class="table table-bordered table-condensed">
             <thead>
                 <tr>
-                    <th style="width: 50px;">#</th>
-                    <th>{{Nom}}</th>
+                    <th style="width: 100px;">#</th>
+                    <th style="width: 300px;">{{Nom}}</th>
 					<th style="width: 120px;">{{Icône-action}}</th>
                     <th style="width: 120px;">{{Sous-Type}}</th>
-                    <th style="width: 120px;">{{Paramètres}}</th>
-                    <th style="width: 100px;">{{Action}}</th>
+                    <th style="width: 120px;">{{Options}}</th>
+                    <th style="width: 100px;">{{Actions}}</th>
                 </tr>
             </thead>
             <tbody>
