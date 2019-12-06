@@ -20,11 +20,11 @@
 require_once dirname(__FILE__) . '/../../../../core/php/core.inc.php';
 
 class livebox extends eqLogic {
-	/*	   * *************************Attributs****************************** */
+	/* * *************************Attributs****************************** */
 	public $_cookies;
 	public $_contextID;
 	public $_version = "2";
-	/*	   * ***********************Methode static*************************** */
+	/* * ***********************Methode static*************************** */
 
 	public static function pull() {
 		foreach (self::byType('livebox') as $eqLogic) {
@@ -212,7 +212,14 @@ class livebox extends eqLogic {
 				$listpage = array("sysbus/VoiceService/VoiceApplication:ring" => "");
 				break;
 			case "changewifi":
-				$listpage = array("sysbus/NeMo/Intf/lan:setWLANConfig" => '"mibs":{"penable":{"'.$option[0].'":{"PersistentEnable":'.$option[1].',"Enable":true}}}');
+				if ($this->getConfiguration('productClass','') == 'Livebox 4' || $this->getConfiguration('productClass','') == 'Livebox 5') {
+					$listpage = array("sysbus/NeMo/Intf/lan:setWLANConfig" => '"mibs":{"penable":{"'.$option['mibs'].'":{"PersistentEnable":'.$option['value'].',"Enable":'.$option['value'].'}}}');
+				} else {
+					$listpage = array("sysbus/NeMo/Intf/lan:setWLANConfig" => '"mibs":{"penable":{"'.$option['mibs'].'":{"PersistentEnable":'.$option['value'].',"Enable":'.$option['value'].'}}}');
+				}
+				break;
+			case "changeguestwifi":
+				$listpage = array("sysbus/NMC.Guest:set" => '"Enable":'.$option['value']);
 				break;
 			case "devicelist":
 				$listpage = array("sysbus/Devices:get" => "");
@@ -262,10 +269,10 @@ class livebox extends eqLogic {
 		else
 		{
 			$json = json_decode($content, true);
-			if ( $json["status"] == "" && $page !== 'tv')
+			if ( $json["status"] == "" && $page !== 'tv' && $page !== 'changewifi')
 			{
-				log::add('livebox','warning','Demande non traitee par la livebox. Param: ' .print_r($param,true));
-				return false;				
+				log::add('livebox','debug','Demande non traitee par la livebox. Param: ' .print_r($param,true));
+				return false;
 			}
 			return $json;
 		}
@@ -582,6 +589,28 @@ class livebox extends eqLogic {
 					if ( is_object($cmd)) {
 						$cmd->remove();		
 					}
+				}
+				$cmd = $this->getCmd(null, 'guestwifion');
+				if ( ! is_object($cmd) ) {
+					$cmd = new liveboxCmd();
+					$cmd->setName('Activer wifi invité');
+					$cmd->setEqLogic_id($this->getId());
+					$cmd->setType('action');
+					$cmd->setSubType('other');
+					$cmd->setLogicalId('guestwifion');
+					$cmd->setEventOnly(1);
+					$cmd->save();
+				}
+				$cmd = $this->getCmd(null, 'guestwifioff');
+				if ( ! is_object($cmd) ) {
+					$cmd = new liveboxCmd();
+					$cmd->setName('Désactiver wifi invité');
+					$cmd->setEqLogic_id($this->getId());
+					$cmd->setType('action');
+					$cmd->setSubType('other');
+					$cmd->setLogicalId('guestwifioff');
+					$cmd->setEventOnly(1);
+					$cmd->save();
 				}
 			}
 
@@ -1016,28 +1045,36 @@ class liveboxCmd extends cmd
 				$page = "wpspushbutton";
 				break;
 			case "wifi2.4on":
-				$option = array($mibs0, "true");
+				$option = array('mibs' => $mibs0, 'value' => 'true');
 				$page = "changewifi";
 				break;
 			case "wifion":
-				$option = array($mibs0, "true");
+				$option = array('mibs' => $mibs0, 'value' => 'true');
 				$page = "changewifi";
 				break;
 			case "wifi2.4off":
-				$option = array($mibs0, "false");
+				$option = array('mibs' => $mibs0, 'value' => 'false');
 				$page = "changewifi";
 				break;
 			case "wifioff":
-				$option = array($mibs0, "false");
+				$option = array('mibs' => $mibs0, 'value' => 'false');
 				$page = "changewifi";
 				break;
 			case "wifi5on":
-				$option = array($mibs1, "true");
+				$option = array('mibs' => $mibs1, 'value' => 'true');
 				$page = "changewifi";
 				break;
 			case "wifi5off":
-				$option = array($mibs1, "false");
+				$option = array('mibs' => $mibs1, 'value' => 'false');
 				$page = "changewifi";
+				break;
+			case "guestwifion":
+				$option = array('value' => 'true');
+				$page = "changeguestwifi";
+				break;
+			case "guestwifioff":
+				$option = array('value' => 'false');
+				$page = "changeguestwifi";
 				break;
 		}
 		if ( $page != null ) {
