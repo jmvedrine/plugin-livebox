@@ -1,10 +1,12 @@
 Présentation
 ===
 Ce plugin permet de récupérer des informations de la Livebox et de lancer des actions.
+Il a été développé à l'origine par Thomas Guenneguez.
 
 Compatibilité :
 ---
 
+Le plugin a été testé avec les versions suivantes de la Livebox :
 - Livebox 2
 - Livebox Play
 - Livebox 4 (depuis la version du 09/12/2019)
