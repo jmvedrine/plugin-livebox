@@ -219,13 +219,21 @@ class livebox extends eqLogic {
 				}
 				break;
 			case "changeguestwifi":
-				$listpage = array("sysbus/NMC/Guest:set" => '"Enable":'.$option['value']);
+                if ($option['value']) {
+                    $guestWifiStatus = 'Enabled';
+                } else {
+                    $guestWifiStatus = 'Disabled';
+                }
+				$listpage = array("sysbus/NMC/Guest:set" => '"Enable":'.$option['value'].',"Status":"'.$guestWifiStatus.'"');
 				break;
 			case "guestwifistate":
 				$listpage = array("sysbus/NMC/Guest:get" => "");
 				break;
 			case "devicelist":
 				$listpage = array("sysbus/Devices:get" => "");
+				break;
+			case "listcalls":
+				$listpage = array("sysbus/VoiceService.VoiceApplication:getCallList" => "");
 				break;
 		}
 		$statuscmd = $this->getCmd(null, 'state');
@@ -700,6 +708,94 @@ class livebox extends eqLogic {
 				{
 					log::add('livebox','debug','Mode VOIP inactif');
 				}
+				$cmd = $this->getCmd(null, 'missedcallsnumber');
+				if ( ! is_object($cmd)) {
+					$cmd = new liveboxCmd();
+					$cmd->setName("Nombre des appels manqués");
+					$cmd->setEqLogic_id($this->getId());
+					$cmd->setLogicalId('missedcallsnumber');
+					$cmd->setUnite('');
+					$cmd->setType('info');
+					$cmd->setSubType('numeric');
+					$cmd->setIsHistorized(0);
+                    $cmd->setTemplate('dashboard', 'line');
+					$cmd->save();
+				}
+				$cmd = $this->getCmd(null, 'incallsnumber');
+				if ( ! is_object($cmd)) {
+					$cmd = new liveboxCmd();
+					$cmd->setName("Nombre des appels entrants");
+					$cmd->setEqLogic_id($this->getId());
+					$cmd->setLogicalId('incallsnumber');
+					$cmd->setUnite('');
+					$cmd->setType('info');
+					$cmd->setSubType('numeric');
+					$cmd->setIsHistorized(0);
+                    $cmd->setTemplate('dashboard', 'line');
+					$cmd->save();
+				}
+				$cmd = $this->getCmd(null, 'outcallsnumber');
+				if ( ! is_object($cmd)) {
+					$cmd = new liveboxCmd();
+					$cmd->setName("Nombre des appels sortants");
+					$cmd->setEqLogic_id($this->getId());
+					$cmd->setLogicalId('outcallsnumber');
+					$cmd->setUnite('');
+					$cmd->setType('info');
+					$cmd->setSubType('numeric');
+					$cmd->setIsHistorized(0);
+                    $cmd->setTemplate('dashboard', 'line');
+					$cmd->save();
+				}
+				$cmd = $this->getCmd(null, 'totalcallsnumber');
+				if ( ! is_object($cmd)) {
+					$cmd = new liveboxCmd();
+					$cmd->setName("Nombre total des appels");
+					$cmd->setEqLogic_id($this->getId());
+					$cmd->setLogicalId('totalcallsnumber');
+					$cmd->setUnite('');
+					$cmd->setType('info');
+					$cmd->setSubType('numeric');
+					$cmd->setIsHistorized(0);
+                    $cmd->setTemplate('dashboard', 'line');
+					$cmd->save();
+				}
+				$cmd = $this->getCmd(null, 'outcallstable');
+				if ( ! is_object($cmd)) {
+					$cmd = new liveboxCmd();
+					$cmd->setName('Liste des appels sortants');
+					$cmd->setEqLogic_id($this->getId());
+					$cmd->setLogicalId('outcallstable');
+					$cmd->setUnite('');
+					$cmd->setType('info');
+					$cmd->setSubType('string');
+					$cmd->setIsHistorized(0);
+					$cmd->save();
+				}
+				$cmd = $this->getCmd(null, 'incallstable');
+				if ( ! is_object($cmd)) {
+					$cmd = new liveboxCmd();
+					$cmd->setName('Liste des appels entrants');
+					$cmd->setEqLogic_id($this->getId());
+					$cmd->setLogicalId('incallstable');
+					$cmd->setUnite('');
+					$cmd->setType('info');
+					$cmd->setSubType('string');
+					$cmd->setIsHistorized(0);
+					$cmd->save();
+				}
+				$cmd = $this->getCmd(null, 'missedcallstable');
+				if ( ! is_object($cmd)) {
+					$cmd = new liveboxCmd();
+					$cmd->setName('Liste des appels manqués');
+					$cmd->setEqLogic_id($this->getId());
+					$cmd->setLogicalId('missedcallstable');
+					$cmd->setUnite('');
+					$cmd->setType('info');
+					$cmd->setSubType('string');
+					$cmd->setIsHistorized(0);
+					$cmd->save();
+				}
 			}
 
 			$cmd = $this->getCmd(null, 'updatetime');
@@ -997,6 +1093,100 @@ class livebox extends eqLogic {
 					}
 				}
 			}
+        }
+        $content = $this->getPage("listcalls");
+        if ( $content !== false ) {
+            $outCallsTable = '';
+            $missedCallsTable = '';
+            $inCallsTable = '';
+            $totalCallsNumber = 0;
+            $outCallsNumber = 0;
+            $inCallsNumber = 0;
+            $missedCallsNumber = 0;
+            $calls = array();
+            if ( isset($content["status"]) ) {
+                foreach ( $content["status"] as $call ) {
+                    $totalCallsNumber++;
+                    $Call_numero = $call["remoteNumber"];
+                    $Call_duree = $call["duration"];
+                    $ts = strtotime($call["startTime"]);
+                    // log::add('livebox','warning',$call["startTime"]." ==> ".date("Y-m-d H:i:s",$ts));
+                    // Appel entrant
+                    if ( $call["callDestination"] == "local" ) {
+                        $in = 1;
+                        // Appel manqué
+                        if($call["callType"] == "missed") {
+                            $missedCallsNumber++;
+                            $missed = 1; 
+                        } else if($call["callType"] == "succeeded") {
+                            $missed = 0; 
+                            $inCallsNumber++; 
+                        } else {
+                            $missed = -1;
+                        }
+                    } else if($call["callOrigin"] == "local") {
+                        // Appel sortant
+                        $outCallsNumber++;
+                        $in = 0; 
+                    }
+                    $calls[] = array("timestamp" => $ts,"num" => $Call_numero, "duree" => $Call_duree,"in" => $in,"missed" => $missed);
+                }
+                if(count($calls) > 1) {
+                    arsort($calls);
+                }
+            }
+            log::add('livebox','debug','Nombre appels manqués '.$missedCallsNumber);
+            $this->checkAndUpdateCmd('missedcallsnumber', $missedCallsNumber);
+            log::add('livebox','debug','Nombre appels entrants '.$inCallsNumber);
+            $this->checkAndUpdateCmd('incallsnumber', $inCallsNumber);
+            log::add('livebox','debug','Nombre appels sortants '.$outCallsNumber);
+            $this->checkAndUpdateCmd('outcallsnumber', $outCallsNumber);
+            log::add('livebox','debug','Nombre total appels '.$totalCallsNumber);
+            $this->checkAndUpdateCmd('totalcallsnumber', $totalCallsNumber);
+            log::add('livebox','debug','Appels '.print_r($calls, true));
+            //  Appels sortants
+            if ($outCallsNumber > 0) {
+                $tabstyle = "<style> th, td { padding-left:3px;padding-right:3px; } </style><style> th { text-align:center; } </style><style> td { text-align:right; } </style>";
+                $outCallsTable = "$tabstyle<table border=1>";
+                $outCallsTable .= "<tr><th>Numéro</th><th>Date</th><th>Durée</th></tr>";
+                foreach($calls as $call) {
+                    if($call["in"] == 0) {
+                        $outCallsTable .= "<tr><td>".$this->fmt_numtel($call["num"])."</td><td>".$this->fmt_date($call["timestamp"])."</td><td>".$this->fmt_duree($call["duree"])."</td></tr>";
+                    }
+                }
+                $outCallsTable .= "</table>";
+            }
+            log::add('livebox','debug','Appels sortants'.$outCallsTable);
+            $this->checkAndUpdateCmd('outcallstable', $outCallsTable);
+          
+            // Appels manqués
+            if ($missedCallsNumber > 0) {
+                $missedCallsTable =  "$tabstyle<table border=1>";
+                $missedCallsTable .=  "<tr><th>Numéro</th><th>Date</th></tr>";
+                foreach($calls as $call) {
+                    if($call["missed"] == 1) {
+                        $missedCallsTable .=  "<tr><td>".$this->fmt_numtel($call["num"])."</td><td>".$this->fmt_date($call["timestamp"])."</td></tr>";
+                    }
+                }
+                $missedCallsTable .=  "</table>";
+            }
+            log::add('livebox','debug','Appels manqués'.$missedCallsTable);
+            $this->checkAndUpdateCmd('missedcallstable', $missedCallsTable);
+          
+
+            // Appels recus
+            if ($inCallsNumber > 0) {
+                $inCallsTable = "$tabstyle<table border=1>";
+                $inCallsTable .= "<tr><th>Numéro</th><th>Date</th><th>Durée</th></tr>";
+                foreach($calls as $call) {
+                    if($call["in"] == 1 && $call["missed"] == 0) {
+                        $inCallsTable .= "<tr><td>".$this->fmt_numtel($call["num"])."</td><td>".$this->fmt_date($call["timestamp"])."</td><td>".$this->fmt_duree($call["duree"])."</td></tr>";
+                    }
+                }
+                $inCallsTable .= "</table>";
+            }
+            log::add('livebox','debug','Appels entrants'.$inCallsTable);
+            $this->checkAndUpdateCmd('incallstable', $inCallsTable);
 		}
 		$content = $this->getPage("devicelist");
 		if ( $content !== false ) {
@@ -1026,10 +1216,34 @@ class livebox extends eqLogic {
 				$eqLogic_cmd->setCollectDate('');
 				$eqLogic_cmd->event($content["status"]["Enable"]);
 			}
-		}
+        }
+
 		$eqLogic_cmd = $this->getCmd(null, 'updatetime');
 		$eqLogic_cmd->event(date("d/m/Y H:i",(time())));
 	}
+  function fmt_date($timeStamp)
+  { return(strftime("%a %d/%m %T",$timeStamp));
+  }
+  function fmt_duree($duree)
+  { $h = floor(((float)$duree)/3600); $m = floor(((float)$duree)/60); $s = $duree%60;
+    $fmt = '';
+    if($h>0) $fmt .= $h.'h ';
+    if($m>0) $fmt .= $m.'mn ';
+    $fmt .= $s.'s';
+    return($fmt);
+  }
+  function fmt_numtel($num)
+  { if(is_numeric($num))
+    { if(strlen($num) == 12 && substr($num,0,3) == '033') $num = '0' . substr($num,3);
+      if(strlen($num) == 10)
+      { $fmt = substr($num,0,2) .' '.substr($num,2,2) .' '.substr($num,4,2) .' '.substr($num,6,2) .' '.substr($num,8);
+        return("<a target=_blank href=\"https://www.pagesjaunes.fr/annuaireinverse/recherche?quoiqui=".$num."&proximite=0\">".$fmt."</a>");
+		}
+      else
+        return("<a target=_blank href=\"https://www.pagesjaunes.fr/annuaireinverse/recherche?quoiqui=".$num."&proximite=0\">".$num."</a>");
+    }
+    else return($num);
+  }
 }
 
 class liveboxCmd extends cmd
