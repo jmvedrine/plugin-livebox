@@ -1,11 +1,9 @@
 
-WARNING: Detail complet des mises à jour sur https://github.com/guenneguezt/plugin-livebox/commits/master[Historique Commit]
+# WARNING:
 
-Liste des évolutions majeures de la version courante :
+Detail complet des mises à jour sur https://github.com/jmvedrine/plugin-livebox/commits/master
 
-- Correction de problème de compte
-
-Anciennes évolutions :
+# Anciennes évolutions :
 
 - Correction lors de la sauvegarde de la livebox
 - Modification pour compatibilité Jeedom V3
@@ -27,4 +25,12 @@ Anciennes évolutions :
 - Correction pour la téléphonie en H.323
 - Optimisation pour ne pas mettre à jour les données si elle le sont déjà.
 - Suppression de commande reset
-- First version beta
+- Première version bêta
+- Correction de problème de compte
+
+# Version du 09/12/2019
+
+- Correction des commandes Wifi pour la Livebox 4
+- Ajout des commandes pour le Wifi invité (état, activation, désactivation) ne marchent qu'avec la Livebox 4
+- Ajout des caractéristiques de la box dans la page équipement
+- Nouvelles commandes pour les appels entrants, sortants et manqués (nombre et tableau des appels)

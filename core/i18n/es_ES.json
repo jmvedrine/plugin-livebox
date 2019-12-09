@@ -1,40 +1,40 @@
 {
     "plugins\/livebox\/desktop\/php\/livebox.php": {
         "Général": "General",
-        "Nom de la livebox": "Nombre de la livebox",
+        "Nom de la livebox": "Nombre del livebox",
         "Objet parent": "Objeto padre",
         "Aucun": "Ninguno",
         "Catégorie": "Categoría",
         "Activer": "Activar",
-        "Accéder à la carte": "Ir al mapa",
+        "Accéder à la carte": "Acceder al mapa",
         "Visible": "Visible",
-        "IP de la livebox": "IP de la livebox",
-        "Compte de la livebox": "Cuenta de la livebox",
-        "Password de la livebox": "Contraseña de la livebox",
+        "IP de la livebox": "IP del livebox",
+        "Compte de la livebox": "Cuenta del livebox",
+        "Password de la livebox": "Contraseña del livebox",
         "Indicateurs": "Indicadores",
         "Nom": "Nombre",
         "Icône-action": "Icono-acción",
-        "Sous-Type": "Sub-Tipo",
+        "Sous-Type": "Subtipo",
         "Paramètres": "Parámetros",
         "Action": "Acción",
         "Sauvegarder": "Guardar",
-        "Ajouter une livebox": "Agregar una livebox",
+        "Ajouter une livebox": "Agregar un livebox",
         "Rechercher": "Buscar",
-        "Gestion": "Administración",
+        "Gestion": "Gestión",
         "Configuration": "Configuración",
-        "Mes Livebox": "Mis Liveboxes",
+        "Mes Livebox": "Mis Livebox",
         "Supprimer": "Borrar"
     },
     "plugins\/livebox\/core\/class\/livebox.class.php": {
-        "La livebox ne repond pas a la demande de cookie.": "Livebox no responde a la solicitud de cookies.",
-        "La livebox ne repond pas.": "La Livebox no responde.",
-        "Le compte est incorrecte.": "La cuenta es incorrecta"
+        "La livebox ne repond pas a la demande de cookie.": "El Livebox no responde a la solicitud de cookie.",
+        "La livebox ne repond pas.": "El Livebox no responde.",
+        "Le compte est incorrecte.": "La cuenta es incorrecta."
     },
     "plugins\/livebox\/desktop\/js\/livebox.js": {
         "Nom": "Nombre",
         "Historiser": "Historizar",
         "Afficher": "Mostrar",
-        "Tester": "Probar",
-        "Accèder à l'interface de la livebox": "Acceda a la interfaz de Livebox"
+        "Tester": "Prueba",
+        "Accèder à l'interface de la livebox": "Acceder al interfaz de livebox"
     }
 }
