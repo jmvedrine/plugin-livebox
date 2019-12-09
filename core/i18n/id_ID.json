@@ -1,29 +1,29 @@
 {
     "plugins\/livebox\/desktop\/php\/livebox.php": {
-        "Général": "umum",
+        "Général": "Général",
         "Nom de la livebox": "Nom de la livebox",
-        "Objet parent": "obyek orangtua",
-        "Aucun": "tidak",
-        "Catégorie": "kategori",
-        "Activer": "mengaktifkan",
+        "Objet parent": "Objet parent",
+        "Aucun": "Aucun",
+        "Catégorie": "Catégorie",
+        "Activer": "Activer",
         "Accéder à la carte": "Accéder à la carte",
-        "Visible": "terlihat",
+        "Visible": "Visible",
         "IP de la livebox": "IP de la livebox",
         "Compte de la livebox": "Compte de la livebox",
         "Password de la livebox": "Password de la livebox",
         "Indicateurs": "Indicateurs",
-        "Nom": "nama",
+        "Nom": "Nom",
         "Icône-action": "Icône-action",
-        "Sous-Type": "Subtipe",
-        "Paramètres": "pengaturan",
-        "Action": "Tindakan",
-        "Sauvegarder": "menyimpan",
+        "Sous-Type": "Sous-Type",
+        "Paramètres": "Paramètres",
+        "Action": "Action",
+        "Sauvegarder": "Sauvegarder",
         "Ajouter une livebox": "Ajouter une livebox",
-        "Rechercher": "pencarian",
-        "Gestion": "Manajemen",
-        "Configuration": "konfigurasi",
+        "Rechercher": "Rechercher",
+        "Gestion": "Gestion",
+        "Configuration": "Configuration",
         "Mes Livebox": "Mes Livebox",
-        "Supprimer": "menghapus"
+        "Supprimer": "Supprimer"
     },
     "plugins\/livebox\/core\/class\/livebox.class.php": {
         "La livebox ne repond pas a la demande de cookie.": "La livebox ne repond pas a la demande de cookie.",
@@ -31,10 +31,10 @@
         "Le compte est incorrecte.": "Le compte est incorrecte."
     },
     "plugins\/livebox\/desktop\/js\/livebox.js": {
-        "Nom": "nama",
-        "Historiser": "Historicize",
-        "Afficher": "Memenitikan",
-        "Tester": "Coba",
+        "Nom": "Nom",
+        "Historiser": "Historiser",
+        "Afficher": "Afficher",
+        "Tester": "Tester",
         "Accèder à l'interface de la livebox": "Accèder à l'interface de la livebox"
     }
 }

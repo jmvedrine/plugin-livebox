@@ -1,27 +1,27 @@
 {
     "plugins\/livebox\/desktop\/php\/livebox.php": {
-        "Général": "Main",
+        "Général": "General",
         "Nom de la livebox": "Livebox name",
         "Objet parent": "Parent object",
         "Aucun": "None",
         "Catégorie": "Category",
-        "Activer": "Activate",
-        "Accéder à la carte": "Access the map",
+        "Activer": "Enable",
+        "Accéder à la carte": "Go to the map",
         "Visible": "Visible",
-        "IP de la livebox": "Livebox IP",
-        "Compte de la livebox": "Livebox account",
-        "Password de la livebox": "Livebox password",
+        "IP de la livebox": "IP of livebox",
+        "Compte de la livebox": "Account of the livebox",
+        "Password de la livebox": "Password of livebox",
         "Indicateurs": "Indicators",
         "Nom": "Name",
-        "Icône-action": "Icon-action",
-        "Sous-Type": "Sub-Type",
+        "Icône-action": "Icon action",
+        "Sous-Type": "Sub-type",
         "Paramètres": "Settings",
         "Action": "Action",
         "Sauvegarder": "Save",
-        "Ajouter une livebox": "Ajouter une livebox",
+        "Ajouter une livebox": "Add a livebox",
         "Rechercher": "Search",
-        "Gestion": "Management",
-        "Configuration": "Configuration",
+        "Gestion": "Gestion",
+        "Configuration": "Setup",
         "Mes Livebox": "Mes Livebox",
         "Supprimer": "Delete"
     },
@@ -31,10 +31,10 @@
         "Le compte est incorrecte.": "Le compte est incorrecte."
     },
     "plugins\/livebox\/desktop\/js\/livebox.js": {
-        "Nom": "Name",
-        "Historiser": "Historize",
-        "Afficher": "Display",
-        "Tester": "Test",
+        "Nom": "Nom",
+        "Historiser": "Historiser",
+        "Afficher": "Afficher",
+        "Tester": "Tester",
         "Accèder à l'interface de la livebox": "Accèder à l'interface de la livebox"
     }
 }

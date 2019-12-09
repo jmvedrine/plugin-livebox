@@ -1,12 +1,15 @@
 Présentation
 ===
 Ce plugin permet de récupérer des informations de la Livebox et de lancer des actions.
+Il a été développé à l'origine par Thomas Guenneguez.
 
 Compatibilité :
 ---
 
+Le plugin a été testé avec les versions suivantes de la Livebox :
 - Livebox 2
 - Livebox Play
+- Livebox 4 (depuis la version du 09/12/2019)
 
 Informations visibles :
 ---
@@ -19,12 +22,14 @@ Informations visibles :
 - **IP Wan** : adresse IP publique (IPv4)
 - **IPv6 Wan** : adresse IP publique (IPv6)
 - **Numéro de téléphone** : numéro de téléphone VoIP
-- **Etat Wifi** : état du service Wifi. Pour Livebox 2 : uniquement Wifi 2.4Ghz. Pour Livebox Play : état du service Wifi pour les fréquences 2.4Ghz et 5Ghz
+- **Etat Wifi** : état du service Wifi. Pour Livebox 2 : uniquement Wifi 2.4Ghz. Pour les Livebox Play et 4 : état du service Wifi pour les fréquences 2.4Ghz et 5Ghz
+- **Etat Wifi invité** : état du service Wifi invité pour la Livebox 4
 
 Actions possibles :
 ---
 
-- **Activation/Désactivation du WiFi** : permet d'activer ou de désactiver le WiFi. Pour Livebox 2 : uniquement le Wifi 2.4Ghz. Pour Livebox Play : activation/désactivation par carte WiFi (2.4Ghz et/ou 5Ghz).
+- **Activation/Désactivation du WiFi** : permet d'activer ou de désactiver le WiFi. Pour Livebox 2 : uniquement le Wifi 2.4Ghz. Pour Livebox Play et 4 : activation/désactivation par carte WiFi (2.4Ghz et/ou 5Ghz).
+- **Activation/Désactivation du WiFi invité** : Pour Livebox 4, permet d'activer ou de désactiver le WiFi invité (les fréquences activées sont les mêmes que pour le Wifi privé).
 - **Reboot** : permet de redémarrer la Livebox
 - **Sonner** : permet de faire sonner votre téléphone VoIP pendant 5 secondes (pour tester le fonctionnement entre la Livebox et votre téléphone)
 
@@ -76,6 +81,7 @@ Les commandes sont les suivantes :
 Les paramètres suivants ne sont visibles que si le protocole VOIP était activé lors de la sauvegarde de l'équipement :
 - Etat VoIP <protocole>
 - Numéro de téléphone <protocole>
+- nombre et tableau des appels entrants, sortants et manqués. Nombre total des appels.
 
 Les paramètres suivants ne sont visibles qu'en connexion de type dsl ou vdsl :
 - Débit montant
@@ -83,16 +89,16 @@ Les paramètres suivants ne sont visibles qu'en connexion de type dsl ou vdsl :
 - Marge de bruit montant
 - Marge de bruit descendant
 
-Preguntas frecuentes
+FAQ
 ===
 
 *Pourquoi le plugin est gratuit ?*
 
-Ce plugin est gratuit pour que chacun puisse en profiter simplement. Si vous souhaitez tout de même faire un don au développeur du plugin, merci de me faire un MP sur le forum.
+Ce plugin est gratuit pour que chacun puisse en profiter simplement.
 
 *J'aimerais remonter des erreurs/modifications directement dans le code ?*
 
-C'est tout à fait possible via https://github.com/guenneguezt/plugin-livebox[github]
+C'est tout à fait possible via le forum communautaire Jeedom https://community.jeedom.com/ catégorie Plugins -> Communication. Créez un nouveau sujet et n'oubliez pas de lui ajouter le tag "plugin-livebox".
 
 *Quelle est la fréquence de rafraîchissement des informations ?*
 
@@ -106,6 +112,9 @@ Pour historiser, il faut aller dans le menu Plugin => Communication => Livebox e
 
 - Livebox 2
 - Livebox Play
+- Livebox 4
+
+Faute de matériel le plugin n'a pas été testé avec la Livebox 5. Merci de remonter les infos sur le forum si vous essayez le plugin avec une livebox 5.
 
 *Est-ce compatible avec la fibre ?*
 
