@@ -1,7 +1,7 @@
 
 # WARNING:
 
-Detail complet des mises à jour sur https://github.com/jeedom/plugin-livebox/commits/master
+Detail complet des mises à jour sur https://github.com/jmvedrine/plugin-livebox/commits/master
 
 # Anciennes évolutions :
 
@@ -28,8 +28,9 @@ Detail complet des mises à jour sur https://github.com/jeedom/plugin-livebox/co
 - Première version bêta
 - Correction de problème de compte
 
-# Version du 07/12/2019
+# Version du 09/12/2019
 
 - Correction des commandes Wifi pour la Livebox 4
-- Ajout des commandes pour le Wifi invité
+- Ajout des commandes pour le Wifi invité (état, activation, désactivation) ne marchent qu'avec la Livebox 4
 - Ajout des caractéristiques de la box dans la page équipement
+- Nouvelles commandes pour les appels entrants, sortants et manqués (nombre et tableau des appels)
