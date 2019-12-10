@@ -219,11 +219,11 @@ class livebox extends eqLogic {
 				}
 				break;
 			case "changeguestwifi":
-                if ($option['value']) {
-                    $guestWifiStatus = 'Enabled';
-                } else {
-                    $guestWifiStatus = 'Disabled';
-                }
+				if ($option['value']) {
+					$guestWifiStatus = 'Enabled';
+				} else {
+					$guestWifiStatus = 'Disabled';
+				}
 				$listpage = array("sysbus/NMC/Guest:set" => '"Enable":'.$option['value'].',"Status":"'.$guestWifiStatus.'"');
 				break;
 			case "guestwifistate":
@@ -718,7 +718,7 @@ class livebox extends eqLogic {
 					$cmd->setType('info');
 					$cmd->setSubType('numeric');
 					$cmd->setIsHistorized(0);
-                    $cmd->setTemplate('dashboard', 'line');
+					$cmd->setTemplate('dashboard', 'line');
 					$cmd->save();
 				}
 				$cmd = $this->getCmd(null, 'incallsnumber');
@@ -731,7 +731,7 @@ class livebox extends eqLogic {
 					$cmd->setType('info');
 					$cmd->setSubType('numeric');
 					$cmd->setIsHistorized(0);
-                    $cmd->setTemplate('dashboard', 'line');
+					$cmd->setTemplate('dashboard', 'line');
 					$cmd->save();
 				}
 				$cmd = $this->getCmd(null, 'outcallsnumber');
@@ -744,7 +744,7 @@ class livebox extends eqLogic {
 					$cmd->setType('info');
 					$cmd->setSubType('numeric');
 					$cmd->setIsHistorized(0);
-                    $cmd->setTemplate('dashboard', 'line');
+					$cmd->setTemplate('dashboard', 'line');
 					$cmd->save();
 				}
 				$cmd = $this->getCmd(null, 'totalcallsnumber');
@@ -757,7 +757,7 @@ class livebox extends eqLogic {
 					$cmd->setType('info');
 					$cmd->setSubType('numeric');
 					$cmd->setIsHistorized(0);
-                    $cmd->setTemplate('dashboard', 'line');
+					$cmd->setTemplate('dashboard', 'line');
 					$cmd->save();
 				}
 				$cmd = $this->getCmd(null, 'outcallstable');
@@ -790,6 +790,18 @@ class livebox extends eqLogic {
 					$cmd->setName('Liste des appels manqués');
 					$cmd->setEqLogic_id($this->getId());
 					$cmd->setLogicalId('missedcallstable');
+					$cmd->setUnite('');
+					$cmd->setType('info');
+					$cmd->setSubType('string');
+					$cmd->setIsHistorized(0);
+					$cmd->save();
+				}
+				$cmd = $this->getCmd(null, 'callstable');
+				if ( ! is_object($cmd)) {
+					$cmd = new liveboxCmd();
+					$cmd->setName('Liste des appels');
+					$cmd->setEqLogic_id($this->getId());
+					$cmd->setLogicalId('callstable');
 					$cmd->setUnite('');
 					$cmd->setType('info');
 					$cmd->setSubType('string');
@@ -1093,100 +1105,109 @@ class livebox extends eqLogic {
 					}
 				}
 			}
-        }
-        $content = $this->getPage("listcalls");
-        if ( $content !== false ) {
-            $outCallsTable = '';
-            $missedCallsTable = '';
-            $inCallsTable = '';
-            $totalCallsNumber = 0;
-            $outCallsNumber = 0;
-            $inCallsNumber = 0;
-            $missedCallsNumber = 0;
-            $calls = array();
-            if ( isset($content["status"]) ) {
-                foreach ( $content["status"] as $call ) {
-                    $totalCallsNumber++;
-                    $Call_numero = $call["remoteNumber"];
-                    $Call_duree = $call["duration"];
-                    $ts = strtotime($call["startTime"]);
-                    // log::add('livebox','warning',$call["startTime"]." ==> ".date("Y-m-d H:i:s",$ts));
-                    // Appel entrant
-                    if ( $call["callDestination"] == "local" ) {
-                        $in = 1;
-                        // Appel manqué
-                        if($call["callType"] == "missed") {
-                            $missedCallsNumber++;
-                            $missed = 1; 
-                        } else if($call["callType"] == "succeeded") {
-                            $missed = 0; 
-                            $inCallsNumber++; 
-                        } else {
-                            $missed = -1;
-                        }
-                    } else if($call["callOrigin"] == "local") {
-                        // Appel sortant
-                        $outCallsNumber++;
-                        $in = 0; 
-                    }
-                    $calls[] = array("timestamp" => $ts,"num" => $Call_numero, "duree" => $Call_duree,"in" => $in,"missed" => $missed);
-                }
-                if(count($calls) > 1) {
-                    arsort($calls);
-                }
-            }
-            log::add('livebox','debug','Nombre appels manqués '.$missedCallsNumber);
-            $this->checkAndUpdateCmd('missedcallsnumber', $missedCallsNumber);
-            log::add('livebox','debug','Nombre appels entrants '.$inCallsNumber);
-            $this->checkAndUpdateCmd('incallsnumber', $inCallsNumber);
-            log::add('livebox','debug','Nombre appels sortants '.$outCallsNumber);
-            $this->checkAndUpdateCmd('outcallsnumber', $outCallsNumber);
-            log::add('livebox','debug','Nombre total appels '.$totalCallsNumber);
-            $this->checkAndUpdateCmd('totalcallsnumber', $totalCallsNumber);
-            log::add('livebox','debug','Appels '.print_r($calls, true));
-            //  Appels sortants
-            if ($outCallsNumber > 0) {
-                $tabstyle = "<style> th, td { padding-left:3px;padding-right:3px; } </style><style> th { text-align:center; } </style><style> td { text-align:right; } </style>";
-                $outCallsTable = "$tabstyle<table border=1>";
-                $outCallsTable .= "<tr><th>Numéro</th><th>Date</th><th>Durée</th></tr>";
-                foreach($calls as $call) {
-                    if($call["in"] == 0) {
-                        $outCallsTable .= "<tr><td>".$this->fmt_numtel($call["num"])."</td><td>".$this->fmt_date($call["timestamp"])."</td><td>".$this->fmt_duree($call["duree"])."</td></tr>";
-                    }
-                }
-                $outCallsTable .= "</table>";
-            }
-            log::add('livebox','debug','Appels sortants'.$outCallsTable);
-            $this->checkAndUpdateCmd('outcallstable', $outCallsTable);
-          
-            // Appels manqués
-            if ($missedCallsNumber > 0) {
-                $missedCallsTable =  "$tabstyle<table border=1>";
-                $missedCallsTable .=  "<tr><th>Numéro</th><th>Date</th></tr>";
-                foreach($calls as $call) {
-                    if($call["missed"] == 1) {
-                        $missedCallsTable .=  "<tr><td>".$this->fmt_numtel($call["num"])."</td><td>".$this->fmt_date($call["timestamp"])."</td></tr>";
-                    }
-                }
-                $missedCallsTable .=  "</table>";
-            }
-            log::add('livebox','debug','Appels manqués'.$missedCallsTable);
-            $this->checkAndUpdateCmd('missedcallstable', $missedCallsTable);
-          
+		}
+		$content = $this->getPage("listcalls");
+		if ( $content !== false ) {
+			$callsTable = '';
+			$outCallsTable = '';
+			$missedCallsTable = '';
+			$inCallsTable = '';
+			$totalCallsNumber = 0;
+			$outCallsNumber = 0;
+			$inCallsNumber = 0;
+			$missedCallsNumber = 0;
+			$tabstyle = "<style> th, td { padding-left:3px;padding-right:3px; } </style><style> th { text-align:center; } </style><style> td { text-align:right; } </style>";
+			$calls = array();
+			if ( isset($content["status"]) ) {
+				$callsTable = "$tabstyle<table border=1>";
+				$callsTable .= "<tr><th>Numéro</th><th>Date</th><th>Durée</th><th>&nbsp;&nbsp;&nbsp;</th></tr>";
+				foreach ( $content["status"] as $call ) {
+					$totalCallsNumber++;
+					$Call_numero = $call["remoteNumber"];
+					$Call_duree = $call["duration"];
+					$ts = strtotime($call["startTime"]);
+					// log::add('livebox','warning',$call["startTime"]." ==> ".date("Y-m-d H:i:s",$ts));
+					// Appel entrant
+					if ( $call["callDestination"] == "local" ) {
+						$in = 1;
+						// Appel manqué
+						if($call["callType"] == "missed") {
+							$missedCallsNumber++;
+							$missed = 1;
+							$icon = '<i class="icon icon_red techno-phone69"</i>';
+						} else if($call["callType"] == "succeeded") {
+							$missed = 0;
+							$inCallsNumber++;
+							$icon = '<i class="icon techno-phone3"</i>';
+						} else {
+							$missed = -1;
+						}
+					} else if($call["callOrigin"] == "local") {
+						// Appel sortant
+						$outCallsNumber++;
+						$in = 0;
+						$icon = '<i class="icon icon_green techno-phone2"</i>';
+					}
+					$calls[] = array("timestamp" => $ts,"num" => $Call_numero, "duree" => $Call_duree,"in" => $in,"missed" => $missed);
+					$callsTable .= "<tr><td>".$this->fmt_numtel($Call_numero)."</td><td>".$this->fmt_date($ts)."</td><td>".$this->fmt_duree($Call_duree)."</td><td>".$icon."</td></tr>";
+				}
+				if(count($calls) > 1) {
+					arsort($calls);
+				}
+				$callsTable .= "</table>";
+			}
+			$this->checkAndUpdateCmd('callstable', $callsTable);
+			log::add('livebox','debug','Nombre appels manqués '.$missedCallsNumber);
+			$this->checkAndUpdateCmd('missedcallsnumber', $missedCallsNumber);
+			log::add('livebox','debug','Nombre appels entrants '.$inCallsNumber);
+			$this->checkAndUpdateCmd('incallsnumber', $inCallsNumber);
+			log::add('livebox','debug','Nombre appels sortants '.$outCallsNumber);
+			$this->checkAndUpdateCmd('outcallsnumber', $outCallsNumber);
+			log::add('livebox','debug','Nombre total appels '.$totalCallsNumber);
+			$this->checkAndUpdateCmd('totalcallsnumber', $totalCallsNumber);
+			log::add('livebox','debug','Appels '.print_r($calls, true));
+			//	Appels sortants
+			if ($outCallsNumber > 0) {
+				$outCallsTable = "$tabstyle<table border=1>";
+				$outCallsTable .= "<tr><th>Numéro</th><th>Date</th><th>Durée</th></tr>";
+				foreach($calls as $call) {
+					if($call["in"] == 0) {
+						$outCallsTable .= "<tr><td>".$this->fmt_numtel($call["num"])."</td><td>".$this->fmt_date($call["timestamp"])."</td><td>".$this->fmt_duree($call["duree"])."</td></tr>";
+					}
+				}
+				$outCallsTable .= "</table>";
+			}
+			log::add('livebox','debug','Appels sortants'.$outCallsTable);
+			$this->checkAndUpdateCmd('outcallstable', $outCallsTable);
 
-            // Appels recus
-            if ($inCallsNumber > 0) {
-                $inCallsTable = "$tabstyle<table border=1>";
-                $inCallsTable .= "<tr><th>Numéro</th><th>Date</th><th>Durée</th></tr>";
-                foreach($calls as $call) {
-                    if($call["in"] == 1 && $call["missed"] == 0) {
-                        $inCallsTable .= "<tr><td>".$this->fmt_numtel($call["num"])."</td><td>".$this->fmt_date($call["timestamp"])."</td><td>".$this->fmt_duree($call["duree"])."</td></tr>";
-                    }
-                }
-                $inCallsTable .= "</table>";
-            }
-            log::add('livebox','debug','Appels entrants'.$inCallsTable);
-            $this->checkAndUpdateCmd('incallstable', $inCallsTable);
+			// Appels manqués
+			if ($missedCallsNumber > 0) {
+				$missedCallsTable =	 "$tabstyle<table border=1>";
+				$missedCallsTable .=  "<tr><th>Numéro</th><th>Date</th></tr>";
+				foreach($calls as $call) {
+					if($call["missed"] == 1) {
+						$missedCallsTable .=  "<tr><td>".$this->fmt_numtel($call["num"])."</td><td>".$this->fmt_date($call["timestamp"])."</td></tr>";
+					}
+				}
+				$missedCallsTable .=  "</table>";
+			}
+			log::add('livebox','debug','Appels manqués'.$missedCallsTable);
+			$this->checkAndUpdateCmd('missedcallstable', $missedCallsTable);
+
+
+			// Appels recus
+			if ($inCallsNumber > 0) {
+				$inCallsTable = "$tabstyle<table border=1>";
+				$inCallsTable .= "<tr><th>Numéro</th><th>Date</th><th>Durée</th></tr>";
+				foreach($calls as $call) {
+					if($call["in"] == 1 && $call["missed"] == 0) {
+						$inCallsTable .= "<tr><td>".$this->fmt_numtel($call["num"])."</td><td>".$this->fmt_date($call["timestamp"])."</td><td>".$this->fmt_duree($call["duree"])."</td></tr>";
+					}
+				}
+				$inCallsTable .= "</table>";
+			}
+			log::add('livebox','debug','Appels entrants'.$inCallsTable);
+			$this->checkAndUpdateCmd('incallstable', $inCallsTable);
 		}
 		$content = $this->getPage("devicelist");
 		if ( $content !== false ) {
@@ -1216,7 +1237,7 @@ class livebox extends eqLogic {
 				$eqLogic_cmd->setCollectDate('');
 				$eqLogic_cmd->event($content["status"]["Enable"]);
 			}
-        }
+		}
 
 		$eqLogic_cmd = $this->getCmd(null, 'updatetime');
 		$eqLogic_cmd->event(date("d/m/Y H:i",(time())));
@@ -1226,23 +1247,23 @@ class livebox extends eqLogic {
   }
   function fmt_duree($duree)
   { $h = floor(((float)$duree)/3600); $m = floor(((float)$duree)/60); $s = $duree%60;
-    $fmt = '';
-    if($h>0) $fmt .= $h.'h ';
-    if($m>0) $fmt .= $m.'mn ';
-    $fmt .= $s.'s';
-    return($fmt);
+	$fmt = '';
+	if($h>0) $fmt .= $h.'h ';
+	if($m>0) $fmt .= $m.'mn ';
+	$fmt .= $s.'s';
+	return($fmt);
   }
   function fmt_numtel($num)
   { if(is_numeric($num))
-    { if(strlen($num) == 12 && substr($num,0,3) == '033') $num = '0' . substr($num,3);
-      if(strlen($num) == 10)
-      { $fmt = substr($num,0,2) .' '.substr($num,2,2) .' '.substr($num,4,2) .' '.substr($num,6,2) .' '.substr($num,8);
-        return("<a target=_blank href=\"https://www.pagesjaunes.fr/annuaireinverse/recherche?quoiqui=".$num."&proximite=0\">".$fmt."</a>");
+	{ if(strlen($num) == 12 && substr($num,0,3) == '033') $num = '0' . substr($num,3);
+	  if(strlen($num) == 10)
+	  { $fmt = substr($num,0,2) .' '.substr($num,2,2) .' '.substr($num,4,2) .' '.substr($num,6,2) .' '.substr($num,8);
+		return("<a target=_blank href=\"https://www.pagesjaunes.fr/annuaireinverse/recherche?quoiqui=".$num."&proximite=0\">".$fmt."</a>");
 		}
-      else
-        return("<a target=_blank href=\"https://www.pagesjaunes.fr/annuaireinverse/recherche?quoiqui=".$num."&proximite=0\">".$num."</a>");
-    }
-    else return($num);
+	  else
+		return("<a target=_blank href=\"https://www.pagesjaunes.fr/annuaireinverse/recherche?quoiqui=".$num."&proximite=0\">".$num."</a>");
+	}
+	else return($num);
   }
 }
 
