@@ -19,22 +19,22 @@
 require_once dirname(__FILE__) . '/../../../core/php/core.inc.php';
 
 function livebox_install() {
-    $cron = cron::byClassAndFunction('livebox', 'pull');
+	$cron = cron::byClassAndFunction('livebox', 'pull');
 	if ( ! is_object($cron)) {
-        $cron = new cron();
-        $cron->setClass('livebox');
-        $cron->setFunction('pull');
-        $cron->setEnable(1);
-        $cron->setDeamon(0);
-        $cron->setSchedule('* * * * *');
-        $cron->save();
+		$cron = new cron();
+		$cron->setClass('livebox');
+		$cron->setFunction('pull');
+		$cron->setEnable(1);
+		$cron->setDeamon(0);
+		$cron->setSchedule('* * * * *');
+		$cron->save();
 	}
 }
 
 function livebox_update() {
-    $cron = cron::byClassAndFunction('livebox', 'pull');
+	$cron = cron::byClassAndFunction('livebox', 'pull');
 	if ( ! is_object($cron)) {
-        $cron = new cron();
+		$cron = new cron();
 	}
 	$cron->setClass('livebox');
 	$cron->setFunction('pull');
@@ -42,16 +42,32 @@ function livebox_update() {
 	$cron->setDeamon(0);
 	$cron->setSchedule('* * * * *');
 	$cron->save();
+
 	foreach (eqLogic::byType('livebox') as $eqLogic) {
+		// Suppression du Wifi invité pour les anciennes LB
+		if ($eqLogic->getConfiguration('productClass','') !== 'Livebox 4' && $eqLogic->getConfiguration('productClass','') !== 'Livebox 5') {
+			$cmd = $eqLogic->getCmd(null, 'guestwifion');
+			if (is_object($cmd)) {
+				$cmd->remove();
+			}
+			$cmd = $eqLogic->getCmd(null, 'guestwifioff');
+			if (is_object($cmd)) {
+				$cmd->remove();
+			}
+			$cmd = $eqLogic->getCmd(null, 'guestwifistatus');
+			if (is_object($cmd)) {
+				$cmd->remove();
+			}
+		}
 		$eqLogic->save();
 	}
 }
 
 function livebox_remove() {
-    $cron = cron::byClassAndFunction('livebox', 'pull');
-    if (is_object($cron)) {
+	$cron = cron::byClassAndFunction('livebox', 'pull');
+	if (is_object($cron)) {
 		$cron->stop();
-        $cron->remove();
-    }
+		$cron->remove();
+	}
 }
 ?>
