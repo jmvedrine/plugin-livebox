@@ -17,13 +17,14 @@
  */
 
 /* * ***************************Includes********************************* */
-require_once dirname(__FILE__) . '/../../../../core/php/core.inc.php';
+require_once __DIR__ . '/../../../../core/php/core.inc.php';
 
 class livebox extends eqLogic {
 	/* * *************************Attributs****************************** */
 	public $_cookies;
 	public $_contextID;
 	public $_version = "2";
+	public $_PagesJaunes = 0; // 0 pas de recherche pj par le plugin
 	/* * ***********************Methode static*************************** */
 
 	public static function pull() {
@@ -957,6 +958,7 @@ class livebox extends eqLogic {
 	}
 
 	function refreshInfo() {
+		setlocale(LC_TIME,"fr_FR.utf8"); // pour que strftime affiche les dates en fr si le locale est installé
 		$content = $this->getPage('deviceinfo');
 		if ( $content !== false ) {
 			$eqLogic_cmd = $this->getCmd(null, 'uptime');
@@ -1100,7 +1102,7 @@ class livebox extends eqLogic {
 		}
 		$content = $this->getPage("listcalls");
 		if ( $content !== false ) {
-			$callsTable = '';
+			// $callsTable = '';
 			$outCallsTable = '';
 			$missedCallsTable = '';
 			$inCallsTable = '';
@@ -1111,8 +1113,8 @@ class livebox extends eqLogic {
 			$tabstyle = "<style> th, td { padding-left:3px;padding-right:3px; } </style><style> th { text-align:center; } </style><style> td { text-align:right; } </style>";
 			$calls = array();
 			if ( isset($content["status"]) ) {
-				$callsTable = "$tabstyle<table border=1>";
-				$callsTable .= "<tr><th>Numéro</th><th>Date</th><th>Durée</th><th>&nbsp;&nbsp;&nbsp;</th></tr>";
+				// $callsTable = "$tabstyle<table border=1>";
+				// $callsTable .= "<tr><th>Numéro</th><th>Date</th><th>Durée</th><th>&nbsp;&nbsp;&nbsp;</th></tr>";
 				foreach ( $content["status"] as $call ) {
 					$totalCallsNumber++;
 					$Call_numero = $call["remoteNumber"];
@@ -1140,15 +1142,55 @@ class livebox extends eqLogic {
 						$in = 0;
 						$icon = '<i class="icon icon_green techno-phone2"</i>';
 					}
-					$calls[] = array("timestamp" => $ts,"num" => $Call_numero, "duree" => $Call_duree,"in" => $in,"missed" => $missed);
-					$callsTable .= "<tr><td>".$this->fmt_numtel($Call_numero)."</td><td>".$this->fmt_date($ts)."</td><td>".$this->fmt_duree($Call_duree)."</td><td>".$icon."</td></tr>";
+					$calls[] = array("timestamp" => $ts,"num" => $Call_numero, "duree" => $Call_duree,"in" => $in,"missed" => $missed,"processed" => 0);
+					// $callsTable .= "<tr><td>".$this->fmt_numtel($Call_numero)."</td><td>".$this->fmt_date($ts)."</td><td>".$this->fmt_duree($Call_duree)."</td><td>".$icon."</td></tr>";
 				}
 				if(count($calls) > 1) {
 					arsort($calls);
 				}
-				$callsTable .= "</table>";
+				// $callsTable .= "</table>";
 			}
-			$this->checkAndUpdateCmd('callstable', $callsTable);
+			  
+			//  Liste des appels
+      $calls_list =  "$tabstyle<table border=1>";
+      if($this->_PagesJaunes == 1 )
+        $calls_list .=  "<tr><th>Nom</th><th>Numéro</th><th>Date</th><th>Durée</th><th></th></tr>";
+      else
+        $calls_list .=  "<tr><th>Numéro</th><th>Date</th><th>Durée</th><th></th></tr>";
+      foreach($calls as &$call) {
+        if($call["processed"] == 0) {
+          $calls_list .=  "<tr>";
+          if($this->_PagesJaunes == 1 )
+          { $nom = $this->getNom($call["num"]); $calls_list .=  "<td>$nom</td>"; }
+          $calls_list .=  "<td>".$this->fmt_numtel($call["num"],$nom)."</td><td>".$this->fmt_date($call["timestamp"])."</td><td>".$this->fmt_duree($call["duree"])."</td><td>";
+          if ($call["in"] == 1 && $call["missed"] == 0 )
+            $calls_list .= "<i class=\"icon techno-phone3\" style=\"font-size : 18px;\"></i>";
+          else if ($call["in"] == 0)
+            $calls_list .= "<i class=\"icon techno-phone2\" style=\"font-size : 18px;color: #028000;\"></i>";
+          else $calls_list .= "<i class=\"icon techno-phone69\" style=\"font-size : 18px;color: #FF0200;\"></i>";
+
+          $calls_list .=  "</td></tr>";
+          $call["processed"] = 1;
+          foreach($calls as &$call2) {
+            if($call2["processed"] == 0 && $call["num"] == $call2["num"]) {
+              if($this->_PagesJaunes == 1 )
+                $calls_list .=  "<tr><td></td>";
+              else
+                $calls_list .=  "<tr>";
+                $calls_list .=  "<td></td><td>".$this->fmt_date($call2["timestamp"])."</td><td>".$this->fmt_duree($call2["duree"])."</td><td>";
+              if ($call2["in"] == 1 && $call2["missed"] == 0 )
+                $calls_list .= "<i class=\"icon techno-phone3\" style=\"font-size : 18px\"></i>";
+              else if ($call2["in"] == 0)
+                $calls_list .= "<i class=\"icon techno-phone2\" style=\"font-size : 18px;color: #028000;\"></i>";
+              else $calls_list .= "<i class=\"icon techno-phone69\" style=\"font-size : 18pxi;color: #FF0200;\"></i>";
+              $calls_list .=  "</td></tr>";
+              $call2["processed"] = 1;
+            }
+          }
+        }
+      }
+      $calls_list .=  "</table>";
+			$this->checkAndUpdateCmd('callstable', $calls_list);
 			log::add('livebox','debug','Nombre appels manqués '.$missedCallsNumber);
 			$this->checkAndUpdateCmd('missedcallsnumber', $missedCallsNumber);
 			log::add('livebox','debug','Nombre appels entrants '.$inCallsNumber);
