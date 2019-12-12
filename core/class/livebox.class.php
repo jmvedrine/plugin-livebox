@@ -1279,7 +1279,7 @@ class livebox extends eqLogic {
 		$eqLogic_cmd->event(date("d/m/Y H:i",(time())));
 	}
   function fmt_date($timeStamp)
-  { return(strftime("%a %d/%m %T",$timeStamp));
+  { return(strftime("%a %d %b %T",$timeStamp));
   }
   function fmt_duree($duree)
   { $h = floor(((float)$duree)/3600); $m = floor(((float)$duree)/60); $s = $duree%60;
