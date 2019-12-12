@@ -199,7 +199,7 @@ class livebox extends eqLogic {
 				$listpage = array("sysbus/NMC:reboot" => "");
 				break;
 			case "wpspushbutton":
-				if ($this->getConfiguration('productClass','') == 'Livebox 4' || $this->getConfiguration('productClass','') == 'Livebox 5') {
+				if ($this->getConfiguration('productClass','') == 'Livebox 4' || $this->getConfiguration('productClass','') == 'Livebox Fibre') {
 					$wifi5 = 'eth6';
 				} else {
 					$wifi5 = 'wl1';
@@ -212,7 +212,7 @@ class livebox extends eqLogic {
 				$listpage = array("sysbus/VoiceService/VoiceApplication:ring" => "");
 				break;
 			case "changewifi":
-				if ($this->getConfiguration('productClass','') == 'Livebox 4' || $this->getConfiguration('productClass','') == 'Livebox 5') {
+				if ($this->getConfiguration('productClass','') == 'Livebox 4' || $this->getConfiguration('productClass','') == 'Livebox Fibre') {
 					$listpage = array("sysbus/NeMo/Intf/lan:setWLANConfig" => '"mibs":{"penable":{"'.$option['mibs'].'":{"PersistentEnable":'.$option['value'].',"Enable":'.$option['value'].'}}}');
 				} else {
 					$listpage = array("sysbus/NeMo/Intf/lan:setWLANConfig" => '"mibs":{"penable":{"'.$option['mibs'].'":{"PersistentEnable":'.$option['value'].',"Enable":'.$option['value'].'}}}');
@@ -589,7 +589,7 @@ class livebox extends eqLogic {
 				}
 				$content2 = $this->getPage("deviceinfo");
 				if ( $content2 !== false ) {
-					if ($content2['status']['ProductClass'] == 'Livebox 4' || $content2['status']['ProductClass'] == 'Livebox 5') {
+					if ($content2['status']['ProductClass'] == 'Livebox 4' || $content2['status']['ProductClass'] == 'Livebox Fibre') {
 						$cmd = $this->getCmd(null, 'guestwifion');
 						if ( ! is_object($cmd) ) {
 							$cmd = new liveboxCmd();
@@ -1216,7 +1216,7 @@ class livebox extends eqLogic {
 				$eqLogic_cmd->event(join(', ', $devicelist));
 			}
 		}
-		if ($this->getConfiguration('productClass','') == 'Livebox 4' || $this->getConfiguration('productClass','') == 'Livebox 5') {
+		if ($this->getConfiguration('productClass','') == 'Livebox 4' || $this->getConfiguration('productClass','') == 'Livebox Fibre') {
 			$content = $this->getPage("guestwifistate");
 			if ( $content !== false ) {
 				log::add('livebox','debug', 'Gest Wifi ' . print_r($content, true));
@@ -1275,7 +1275,7 @@ class liveboxCmd extends cmd
 		}
 		log::add('livebox','debug','get '.$this->getLogicalId());
 		$option = array();
-		if ($eqLogic->getConfiguration('productClass','') == 'Livebox 4' || $eqLogic->getConfiguration('productClass','') == 'Livebox 5') {
+		if ($eqLogic->getConfiguration('productClass','') == 'Livebox 4' || $eqLogic->getConfiguration('productClass','') == 'Livebox Fibre') {
 			$mibs0 = 'wifi0_bcm';
 			$mibs1 = 'wifi0_quan';
 		} else {

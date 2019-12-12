@@ -45,7 +45,7 @@ function livebox_update() {
 
 	foreach (eqLogic::byType('livebox') as $eqLogic) {
 		// Suppression du Wifi invité pour les anciennes LB
-		if ($eqLogic->getConfiguration('productClass','') !== 'Livebox 4' && $eqLogic->getConfiguration('productClass','') !== 'Livebox 5') {
+		if ($eqLogic->getConfiguration('productClass','') !== 'Livebox 4' && $eqLogic->getConfiguration('productClass','') !== 'Livebox Fibre') {
 			$cmd = $eqLogic->getCmd(null, 'guestwifion');
 			if (is_object($cmd)) {
 				$cmd->remove();
@@ -57,6 +57,40 @@ function livebox_update() {
 			$cmd = $eqLogic->getCmd(null, 'guestwifistatus');
 			if (is_object($cmd)) {
 				$cmd->remove();
+			}
+		} else {
+			// Correction des commandes manquantes avec Livebox 5
+			$cmd = $eqLogic->getCmd(null, 'guestwifion');
+			if ( ! is_object($cmd) ) {
+				$cmd = new liveboxCmd();
+				$cmd->setName('Activer wifi invité');
+				$cmd->setEqLogic_id($eqLogic->getId());
+				$cmd->setType('action');
+				$cmd->setSubType('other');
+				$cmd->setLogicalId('guestwifion');
+				$cmd->save();
+			}
+			$cmd = $eqLogic->getCmd(null, 'guestwifioff');
+			if ( ! is_object($cmd) ) {
+				$cmd = new liveboxCmd();
+				$cmd->setName('Désactiver wifi invité');
+				$cmd->setEqLogic_id($eqLogic->getId());
+				$cmd->setType('action');
+				$cmd->setSubType('other');
+				$cmd->setLogicalId('guestwifioff');
+				$cmd->save();
+			}
+			$cmd = $eqLogic->getCmd(null, 'guestwifistatus');
+			if ( ! is_object($cmd)) {
+				$cmd = new liveboxCmd();
+				$cmd->setName('Etat Wifi Invité');
+				$cmd->setEqLogic_id($eqLogic->getId());
+				$cmd->setLogicalId('guestwifistatus');
+				$cmd->setUnite('');
+				$cmd->setType('info');
+				$cmd->setSubType('binary');
+				$cmd->setIsHistorized(0);
+				$cmd->save();
 			}
 		}
 		$eqLogic->save();
