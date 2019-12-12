@@ -409,8 +409,7 @@ class livebox extends eqLogic {
 						$cmd->save();
 					}
 
-				}
-				elseif ( $content->data->LinkType == "ethernet" ) {
+				} elseif ( $content->data->LinkType == "ethernet" ) {
 					log::add('livebox','debug','Connexion mode ethernet');
 					$cmd = $this->getCmd(null, 'debitmontant');
 					if ( is_object($cmd)) {
@@ -436,12 +435,7 @@ class livebox extends eqLogic {
 					if ( is_object($cmd)) {
 						$cmd->remove();
 					}
-
 				}
-			}
-			$cmd = $this->getCmd(null, 'reset');
-			if ( is_object($cmd) ) {
-				$cmd->remove();
 			}
 			$content = $this->getPage("wifilist");
 			if ( $content !== false ) {
@@ -639,10 +633,7 @@ class livebox extends eqLogic {
 				}
 			}
 
-			$cmd = $this->getCmd(null, 'voipstatus');
-			if ( is_object($cmd)) {
-				$cmd->remove();
-			}
+
 			$cmd = $this->getCmd(null, 'numerotelephone');
 			if ( is_object($cmd)) {
 				$cmd->remove();
@@ -651,8 +642,7 @@ class livebox extends eqLogic {
 			if ( $content !== false ) {
 				log::add('livebox','debug','Mode VOIP');
 
-				if ( isset($content["status"]) )
-				{
+				if ( isset($content["status"]) ) {
 					log::add('livebox','debug','Mode VOIP actif');
 					foreach ( $content["status"] as $voip ) {
 						if ( ! isset($voip["signalingProtocol"]) ) {
@@ -662,49 +652,46 @@ class livebox extends eqLogic {
 							log::add('livebox','debug','Mode VOIP '.$voip["signalingProtocol"].' actif');
 							if ( strtolower($voip["trunk_lines"]["0"]["enable"]) == "enabled" ) {
 								$cmd = $this->getCmd(null, 'voipstatus'.$voip["signalingProtocol"]);
-
-							if ( ! is_object($cmd)) {
-								$cmd = new liveboxCmd();
-								$cmd->setName('Etat VoIP '.$voip["signalingProtocol"]);
-								$cmd->setEqLogic_id($this->getId());
-								$cmd->setLogicalId('voipstatus'.$voip["signalingProtocol"]);
-								$cmd->setUnite('');
-								$cmd->setType('info');
-								$cmd->setSubType('binary');
-								$cmd->setIsHistorized(0);
-								$cmd->setIsVisible(1);
-								$cmd->save();
-							}
-							$cmd = $this->getCmd(null, 'numerotelephone'.$voip["signalingProtocol"]);
-							if ( ! is_object($cmd)) {
-								$cmd = new liveboxCmd();
-								$cmd->setName('Numero de telephone '.$voip["signalingProtocol"]);
-								$cmd->setEqLogic_id($this->getId());
-								$cmd->setLogicalId('numerotelephone'.$voip["signalingProtocol"]);
-								$cmd->setUnite('');
-								$cmd->setType('info');
-								$cmd->setSubType('string');
-								$cmd->setIsHistorized(0);
-								$cmd->setIsVisible(1);
-								$cmd->save();
+								if ( ! is_object($cmd)) {
+									$cmd = new liveboxCmd();
+									$cmd->setName('Etat VoIP '.$voip["signalingProtocol"]);
+									$cmd->setEqLogic_id($this->getId());
+									$cmd->setLogicalId('voipstatus'.$voip["signalingProtocol"]);
+									$cmd->setUnite('');
+									$cmd->setType('info');
+									$cmd->setSubType('binary');
+									$cmd->setIsHistorized(0);
+									$cmd->setIsVisible(1);
+									$cmd->save();
+								}
+								$cmd = $this->getCmd(null, 'numerotelephone'.$voip["signalingProtocol"]);
+								if ( ! is_object($cmd)) {
+									$cmd = new liveboxCmd();
+									$cmd->setName('Numero de telephone '.$voip["signalingProtocol"]);
+									$cmd->setEqLogic_id($this->getId());
+									$cmd->setLogicalId('numerotelephone'.$voip["signalingProtocol"]);
+									$cmd->setUnite('');
+									$cmd->setType('info');
+									$cmd->setSubType('string');
+									$cmd->setIsHistorized(0);
+									$cmd->setIsVisible(1);
+									$cmd->save();
+								}
+							} else {
+								$cmd = $this->getCmd(null, 'voipstatus'.$voip["signalingProtocol"]);
+								if ( is_object($cmd)) {
+									$cmd->remove();
+								}
+								$cmd = $this->getCmd(null, 'numerotelephone'.$voip["signalingProtocol"]);
+								if ( is_object($cmd)) {
+									$cmd->remove();
+								}
 							}
 						} else {
-							$cmd = $this->getCmd(null, 'voipstatus'.$voip["signalingProtocol"]);
-							if ( is_object($cmd)) {
-								$cmd->remove();
-							}
-							$cmd = $this->getCmd(null, 'numerotelephone'.$voip["signalingProtocol"]);
-							if ( is_object($cmd)) {
-								$cmd->remove();
-							}
-						}
-					} else {
 							log::add('livebox','debug','Mode VOIP '.$voip["signalingProtocol"].' inactif');
 						}
 					}
-				}
-				else
-				{
+				} else {
 					log::add('livebox','debug','Mode VOIP inactif');
 				}
 				$cmd = $this->getCmd(null, 'missedcallsnumber');
@@ -865,7 +852,19 @@ class livebox extends eqLogic {
 				$cmd->setIsHistorized(0);
 				$cmd->save();
 			}
-
+			$cmd = $this->getCmd(null, 'uptime');
+			if ( ! is_object($cmd)) {
+				$cmd = new liveboxCmd();
+				$cmd->setName('Durée de	 fonctionnement');
+				$cmd->setEqLogic_id($this->getId());
+				$cmd->setLogicalId('uptime');
+				$cmd->setUnite('s');
+				$cmd->setType('info');
+				$cmd->setSubType('numeric');
+				$cmd->setTemplate('dashboard', 'line');
+				$cmd->setIsHistorized(0);
+				$cmd->save();
+			}
 			$cmd = $this->getCmd(null, 'linkstate');
 			if ( ! is_object($cmd)) {
 				$cmd = new liveboxCmd();
@@ -958,6 +957,11 @@ class livebox extends eqLogic {
 	}
 
 	function refreshInfo() {
+		$content = $this->getPage('deviceinfo');
+		if ( $content !== false ) {
+			$eqLogic_cmd = $this->getCmd(null, 'uptime');
+			$this->checkAndUpdateCmd('uptime', $content["status"]["UpTime"]);
+		}
 		$content = $this->getPage("internet");
 		if ( $content !== false ) {
 			$eqLogic_cmd = $this->getCmd(null, 'linkstate');

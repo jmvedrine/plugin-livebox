@@ -59,6 +59,14 @@ function livebox_update() {
 				$cmd->remove();
 			}
 		}
+		$cmd = $eqLogic->getCmd(null, 'reset');
+		if ( is_object($cmd) ) {
+			$cmd->remove();
+		}
+		$cmd = $eqLogic->getCmd(null, 'voipstatus');
+		if ( is_object($cmd)) {
+			$cmd->remove();
+		}
 		$eqLogic->save();
 	}
 }
