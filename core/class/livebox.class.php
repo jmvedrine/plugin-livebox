@@ -1216,14 +1216,16 @@ class livebox extends eqLogic {
 				$eqLogic_cmd->event(join(', ', $devicelist));
 			}
 		}
-		$content = $this->getPage("guestwifistate");
-		if ( $content !== false ) {
-			log::add('livebox','debug', 'Gest Wifi ' . print_r($content, true));
-			$eqLogic_cmd = $this->getCmd(null, 'guestwifistatus');
-			if ($eqLogic_cmd->execCmd() != $eqLogic_cmd->formatValue($content["status"]["Enable"])) {
-				log::add('livebox','debug','Maj wifi invité status');
-				$eqLogic_cmd->setCollectDate('');
-				$eqLogic_cmd->event($content["status"]["Enable"]);
+		if ($this->getConfiguration('productClass','') == 'Livebox 4' || $this->getConfiguration('productClass','') == 'Livebox 5') {
+			$content = $this->getPage("guestwifistate");
+			if ( $content !== false ) {
+				log::add('livebox','debug', 'Gest Wifi ' . print_r($content, true));
+				$eqLogic_cmd = $this->getCmd(null, 'guestwifistatus');
+				if ($eqLogic_cmd->execCmd() != $eqLogic_cmd->formatValue($content["status"]["Enable"])) {
+					log::add('livebox','debug','Maj wifi invité status');
+					$eqLogic_cmd->setCollectDate('');
+					$eqLogic_cmd->event($content["status"]["Enable"]);
+				}
 			}
 		}
 
