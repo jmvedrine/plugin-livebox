@@ -199,11 +199,7 @@ class livebox extends eqLogic {
 				$listpage = array("sysbus/NMC:reboot" => "");
 				break;
 			case "wpspushbutton":
-				if ($this->getConfiguration('productClass','') == 'Livebox 4' || $this->getConfiguration('productClass','') == 'Livebox Fibre') {
-					$wifi5 = 'eth6';
-				} else {
-					$wifi5 = 'wl1';
-				}
+				$wifi5 = $this->getConfiguration('wifi5Name','wl1');
 				$listpage = array("sysbus/NeMo/Intf/lan:setWLANConfig" => '"mibs":{"wlanvap":{"wl0":{"WPS":{"ConfigMethodsEnabled":"PushButton,Label,Ethernet"}}},"' . $wifi5 . '":{"WPS":{"ConfigMethodsEnabled":"PushButton,Label,Ethernet"}}}',
 								"sysbus/NeMo/Intf/wl0/WPS:pushButton" => '',
 								"sysbus/NeMo/Intf/$wifi5/WPS:pushButton" => '');
@@ -855,7 +851,7 @@ class livebox extends eqLogic {
 			$cmd = $this->getCmd(null, 'uptime');
 			if ( ! is_object($cmd)) {
 				$cmd = new liveboxCmd();
-				$cmd->setName('Durée de	 fonctionnement');
+				$cmd->setName('Durée de fonctionnement');
 				$cmd->setEqLogic_id($this->getId());
 				$cmd->setLogicalId('uptime');
 				$cmd->setUnite('s');
@@ -1085,9 +1081,15 @@ class livebox extends eqLogic {
 					$eqLogic_cmd = $this->getCmd(null, 'wifi5status');
 					if (isset($content["status"]["wlanvap"]["eth6"])) {
 						// Livebox 4.
+						$this->setConfiguration('wifi5Name', 'eth6');
 						$statusvalue = $content["status"]["wlanvap"]["eth6"]["VAPStatus"];
+					} else if (isset($content["status"]["wlanvap"]["eth4"])) {
+						// Livebox 5.
+						$this->setConfiguration('wifi5Name', 'eth4');
+						$statusvalue = $content["status"]["wlanvap"]["eth4"]["VAPStatus"];
 					} else {
 						// Livebox Play.
+						$this->setConfiguration('wifi5Name', 'wl1');
 						$statusvalue = $content["status"]["wlanvap"]["wl1"]["VAPStatus"];
 					}
 					if ($eqLogic_cmd->execCmd() != $eqLogic_cmd->formatValue($statusvalue)) {
