@@ -1102,6 +1102,7 @@ class livebox extends eqLogic {
 		}
 		$content = $this->getPage("listcalls");
 		if ( $content !== false ) {
+			setlocale(LC_TIME, 'fr_FR.utf8','fra');
 			$callsTable = '';
 			$outCallsTable = '';
 			$missedCallsTable = '';
@@ -1110,11 +1111,9 @@ class livebox extends eqLogic {
 			$outCallsNumber = 0;
 			$inCallsNumber = 0;
 			$missedCallsNumber = 0;
-			$tabstyle = "<style> th, td { padding-left:3px;padding-right:3px; } </style><style> th { text-align:center; } </style><style> td { text-align:right; } </style>";
+
 			$calls = array();
 			if ( isset($content["status"]) ) {
-				$callsTable = "$tabstyle<table border=1>";
-				$callsTable .= "<tr><th>Numéro</th><th>Date</th><th>Durée</th><th>&nbsp;&nbsp;&nbsp;</th></tr>";
 				foreach ( $content["status"] as $call ) {
 					$totalCallsNumber++;
 					$Call_numero = $call["remoteNumber"];
@@ -1140,17 +1139,18 @@ class livebox extends eqLogic {
 						// Appel sortant
 						$outCallsNumber++;
 						$in = 0;
+						$missed = 0;
 						$icon = '<i class="icon icon_green techno-phone2"</i>';
 					}
-					$calls[] = array("timestamp" => $ts,"num" => $Call_numero, "duree" => $Call_duree,"in" => $in,"missed" => $missed);
-					$callsTable .= "<tr><td>".$this->fmt_numtel($Call_numero)."</td><td>".$this->fmt_date($ts)."</td><td>".$this->fmt_duree($Call_duree)."</td><td>".$icon."</td></tr>";
+					$calls[] = array("timestamp" => $ts, "num" => $Call_numero, "duree" => $Call_duree, "in" => $in, "missed" => $missed, "icon" => $icon);
+
 				}
 				if(count($calls) > 1) {
 					arsort($calls);
 				}
-				$callsTable .= "</table>";
 			}
-			$this->checkAndUpdateCmd('callstable', $callsTable);
+
+			log::add('livebox','debug','Appels '.print_r($calls, true));
 			log::add('livebox','debug','Nombre appels manqués '.$missedCallsNumber);
 			$this->checkAndUpdateCmd('missedcallsnumber', $missedCallsNumber);
 			log::add('livebox','debug','Nombre appels entrants '.$inCallsNumber);
@@ -1159,7 +1159,19 @@ class livebox extends eqLogic {
 			$this->checkAndUpdateCmd('outcallsnumber', $outCallsNumber);
 			log::add('livebox','debug','Nombre total appels '.$totalCallsNumber);
 			$this->checkAndUpdateCmd('totalcallsnumber', $totalCallsNumber);
-			log::add('livebox','debug','Appels '.print_r($calls, true));
+
+			$tabstyle = "<style> th, td { padding : 2px !important; } </style><style> th { text-align:center; } </style><style> td { text-align:right; } </style>";
+
+			//	Tous les appels
+			if ($totalCallsNumber > 0) {
+				$callsTable = "$tabstyle<table border=1>";
+				$callsTable .= "<tr><th>Numéro</th><th>Date</th><th>Durée</th><th>&nbsp;&nbsp;&nbsp;</th></tr>";
+				foreach($calls as $call) {
+					$callsTable .= "<tr><td>".$this->fmt_numtel($call["num"])."</td><td>".$this->fmt_date($call["timestamp"])."</td><td>".$this->fmt_duree($call["duree"])."</td><td>".$call["icon"]."</td></tr>";
+				}
+				$callsTable .= "</table>";
+			}
+
 			//	Appels sortants
 			if ($outCallsNumber > 0) {
 				$outCallsTable = "$tabstyle<table border=1>";
@@ -1171,8 +1183,6 @@ class livebox extends eqLogic {
 				}
 				$outCallsTable .= "</table>";
 			}
-			log::add('livebox','debug','Appels sortants'.$outCallsTable);
-			$this->checkAndUpdateCmd('outcallstable', $outCallsTable);
 
 			// Appels manqués
 			if ($missedCallsNumber > 0) {
@@ -1185,9 +1195,6 @@ class livebox extends eqLogic {
 				}
 				$missedCallsTable .=  "</table>";
 			}
-			log::add('livebox','debug','Appels manqués'.$missedCallsTable);
-			$this->checkAndUpdateCmd('missedcallstable', $missedCallsTable);
-
 
 			// Appels recus
 			if ($inCallsNumber > 0) {
@@ -1200,9 +1207,16 @@ class livebox extends eqLogic {
 				}
 				$inCallsTable .= "</table>";
 			}
-			log::add('livebox','debug','Appels entrants'.$inCallsTable);
-			$this->checkAndUpdateCmd('incallstable', $inCallsTable);
 		}
+
+		$this->checkAndUpdateCmd('callstable', $callsTable);
+		log::add('livebox','debug','Appels entrants'.$inCallsTable);
+		$this->checkAndUpdateCmd('incallstable', $inCallsTable);
+		log::add('livebox','debug','Appels sortants'.$outCallsTable);
+		$this->checkAndUpdateCmd('outcallstable', $outCallsTable);
+		log::add('livebox','debug','Appels manqués'.$missedCallsTable);
+		$this->checkAndUpdateCmd('missedcallstable', $missedCallsTable);
+
 		$content = $this->getPage("devicelist");
 		if ( $content !== false ) {
 			$eqLogic_cmd = $this->getCmd(null, 'devicelist');
@@ -1238,29 +1252,35 @@ class livebox extends eqLogic {
 		$eqLogic_cmd = $this->getCmd(null, 'updatetime');
 		$eqLogic_cmd->event(date("d/m/Y H:i",(time())));
 	}
-  function fmt_date($timeStamp)
-  { return(strftime("%a %d/%m %T",$timeStamp));
-  }
-  function fmt_duree($duree)
-  { $h = floor(((float)$duree)/3600); $m = floor(((float)$duree)/60); $s = $duree%60;
-	$fmt = '';
-	if($h>0) $fmt .= $h.'h ';
-	if($m>0) $fmt .= $m.'mn ';
-	$fmt .= $s.'s';
-	return($fmt);
-  }
-  function fmt_numtel($num)
-  { if(is_numeric($num))
-	{ if(strlen($num) == 12 && substr($num,0,3) == '033') $num = '0' . substr($num,3);
-	  if(strlen($num) == 10)
-	  { $fmt = substr($num,0,2) .' '.substr($num,2,2) .' '.substr($num,4,2) .' '.substr($num,6,2) .' '.substr($num,8);
-		return("<a target=_blank href=\"https://www.pagesjaunes.fr/annuaireinverse/recherche?quoiqui=".$num."&proximite=0\">".$fmt."</a>");
-		}
-	  else
-		return("<a target=_blank href=\"https://www.pagesjaunes.fr/annuaireinverse/recherche?quoiqui=".$num."&proximite=0\">".$num."</a>");
+
+	function fmt_date($timeStamp) {
+		return(ucwords(strftime("%a %d %b %T",$timeStamp)));
 	}
-	else return($num);
-  }
+
+	function fmt_duree($duree) {
+		$h = floor(((float)$duree)/3600); $m = floor(((float)$duree)/60); $s = $duree%60;
+		$fmt = '';
+		if($h>0) $fmt .= $h.'h ';
+		if($m>0) $fmt .= $m.'mn ';
+		$fmt .= $s.'s';
+		return($fmt);
+	}
+
+	function fmt_numtel($num) {
+		if(is_numeric($num)) {
+			if(strlen($num) == 12 && substr($num,0,3) == '033') {
+				$num = '0' . substr($num,3);
+			}
+			if(strlen($num) == 10) {
+				$fmt = substr($num,0,2) .' '.substr($num,2,2) .' '.substr($num,4,2) .' '.substr($num,6,2) .' '.substr($num,8);
+				return("<a target=_blank href=\"https://www.pagesjaunes.fr/annuaireinverse/recherche?quoiqui=".$num."&proximite=0\">".$fmt."</a>");
+			} else {
+				return("<a target=_blank href=\"https://www.pagesjaunes.fr/annuaireinverse/recherche?quoiqui=".$num."&proximite=0\">".$num."</a>");
+			}
+		} else {
+			return($num);
+		}
+	}
 }
 
 class liveboxCmd extends cmd
