@@ -96,8 +96,8 @@ class livebox extends eqLogic {
 							$statuscmd->event(0);
 						}
 					}
-					log::add('livebox','error',__('La livebox ne repond pas a la demande de cookie.',__FILE__)." ".$this->getName()." : ".curl_error ($session));
-					throw new Exception(__('La livebox ne repond pas a la demande de cookie.', __FILE__));
+					log::add('livebox','error',__('La Livebox ne répond pas à la demande de cookie.',__FILE__)." ".$this->getName()." : ".curl_error ($session));
+					throw new Exception(__('La Livebox ne répond pas à la demande de cookie.', __FILE__));
 					return false;
 				}
 			}
@@ -256,7 +256,7 @@ class livebox extends eqLogic {
 						$statuscmd->setCollectDate('');
 						$statuscmd->event(0);
 					}
-					log::add('livebox','error',__('La livebox ne repond pas.',__FILE__)." ".$this->getName());
+					log::add('livebox','error',__('La Livebox ne répond pas.',__FILE__)." ".$this->getName());
 					return false;
 				}
 					log::add('livebox','debug','content '.$content);
@@ -278,7 +278,7 @@ class livebox extends eqLogic {
 			$json = json_decode($content, true);
 			if ( $json["status"] == "" && $page !== 'tv' && $page !== 'changewifi')
 			{
-				log::add('livebox','debug','Demande non traitee par la livebox. Param: ' .print_r($param,true));
+				log::add('livebox','debug','Demande non traitee par la Livebox. Param: ' .print_r($param,true));
 				return false;
 			}
 			return $json;
@@ -1297,7 +1297,7 @@ class liveboxCmd extends cmd
 	public function execute($_options = null) {
 		$eqLogic = $this->getEqLogic();
 		if (!is_object($eqLogic) || $eqLogic->getIsEnable() != 1) {
-			throw new Exception(__('Equipement desactivé impossible d\éxecuter la commande : ' . $this->getHumanName(), __FILE__));
+			throw new Exception(__("Equipement desactivé impossible d'éxecuter la commande : " . $this->getHumanName(), __FILE__));
 		}
 		log::add('livebox','debug','get '.$this->getLogicalId());
 		$option = array();

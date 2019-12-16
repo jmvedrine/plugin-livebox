@@ -26,7 +26,7 @@ $eqLogics = eqLogic::byType('livebox');
 		<div class="eqLogicThumbnailContainer">
 			<?php
 			if (count($eqLogics) == 0) {
-				echo "<br/><br/><br/><center><span style='color:#767676;font-size:1.2em;font-weight: bold;'>{{Vous n'avez pas encore de livebox, cliquez sur Ajouter un équipement pour commencer}}</span></center>";
+				echo "<br/><br/><br/><center><span style='color:#767676;font-size:1.2em;font-weight: bold;'>{{Vous n'avez pas encore de Livebox, cliquez sur Ajouter un équipement pour commencer}}</span></center>";
 			} else {
                 foreach ($eqLogics as $eqLogic) {
                     echo '<div class="eqLogicDisplayCard cursor" data-eqLogic_id="' . $eqLogic->getId() . '" style="background-color : #ffffff; height : 200px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;" >';
@@ -62,10 +62,10 @@ $eqLogics = eqLogic::byType('livebox');
                     {{Général}}
 			   </legend>
                 <div class="form-group">
-                    <label class="col-lg-2 control-label">{{Nom de la livebox}}</label>
+                    <label class="col-lg-2 control-label">{{Nom de la Livebox}}</label>
                     <div class="col-lg-3">
                         <input type="text" class="eqLogicAttr form-control" data-l1key="id" style="display : none;" />
-                        <input type="text" class="eqLogicAttr form-control" data-l1key="name" placeholder="{{Nom de la livebox}}"/>
+                        <input type="text" class="eqLogicAttr form-control" data-l1key="name" placeholder="{{Nom de la Livebox}}"/>
                     </div>
                 </div>
                 <div class="form-group">
@@ -100,22 +100,28 @@ $eqLogics = eqLogic::byType('livebox');
 					<label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-label-text="{{Activer}}" data-l1key="isEnable" checked/>Activer</label>
 					<label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-label-text="{{Visible}}" data-l1key="isVisible" checked/>Visible</label>
 					</div>
-					<a class="btn btn-default" id="bt_goCarte" title='{{Accéder à la carte}}'><i class="fas fa-cogs"></i></a>
+					
                 </div>
                 <div class="form-group">
-                    <label class="col-lg-2 control-label">{{IP de la livebox}}</label>
+                    <label class="col-lg-2 control-label" >{{Accéder à la Livebox}}</label>
+                    <div class="col-lg-3">
+                        <a class="btn btn-default" id="bt_goCarte" title='{{Accéder à la Livebox}}'><i class="fas fa-cogs"></i></a>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-2 control-label">{{IP de la Livebox}}</label>
                     <div class="col-lg-3">
                         <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="ip"/>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="col-lg-2 control-label">{{Compte de la livebox}}</label>
+                    <label class="col-lg-2 control-label">{{Compte de la Livebox}}</label>
                     <div class="col-lg-3">
                         <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="username"/>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="col-lg-2 control-label">{{Password de la livebox}}</label>
+                    <label class="col-lg-2 control-label">{{Password de la Livebox}}</label>
                     <div class="col-lg-3">
                         <input type="password" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="password"/>
                     </div>
