@@ -1,24 +1,30 @@
 {
     "plugins\/livebox\/desktop\/php\/livebox.php": {
+        "401 - Accès non autorisé": "401 - Accès non autorisé",
+        "Vous n'avez pas encore de Livebox, cliquez sur Ajouter un équipement pour commencer": "Vous n'avez pas encore de Livebox, cliquez sur Ajouter un équipement pour commencer",
+        "Configuration avancée": "Configuration avancée",
+        "Equipement": "Equipement",
+        "Commandes": "Commandes",
         "Général": "General",
-        "Nom de la livebox": "Nombre del livebox",
+        "Nom de la Livebox": "Nom de la Livebox",
         "Objet parent": "Objeto padre",
         "Aucun": "Ninguno",
         "Catégorie": "Categoría",
         "Activer": "Activar",
-        "Accéder à la carte": "Acceder al mapa",
+        "Accéder à la Livebox": "Accéder à la Livebox",
         "Visible": "Visible",
-        "IP de la livebox": "IP del livebox",
-        "Compte de la livebox": "Cuenta del livebox",
-        "Password de la livebox": "Contraseña del livebox",
+        "IP de la Livebox": "IP de la Livebox",
+        "Compte de la Livebox": "Compte de la Livebox",
+        "Password de la Livebox": "Password de la Livebox",
         "Indicateurs": "Indicadores",
         "Nom": "Nombre",
         "Icône-action": "Icono-acción",
         "Sous-Type": "Subtipo",
         "Paramètres": "Parámetros",
-        "Action": "Acción",
+        "Options": "Options",
+        "Actions": "Actions",
         "Sauvegarder": "Guardar",
-        "Ajouter une livebox": "Agregar un livebox",
+        "Ajouter une Livebox": "Ajouter une Livebox",
         "Rechercher": "Buscar",
         "Gestion": "Gestión",
         "Configuration": "Configuración",
@@ -26,15 +32,23 @@
         "Supprimer": "Borrar"
     },
     "plugins\/livebox\/core\/class\/livebox.class.php": {
-        "La livebox ne repond pas a la demande de cookie.": "El Livebox no responde a la solicitud de cookie.",
-        "La livebox ne repond pas.": "El Livebox no responde.",
-        "Le compte est incorrecte.": "La cuenta es incorrecta."
+        "La Livebox ne répond pas à la demande de cookie.": "La Livebox ne répond pas à la demande de cookie.",
+        "La Livebox ne répond pas.": "La Livebox ne répond pas.",
+        "Le compte est incorrect.": "Le compte est incorrect.",
+        "Equipement desactivé impossible d'éxecuter la commande : ": "Equipement desactivé impossible d'éxecuter la commande : ",
+        "Commande non implémentée actuellement": "Commande non implémentée actuellement'"
     },
     "plugins\/livebox\/desktop\/js\/livebox.js": {
+        "Fabricant": "Fabricant",
+        "Type": "Type",
+        "Modèle": "Modèle",
+        "Numéro de série": "Numéro de série",
+        "Version hardware": "Version hardware",
+        "Version software": "Version software",
         "Nom": "Nombre",
         "Historiser": "Historizar",
         "Afficher": "Mostrar",
         "Tester": "Prueba",
-        "Accèder à l'interface de la livebox": "Acceder al interfaz de livebox"
+        "Accèder à l'interface de la Livebox": "Accèder à l'interface de la Livebox"
     }
 }
