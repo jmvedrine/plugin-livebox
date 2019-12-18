@@ -402,6 +402,13 @@ class livebox extends eqLogic {
 						$cmd->setType('info');
 						$cmd->setSubType('numeric');
 						$cmd->setIsHistorized(1);
+						if ( version_compare(jeedom::version(), "4", "<")) {
+							$cmd->setTemplate('dashboard', 'dureev3');
+							$cmd->setTemplate('mobile', 'dureev3');
+						} else {
+							$cmd->setTemplate('dashboard', 'livebox::duree');
+							$cmd->setTemplate('mobile', 'livebox::duree');
+						}
 						$cmd->save();
 					}
 
@@ -739,6 +746,7 @@ class livebox extends eqLogic {
 					$cmd->setType('info');
 					$cmd->setSubType('numeric');
 					$cmd->setIsHistorized(0);
+					$cmd->setIsVisible(0);
 					$cmd->setTemplate('dashboard', 'line');
 					$cmd->save();
 				}
@@ -751,7 +759,15 @@ class livebox extends eqLogic {
 					$cmd->setUnite('');
 					$cmd->setType('info');
 					$cmd->setSubType('string');
+					$cmd->setIsVisible(0);
 					$cmd->setIsHistorized(0);
+					if ( version_compare(jeedom::version(), "4", "<")) {
+						$cmd->setTemplate('dashboard', 'deroulantv3');
+						$cmd->setTemplate('mobile', 'deroulantv3');
+					} else {
+						$cmd->setTemplate('dashboard', 'livebox::deroulant');
+						$cmd->setTemplate('mobile', 'livebox::deroulant');
+					}
 					$cmd->save();
 				}
 				$cmd = $this->getCmd(null, 'incallstable');
@@ -763,7 +779,15 @@ class livebox extends eqLogic {
 					$cmd->setUnite('');
 					$cmd->setType('info');
 					$cmd->setSubType('string');
+					$cmd->setIsVisible(0);
 					$cmd->setIsHistorized(0);
+					if ( version_compare(jeedom::version(), "4", "<")) {
+						$cmd->setTemplate('dashboard', 'deroulantv3');
+						$cmd->setTemplate('mobile', 'deroulantv3');
+					} else {
+						$cmd->setTemplate('dashboard', 'livebox::deroulant');
+						$cmd->setTemplate('mobile', 'livebox::deroulant');
+					}
 					$cmd->save();
 				}
 				$cmd = $this->getCmd(null, 'missedcallstable');
@@ -775,7 +799,15 @@ class livebox extends eqLogic {
 					$cmd->setUnite('');
 					$cmd->setType('info');
 					$cmd->setSubType('string');
+					$cmd->setIsVisible(0);
 					$cmd->setIsHistorized(0);
+					if ( version_compare(jeedom::version(), "4", "<")) {
+						$cmd->setTemplate('dashboard', 'deroulantv3');
+						$cmd->setTemplate('mobile', 'deroulantv3');
+					} else {
+						$cmd->setTemplate('dashboard', 'livebox::deroulant');
+						$cmd->setTemplate('mobile', 'livebox::deroulant');
+					}
 					$cmd->save();
 				}
 				$cmd = $this->getCmd(null, 'callstable');
@@ -788,6 +820,13 @@ class livebox extends eqLogic {
 					$cmd->setType('info');
 					$cmd->setSubType('string');
 					$cmd->setIsHistorized(0);
+					if ( version_compare(jeedom::version(), "4", "<")) {
+						$cmd->setTemplate('dashboard', 'deroulantv3');
+						$cmd->setTemplate('mobile', 'deroulantv3');
+					} else {
+						$cmd->setTemplate('dashboard', 'livebox::deroulant');
+						$cmd->setTemplate('mobile', 'livebox::deroulant');
+					}
 					$cmd->save();
 				}
 			}
@@ -857,7 +896,13 @@ class livebox extends eqLogic {
 				$cmd->setUnite('s');
 				$cmd->setType('info');
 				$cmd->setSubType('numeric');
-				$cmd->setTemplate('dashboard', 'line');
+				if ( version_compare(jeedom::version(), "4", "<")) {
+					$cmd->setTemplate('dashboard', 'dureev3');
+					$cmd->setTemplate('mobile', 'dureev3');
+				} else {
+					$cmd->setTemplate('dashboard', 'livebox::duree');
+					$cmd->setTemplate('mobile', 'livebox::duree');
+				}
 				$cmd->setIsHistorized(0);
 				$cmd->save();
 			}
