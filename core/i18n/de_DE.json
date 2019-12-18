@@ -1,24 +1,30 @@
 {
     "plugins\/livebox\/desktop\/php\/livebox.php": {
+        "401 - Accès non autorisé": "401 - Accès non autorisé",
+        "Vous n'avez pas encore de Livebox, cliquez sur Ajouter un équipement pour commencer": "Vous n'avez pas encore de Livebox, cliquez sur Ajouter un équipement pour commencer",
+        "Configuration avancée": "Configuration avancée",
+        "Equipement": "Equipement",
+        "Commandes": "Commandes",
         "Général": "Allgemein",
-        "Nom de la livebox": "Livebox Name",
+        "Nom de la Livebox": "Nom de la Livebox",
         "Objet parent": "Elternobjekt",
         "Aucun": "Keine",
         "Catégorie": "Kategorie",
         "Activer": "Aktivieren",
-        "Accéder à la carte": "Auf die Karte zugreifen",
+        "Accéder à la Livebox": "Accéder à la Livebox",
         "Visible": "Sichtbar",
-        "IP de la livebox": "Livebox IP",
-        "Compte de la livebox": "Livebox Konto",
-        "Password de la livebox": "Livebox Passwort",
+        "IP de la Livebox": "IP de la Livebox",
+        "Compte de la Livebox": "Compte de la Livebox",
+        "Password de la Livebox": "Password de la Livebox",
         "Indicateurs": "Indikatoren",
         "Nom": "Name",
         "Icône-action": "Aktion-Symbol",
         "Sous-Type": "Unter-Typ",
         "Paramètres": "Parameter",
-        "Action": "Aktion",
+        "Options": "Options",
+        "Actions": "Actions",
         "Sauvegarder": "Speichern",
-        "Ajouter une livebox": "Livebox hinzufügen",
+        "Ajouter une Livebox": "Ajouter une Livebox",
         "Rechercher": "Suchen",
         "Gestion": "Verwaltung",
         "Configuration": "Konfiguration",
@@ -26,15 +32,23 @@
         "Supprimer": "Löschen"
     },
     "plugins\/livebox\/core\/class\/livebox.class.php": {
-        "La livebox ne repond pas a la demande de cookie.": "La livebox ne repond pas a la demande de cookie.",
-        "La livebox ne repond pas.": "La livebox ne repond pas.",
-        "Le compte est incorrecte.": "Le compte est incorrecte."
+        "La Livebox ne répond pas à la demande de cookie.": "La Livebox ne répond pas à la demande de cookie.",
+        "La Livebox ne répond pas.": "La Livebox ne répond pas.",
+        "Le compte est incorrect.": "Le compte est incorrect.",
+        "Equipement desactivé impossible d'éxecuter la commande : ": "Equipement desactivé impossible d'éxecuter la commande : ",
+        "Commande non implémentée actuellement": "Commande non implémentée actuellement'"
     },
     "plugins\/livebox\/desktop\/js\/livebox.js": {
+        "Fabricant": "Fabricant",
+        "Type": "Type",
+        "Modèle": "Modèle",
+        "Numéro de série": "Numéro de série",
+        "Version hardware": "Version hardware",
+        "Version software": "Version software",
         "Nom": "Name",
         "Historiser": "Archivieren",
         "Afficher": "Afficher",
         "Tester": "Tester",
-        "Accèder à l'interface de la livebox": "Accèder à l'interface de la livebox"
+        "Accèder à l'interface de la Livebox": "Accèder à l'interface de la Livebox"
     }
 }
