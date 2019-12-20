@@ -1297,46 +1297,46 @@ class livebox extends eqLogic {
 	}
 
 	function getPjCallerName($num) {
-        $oups = 0;
-        $opts = array(
-          'http'=>array(
-            'method'=>"GET",
-            'header'=>array("Host: www.pagesjaunes.fr",
-                "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:65.0) Gecko/20100101 Firefox/65.0",
-                "Accept: text/html,application/xhtml+xml,application/xml;",
-                "Accept-Language: fr,fr-FR",
-                "Accept-Encoding: gzip, deflate",
-                "Referer: https://www.pagesjaunes.fr/",
-                "Content-Type: application/x-www-form-urlencoded",
-                "Connection: keep-alive",
-                "Upgrade-Insecure-Requests: 1",
-                "Cache-Control: max-age=0"
-              )
-            )
-        );
-        $context = stream_context_create($opts);
+		$oups = 0;
+		$opts = array(
+		  'http'=>array(
+			'method'=>"GET",
+			'header'=>array("Host: www.pagesjaunes.fr",
+				"User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:65.0) Gecko/20100101 Firefox/65.0",
+				"Accept: text/html,application/xhtml+xml,application/xml;",
+				"Accept-Language: fr,fr-FR",
+				"Accept-Encoding: gzip, deflate",
+				"Referer: https://www.pagesjaunes.fr/",
+				"Content-Type: application/x-www-form-urlencoded",
+				"Connection: keep-alive",
+				"Upgrade-Insecure-Requests: 1",
+				"Cache-Control: max-age=0"
+			  )
+			)
+		);
+		$context = stream_context_create($opts);
 
-        $pj = file_get_contents("https://www.pagesjaunes.fr/annuaireinverse/recherche?quoiqui=".$num,false,$context);
-        $pj = zlib_decode($pj);
-        if ( $pj !== false ) {
-            $oups = strpos($pj,"Oups… nous");
-            if ($oups > 0) {
-                return "Oups";
-            }
-            // echo $pj;
-            $previousValue = libxml_use_internal_errors(true);
-            $dom = new DomDocument;
-            $dom->loadHTML($pj);
-            $xpath = new DomXPath($dom);
-            $nodes = $xpath->query(".//a[@class='denomination-links pj-lb pj-link']/text()");
-            libxml_clear_errors();
-            libxml_use_internal_errors($previousValue);
-            if (!is_null($nodes) && $nodes->length > 0) {
-                return strip_tags($nodes[0]->nodeValue);
-            } else {
-                return '';
-            }
-        }
+		$pj = file_get_contents("https://www.pagesjaunes.fr/annuaireinverse/recherche?quoiqui=".$num,false,$context);
+		$pj = zlib_decode($pj);
+		if ( $pj !== false ) {
+			$oups = strpos($pj,"Oups… nous");
+			if ($oups > 0) {
+				return "Oups";
+			}
+			// echo $pj;
+			$previousValue = libxml_use_internal_errors(true);
+			$dom = new DomDocument;
+			$dom->loadHTML($pj);
+			$xpath = new DomXPath($dom);
+			$nodes = $xpath->query(".//a[@class='denomination-links pj-lb pj-link']/text()");
+			libxml_clear_errors();
+			libxml_use_internal_errors($previousValue);
+			if (!is_null($nodes) && $nodes->length > 0) {
+				return strip_tags($nodes[0]->nodeValue);
+			} else {
+				return '';
+			}
+		}
 	}
 
 	function normalizePhone($num) {
@@ -1355,48 +1355,48 @@ class livebox extends eqLogic {
 		$normalizedPhone = $this->normalizePhone($num);
 		log::add('livebox','debug','normalized Phone : '.$normalizedPhone);
 
-        $responses = livebox_calls::searchByPhone($normalizedPhone);
-        log::add('livebox','debug','caller : '.print_r($responses, true));
-        log::add('livebox','debug','caller count : '.count($responses));
-        if (!is_array($responses) || count($responses) ===0) {
-            log::add('livebox','debug','caller not stored');
-            // Il n'est pas dans la base, nouveau caller.
-            $caller = new livebox_calls;
-            $caller->setStartDate(date('Y-m-d H:i:s'));
-            $caller->setPhone($normalizedPhone);
-            $caller->setFavorite(0);
-            if ($_pagesJaunesRequests < 4 && strlen($num) == 10) {
-                log::add('livebox','debug','we fetch the name');
-                $_pagesJaunesRequests++;
-                $callerName = $this->getPjCallerName($normalizedPhone);
-                $caller->setCallerName($callerName);
-                $caller->setIsFetched(1);
-            } else {
-                log::add('livebox','debug','store it but not fetched');
-                $caller->setCallerName('');
-                $caller->setIsFetched(0);
-            }
-            $caller->save();
-        } else {
-            // Il est déjà dans la base
-            log::add('livebox','debug','caller already stored');
-            // On prend le premier retourné car priorité aux favoris et aux plus récents.
-            $caller = $responses[0];
-            if ($caller->getIsFetched() == 0 && $caller->getFavorite() == 0) {
-                log::add('livebox','debug','but it is not fetched and not favorite');
-                if ($_pagesJaunesRequests < 4 && strlen($num) == 10) {
-                    log::add('livebox','debug','we fetch the name');
-                    $_pagesJaunesRequests++;
-                    $callerName = $this->getPjCallerName($normalizedPhone);
-                    log::add('livebox','debug','response from pages jaunes '.$callerName);
-                    $caller->setCallerName($callerName);
-                    $caller->setIsFetched(1);
-                    log::add('livebox','debug','and we save it');
-                    $caller->save();
-                }
-            }
-        }
-        return $caller->getCallerName();
+		$responses = livebox_calls::searchByPhone($normalizedPhone);
+		log::add('livebox','debug','caller : '.print_r($responses, true));
+		log::add('livebox','debug','caller count : '.count($responses));
+		if (!is_array($responses) || count($responses) ===0) {
+			log::add('livebox','debug','caller not stored');
+			// Il n'est pas dans la base, nouveau caller.
+			$caller = new livebox_calls;
+			$caller->setStartDate(date('Y-m-d H:i:s'));
+			$caller->setPhone($normalizedPhone);
+			$caller->setFavorite(0);
+			if ($_pagesJaunesRequests < 4 && strlen($num) == 10) {
+				log::add('livebox','debug','we fetch the name');
+				$_pagesJaunesRequests++;
+				$callerName = $this->getPjCallerName($normalizedPhone);
+				$caller->setCallerName($callerName);
+				$caller->setIsFetched(1);
+			} else {
+				log::add('livebox','debug','store it but not fetched');
+				$caller->setCallerName('');
+				$caller->setIsFetched(0);
+			}
+			$caller->save();
+		} else {
+			// Il est déjà dans la base
+			log::add('livebox','debug','caller already stored');
+			// On prend le premier retourné car priorité aux favoris et aux plus récents.
+			$caller = $responses[0];
+			if ($caller->getIsFetched() == 0 && $caller->getFavorite() == 0) {
+				log::add('livebox','debug','but it is not fetched and not favorite');
+				if ($_pagesJaunesRequests < 4 && strlen($num) == 10) {
+					log::add('livebox','debug','we fetch the name');
+					$_pagesJaunesRequests++;
+					$callerName = $this->getPjCallerName($normalizedPhone);
+					log::add('livebox','debug','response from pages jaunes '.$callerName);
+					$caller->setCallerName($callerName);
+					$caller->setIsFetched(1);
+					log::add('livebox','debug','and we save it');
+					$caller->save();
+				}
+			}
+		}
+		return $caller->getCallerName();
 	}
 
 	function fmt_date($timeStamp) {
@@ -1590,6 +1590,14 @@ class livebox_calls {
 		$sql = 'SELECT ' . DB::buildField(__CLASS__) . '
 		FROM livebox_calls';
 		return DB::Prepare($sql, array(), DB::FETCH_TYPE_ALL, PDO::FETCH_CLASS, __CLASS__);
+	}
+
+	public static function allFavorites() {
+		$sql = 'SELECT ' . DB::buildField(__CLASS__) . '
+		FROM livebox_calls
+		WHERE favorite=1';
+		$result = DB::Prepare($sql, array(), DB::FETCH_TYPE_ALL, PDO::FETCH_CLASS, __CLASS__);
+		return $result;
 	}
 
 	/*	   * *********************Methode d'instance************************* */

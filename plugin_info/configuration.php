@@ -40,3 +40,108 @@ if (!isConnect()) {
 		</div>
 	</fieldset>
 </form>
+<form class="form-horizontal">
+  <fieldset>
+	<legend>{{Favoris}}
+	  <a class="btn btn-xs btn-success pull-right" id="bt_addFavorite"><i class="fas fa-plus"></i> {{Ajouter}}</a>
+	</legend>
+	<table class="table table-bordered table-condensed" id="table_favorites" style="width:50% !important;"">
+	  <thead>
+		<tr>
+		  <th style="display: none; witdh: auto;">{{Id}}</th>
+		  <th>{{Nom}}</th>
+		  <th>{{Numéro de téléphone}}</th>
+		  <th style="display: none; witdh: auto;">{{Date}}</th>
+		  <th style="display: none; witdh: auto;">{{Pages Jaunes}}</th>
+		  <th style="display: none; witdh: auto;">{{Favori}}</th>
+		  <th>{{Action}}</th>
+		</tr>
+	  </thead>
+	  <tbody>
+
+	  </tbody>
+	</table>
+  </fieldset>
+</form>
+
+<script>
+	function getFavorites() {
+		$.ajax({
+			type: "POST",
+			url: "plugins/livebox/core/ajax/livebox.ajax.php",
+			data: {
+			  action: "getFavorites",
+			},
+			dataType: 'json',
+			global: false,
+			error: function (request, status, error) {
+			  handleAjaxError(request, status, error);
+			},
+			success: function (data) {
+				if(data === false){
+				  return;
+				}
+				if (data.state != 'ok') {
+					$('#div_alert').showAlert({
+					  message: data.result,
+					  level: 'danger'
+					});
+					return;
+				}
+				var tr='';
+				for(var i in data.result){
+				  tr += '<tr class="favorite">';
+				  tr += '<td style="display: none; witdh: auto;">';
+				  tr += '<input class="form-control favoriteAttr" data-l1key="id" value="'+data.result[i].id+'" disabled />';
+				  tr += '</td>';
+				  tr += '<td>';
+				  tr += '<input class="form-control favoriteAttr" data-l1key="callerName" value="'+data.result[i].callerName+'" />';
+				  tr += '</td>';
+				  tr += '<td>';
+				  tr += '<input class="form-control favoriteAttr" data-l1key="phone" value="'+data.result[i].phone+'" />';
+				  tr += '</td>';
+				  tr += '<td style="display: none; witdh: auto;">';
+				  tr += '<input class="form-control favoriteAttr" data-l1key="startDate" value="'+data.result[i].startDate+'" disabled />';
+				  tr += '</td>';
+				  tr += '<td style="display: none; witdh: auto;">';
+				  tr += '<input class="form-control favoriteAttr" data-l1key="isFetched" value="'+data.result[i].isFetched+'" disabled />';
+				  tr += '</td>';
+				  tr += '<td style="display: none; witdh: auto;">';
+				  tr += '<input class="form-control favoriteAttr" data-l1key="favorite" value="'+data.result[i].favorite+'" disabled />';
+				  tr += '</td>';
+				  tr += '<td>';
+				  tr += '<a class="btn btn-default btn-xs bt_removeFavorite pull-right"><i class="fas fa-minus"></i></a>';
+				}
+				$('#table_favorites tbody').empty().append(tr);
+			}
+		});
+	};
+	 getFavorites();
+
+$('#bt_addFavorite').off('click').on('click',function(){
+  var tr = '<tr class="favorite">';
+  tr += '<td style="display: none; witdh: auto;">';
+  tr += '<input class="form-control favoriteAttr" data-l1key="id" disabled/>';
+  tr += '</td>';
+  tr += '<td>';
+  tr += '<input class="form-control favoriteAttr" data-l1key="callerName" />';
+  tr += '</td>';
+  tr += '<td>';
+  tr += '<input class="form-control favoriteAttr" data-l1key="phone" />';
+  tr += '</td>';
+  tr += '<td style="display: none; witdh: auto;">';
+  tr += '<input class="form-control favoriteAttr" data-l1key="startDate" />';
+  tr += '</td>';
+  tr += '<td style="display: none; witdh: auto;">';
+  tr += '<input class="form-control favoriteAttr" data-l1key="isFetched" />';
+  tr += '</td style="display: none; witdh: auto;">';
+  tr += '<td style="display: none; witdh: auto;">';
+  tr += '<input class="form-control favoriteAttr" data-l1key="favorite" />';
+  tr += '</td>';
+  tr += '</tr>';
+  $('#table_favorites tbody').append(tr);
+});
+$('#table_favorites').off('click','.bt_removeFavorite').on('click','.bt_removeFavorite',function(){
+  $(this).closest('tr').remove();
+});
+</script>
