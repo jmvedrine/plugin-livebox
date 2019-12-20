@@ -37,13 +37,15 @@ class livebox extends eqLogic {
 		$favoris = config::byKey('favorites','livebox', array());
 		livebox_calls::deleteAllFavorites();
 		foreach ( $favoris as $favori ) {
-			$caller = new livebox_calls;
-			$caller->setCallerName($favori['callerName']);
-			$caller->setStartDate(date('Y-m-d H:i:s'));
-			$caller->setPhone($favori['phone']);
-			$caller->setIsFetched(1);
-			$caller->setFavorite(1);
-			$caller->save();
+            if ($favori['callerName'] != '' && $favori['phone'] != '') {
+                $caller = new livebox_calls;
+                $caller->setCallerName($favori['callerName']);
+                $caller->setStartDate(date('Y-m-d H:i:s'));
+                $caller->setPhone($favori['phone']);
+                $caller->setIsFetched(1);
+                $caller->setFavorite(1);
+                $caller->save();
+            }
 		}
 	}
 
