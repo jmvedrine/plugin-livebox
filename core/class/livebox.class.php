@@ -17,13 +17,14 @@
  */
 
 /* * ***************************Includes********************************* */
-require_once dirname(__FILE__) . '/../../../../core/php/core.inc.php';
+require_once __DIR__ . '/../../../../core/php/core.inc.php';
 
 class livebox extends eqLogic {
 	/* * *************************Attributs****************************** */
 	public $_cookies;
 	public $_contextID;
 	public $_version = "2";
+	public $_pagesJaunesRequests = 0;  // Nombre de fois où on a interrogé Pages jaunes
 	/* * ***********************Methode static*************************** */
 
 	public static function pull() {
@@ -278,7 +279,7 @@ class livebox extends eqLogic {
 			$json = json_decode($content, true);
 			if ( $json["status"] == "" && $page !== 'tv' && $page !== 'changewifi')
 			{
-				log::add('livebox','debug','Demande non traitee par la Livebox. Param: ' .print_r($param,true));
+				log::add('livebox','debug','Demande non traitée par la Livebox. Param: ' .print_r($param,true));
 				return false;
 			}
 			return $json;
@@ -325,17 +326,6 @@ class livebox extends eqLogic {
 		}
 	}
 
-/*	public function preInsert()
-	{
-		$this->setConfiguration('username', 'admin');
-		$this->setConfiguration('password', 'admin');
-		$this->setConfiguration('ip', 'livebox');
-		$this->setLogicalId('livebox');
-		$this->setEqType_name('livebox');
-		$this->setIsEnable(1);
-		$this->setIsVisible(0);
-	}
-*/
 	public function postUpdate() {
 		if ( $this->getIsEnable() ) {
 			$content = $this->getPage("internet");
@@ -1144,7 +1134,6 @@ class livebox extends eqLogic {
 		}
 		$content = $this->getPage("listcalls");
 		if ( $content !== false ) {
-			setlocale(LC_TIME, 'fr_FR.utf8','fra');
 			$callsTable = '';
 			$outCallsTable = '';
 			$missedCallsTable = '';
@@ -1153,8 +1142,10 @@ class livebox extends eqLogic {
 			$outCallsNumber = 0;
 			$inCallsNumber = 0;
 			$missedCallsNumber = 0;
-
+			$setting = config::byKey('minincallduration','livebox', 5);
+			$usepagesjaunes = config::byKey('pagesjaunes','livebox', false);
 			$calls = array();
+
 			if ( isset($content["status"]) ) {
 				foreach ( $content["status"] as $call ) {
 					$totalCallsNumber++;
@@ -1165,8 +1156,8 @@ class livebox extends eqLogic {
 					// Appel entrant
 					if ( $call["callDestination"] == "local" ) {
 						$in = 1;
-						// Appel manqué
-						if($call["callType"] == "missed") {
+						// Appel manqué ou trop court (considéré comme manqué).
+						if($call["callType"] == "missed" || $Call_duree < $setting) {
 							$missedCallsNumber++;
 							$missed = 1;
 							$icon = '<i class="icon icon_red techno-phone69"</i>';
@@ -1207,9 +1198,19 @@ class livebox extends eqLogic {
 			//	Tous les appels
 			if ($totalCallsNumber > 0) {
 				$callsTable = "$tabstyle<table border=1>";
-				$callsTable .= "<tr><th>Numéro</th><th>Date</th><th>Durée</th><th>&nbsp;&nbsp;&nbsp;</th></tr>";
-				foreach($calls as $call) {
+				if($usepagesjaunes == 1) {
+					$callsTable .=	"<tr><th>Nom</th><th>Numéro</th><th>Date</th><th>Durée</th><th></th></tr>";
+				} else {
+					$callsTable .=	"<tr><th>Numéro</th><th>Date</th><th>Durée</th><th></th></tr>";
+				}
+				foreach($calls as $key => $call) {
+					if($usepagesjaunes == 1) {
+						$callerName = trim($this->getCallerName($call["num"]));
+						log::add('livebox','debug','Caller name returned by getCallerName $'.$callerName.'$');
+						$callsTable .= "<tr><td>" . $callerName ."</td><td>".$this->fmt_numtel($call["num"])."</td><td>".$this->fmt_date($call["timestamp"])."</td><td>".$this->fmt_duree($call["duree"])."</td><td>".$call["icon"]."</td></tr>";
+					} else {
 					$callsTable .= "<tr><td>".$this->fmt_numtel($call["num"])."</td><td>".$this->fmt_date($call["timestamp"])."</td><td>".$this->fmt_duree($call["duree"])."</td><td>".$call["icon"]."</td></tr>";
+				}
 				}
 				$callsTable .= "</table>";
 			}
@@ -1295,8 +1296,111 @@ class livebox extends eqLogic {
 		$eqLogic_cmd->event(date("d/m/Y H:i",(time())));
 	}
 
+	function getPjCallerName($num) {
+        $oups = 0;
+        $opts = array(
+          'http'=>array(
+            'method'=>"GET",
+            'header'=>array("Host: www.pagesjaunes.fr",
+                "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:65.0) Gecko/20100101 Firefox/65.0",
+                "Accept: text/html,application/xhtml+xml,application/xml;",
+                "Accept-Language: fr,fr-FR",
+                "Accept-Encoding: gzip, deflate",
+                "Referer: https://www.pagesjaunes.fr/",
+                "Content-Type: application/x-www-form-urlencoded",
+                "Connection: keep-alive",
+                "Upgrade-Insecure-Requests: 1",
+                "Cache-Control: max-age=0"
+              )
+            )
+        );
+        $context = stream_context_create($opts);
+
+        $pj = file_get_contents("https://www.pagesjaunes.fr/annuaireinverse/recherche?quoiqui=".$num,false,$context);
+        $pj = zlib_decode($pj);
+        if ( $pj !== false ) {
+            $oups = strpos($pj,"Oups… nous");
+            if ($oups > 0) {
+                return "Oups";
+            }
+            // echo $pj;
+            $previousValue = libxml_use_internal_errors(true);
+            $dom = new DomDocument;
+            $dom->loadHTML($pj);
+            $xpath = new DomXPath($dom);
+            $nodes = $xpath->query(".//a[@class='denomination-links pj-lb pj-link']/text()");
+            libxml_clear_errors();
+            libxml_use_internal_errors($previousValue);
+            if (!is_null($nodes) && $nodes->length > 0) {
+                return strip_tags($nodes[0]->nodeValue);
+            } else {
+                return '';
+            }
+        }
+	}
+
+	function normalizePhone($num) {
+		if(is_numeric($num)) {
+			if(strlen($num) == 12 && substr($num,0,3) == '033') {
+				$num = '0' . substr($num,3);
+			}  else if(strlen($num) == 11 && substr($num,0,2) == '33') {
+				$num = '0' . substr($num,2);
+			}
+		}
+		return $num;
+	}
+
+	function getCallerName($num) {
+		log::add('livebox','debug','getCallerName : '.$num);
+		$normalizedPhone = $this->normalizePhone($num);
+		log::add('livebox','debug','normalized Phone : '.$normalizedPhone);
+
+        $responses = livebox_calls::searchByPhone($normalizedPhone);
+        log::add('livebox','debug','caller : '.print_r($responses, true));
+        log::add('livebox','debug','caller count : '.count($responses));
+        if (!is_array($responses) || count($responses) ===0) {
+            log::add('livebox','debug','caller not stored');
+            // Il n'est pas dans la base, nouveau caller.
+            $caller = new livebox_calls;
+            $caller->setStartDate(date('Y-m-d H:i:s'));
+            $caller->setPhone($normalizedPhone);
+            $caller->setFavorite(0);
+            if ($_pagesJaunesRequests < 4 && strlen($num) == 10) {
+                log::add('livebox','debug','we fetch the name');
+                $_pagesJaunesRequests++;
+                $callerName = $this->getPjCallerName($normalizedPhone);
+                $caller->setCallerName($callerName);
+                $caller->setIsFetched(1);
+            } else {
+                log::add('livebox','debug','store it but not fetched');
+                $caller->setCallerName('');
+                $caller->setIsFetched(0);
+            }
+            $caller->save();
+        } else {
+            // Il est déjà dans la base
+            log::add('livebox','debug','caller already stored');
+            // On prend le premier retourné car priorité aux favoris et aux plus récents.
+            $caller = $responses[0];
+            if ($caller->getIsFetched() == 0 && $caller->getFavorite() == 0) {
+                log::add('livebox','debug','but it is not fetched and not favorite');
+                if ($_pagesJaunesRequests < 4 && strlen($num) == 10) {
+                    log::add('livebox','debug','we fetch the name');
+                    $_pagesJaunesRequests++;
+                    $callerName = $this->getPjCallerName($normalizedPhone);
+                    log::add('livebox','debug','response from pages jaunes '.$callerName);
+                    $caller->setCallerName($callerName);
+                    $caller->setIsFetched(1);
+                    log::add('livebox','debug','and we save it');
+                    $caller->save();
+                }
+            }
+        }
+        return $caller->getCallerName();
+	}
+
 	function fmt_date($timeStamp) {
-		return(ucwords(strftime("%a %d %b %T",$timeStamp)));
+		return date_fr(date('D', $timeStamp)) . ' ' . date('d', $timeStamp) . ' ' . date_fr(date('M', $timeStamp)) . ' ' . date('H:i:s', $timeStamp);
 	}
 
 	function fmt_duree($duree) {
@@ -1339,7 +1443,7 @@ class liveboxCmd extends cmd
 	public function execute($_options = null) {
 		$eqLogic = $this->getEqLogic();
 		if (!is_object($eqLogic) || $eqLogic->getIsEnable() != 1) {
-			throw new Exception(__("Equipement desactivé impossible d'éxecuter la commande : " . $this->getHumanName(), __FILE__));
+			throw new Exception(__("Equipement désactivé impossible d'exécuter la commande : " . $this->getHumanName(), __FILE__));
 		}
 		log::add('livebox','debug','get '.$this->getLogicalId());
 		$option = array();
@@ -1445,6 +1549,121 @@ class liveboxCmd extends cmd
 			}
 		}
 		return $_value;
+	}
+}
+
+class livebox_calls {
+
+	/*	   * *************************Attributs****************************** */
+
+	private $id;
+	private $callerName;
+	private $phone;
+	private $startDate;
+	private $isFetched;
+	private $favorite;
+	protected $_changed = false;
+
+	public static function byId($_id) {
+		$values = array(
+			'id' => $_id,
+		);
+		$sql = 'SELECT ' . DB::buildField(__CLASS__) . '
+		FROM livebox_calls
+		WHERE id=:id';
+		return DB::Prepare($sql, $values, DB::FETCH_TYPE_ROW, PDO::FETCH_CLASS, __CLASS__);
+	}
+
+	public static function searchByPhone($_phonenum) {
+		$values = array(
+			'phone' => $_phonenum,
+		);
+		log::add('livebox','debug','searchbyphone values ' .print_r($values, true));
+		$sql = 'SELECT ' . DB::buildField(__CLASS__) . '
+		FROM livebox_calls
+		WHERE phone=:phone ORDER BY favorite DESC, startDate DESC';
+		log::add('livebox','debug','searchbyphone sql ' .$sql);
+		return DB::Prepare($sql, $values, DB::FETCH_TYPE_ALL, PDO::FETCH_CLASS, __CLASS__);
+	}
+
+	public static function all() {
+		$sql = 'SELECT ' . DB::buildField(__CLASS__) . '
+		FROM livebox_calls';
+		return DB::Prepare($sql, array(), DB::FETCH_TYPE_ALL, PDO::FETCH_CLASS, __CLASS__);
+	}
+
+	/*	   * *********************Methode d'instance************************* */
+	public function save() {
+		return DB::save($this);
+	}
+
+	public function remove() {
+		return DB::remove($this);
+	}
+
+	/*	   * **********************Getteur Setteur*************************** */
+
+	public function getId() {
+		return $this->id;
+	}
+
+	public function setId($_id) {
+		$this->_changed = utils::attrChanged($this->_changed,$this->id,$_id);
+		$this->id = $_id;
+	}
+
+	public function getStartDate() {
+		return $this->startDate;
+	}
+
+	public function setStartDate($_startDate) {
+		$this->_changed = utils::attrChanged($this->_changed,$this->startDate,$_startDate);
+		$this->startDate = $_startDate;
+	}
+
+	public function getPhone() {
+		return $this->phone;
+	}
+
+	public function setPhone($_phone) {
+		$this->_changed = utils::attrChanged($this->_changed,$this->phone,$_phone);
+		$this->phone = $_phone;
+	}
+
+	public function getCallerName() {
+		return $this->callerName;
+	}
+
+	public function setCallerName($_callerName) {
+		$this->_changed = utils::attrChanged($this->_changed,$this->callerName,$_callerName);
+		$this->callerName = $_callerName;
+	}
+
+	public function getIsFetched() {
+		return $this->isFetched;
+	}
+
+	public function setIsFetched($_isFetched) {
+		$this->_changed = utils::attrChanged($this->_changed,$this->isFetched,$_isFetched);
+		$this->isFetched = $_isFetched;
+	}
+
+	public function getFavorite() {
+		return $this->favorite;
+	}
+
+	public function setFavorite($_favorite) {
+		$this->_changed = utils::attrChanged($this->_changed,$this->favorite,$_favorite);
+		$this->favorite = $_favorite;
+	}
+
+	public function getChanged() {
+		return $this->_changed;
+	}
+
+	public function setChanged($_changed) {
+		$this->_changed = $_changed;
+		return $this;
 	}
 }
 ?>

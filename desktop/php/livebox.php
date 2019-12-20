@@ -50,6 +50,7 @@ $eqLogics = eqLogic::byType('livebox');
    <li role="presentation"><a href="" class="eqLogicAction" aria-controls="home" role="tab" data-toggle="tab" data-action="returnToThumbnailDisplay"><i class="fas fa-arrow-circle-left"></i></a></li>
    <li role="presentation" class="active"><a href="#eqlogictabin" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-tachometer-alt"></i> {{Equipement}}</a></li>
    <li role="presentation"><a href="#cmdtab" aria-controls="profile" role="tab" data-toggle="tab"><i class="fas fa-list-alt"></i> {{Commandes}}</a></li>
+   <li role="presentation"><a href="#scheduletab" aria-controls="profile" role="tab" data-toggle="tab"><i class="fas fa-calendar"></i> {{Planning}}</a></li>
  </ul>
  <div class="tab-content" style="height:calc(100% - 50px);overflow:auto;overflow-x: hidden;">
   <div role="tabpanel" class="tab-pane active" id="eqlogictabin">
@@ -160,6 +161,18 @@ $eqLogics = eqLogic::byType('livebox');
 
             </tbody>
         </table>
+ </div>
+ <div role="tabpanel" class="tab-pane" id="scheduletab">
+    <form class="form-horizontal">
+        <fieldset>
+            <br/>
+            <div id="div_schedule"></div>
+        </fieldset>
+    </form>
+    <br/>
+    <div class="alert alert-info">{{Dans cet onglet vous pouvez voir s'il y a un planning dans le plugin agenda agissant sur votre équipement Livebox..<br>
+        Exemple : planifier une plage d'activation du Wifi.}}
+    </div>
  </div>
  </div></div>
 		</div>

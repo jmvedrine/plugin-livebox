@@ -19,6 +19,8 @@
 require_once dirname(__FILE__) . '/../../../core/php/core.inc.php';
 
 function livebox_install() {
+	$sql = file_get_contents(dirname(__FILE__) . '/install.sql');
+	DB::Prepare($sql, array(), DB::FETCH_TYPE_ROW);
 	$cron = cron::byClassAndFunction('livebox', 'pull');
 	if ( ! is_object($cron)) {
 		$cron = new cron();
@@ -51,6 +53,8 @@ function livebox_install() {
 }
 
 function livebox_update() {
+	$sql = file_get_contents(dirname(__FILE__) . '/install.sql');
+	DB::Prepare($sql, array(), DB::FETCH_TYPE_ROW);
 	$cron = cron::byClassAndFunction('livebox', 'pull');
 	if ( ! is_object($cron)) {
 		$cron = new cron();
@@ -148,5 +152,6 @@ function livebox_remove() {
 		$cron->stop();
 		$cron->remove();
 	}
+	DB::Prepare('DROP TABLE IF EXISTS `livebox_calls`', array(), DB::FETCH_TYPE_ROW);
 }
 ?>

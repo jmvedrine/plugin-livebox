@@ -20,7 +20,54 @@ function printEqLogic(_eqLogic) {
     printEqLogicHelper("{{Numéro de série}}","serialNumber",_eqLogic);
     printEqLogicHelper("{{Version hardware}}","hardwareVersion",_eqLogic);
     printEqLogicHelper("{{Version software}}","softwareVersion",_eqLogic);
+
+    printScheduling(_eqLogic);
 }
+
+function printScheduling(_eqLogic){
+  $.ajax({
+    type: 'POST',
+    url: 'plugins/livebox/core/ajax/livebox.ajax.php',
+    data: {
+      action: 'getLinkCalendar',
+      id: _eqLogic.id,
+    },
+    dataType: 'json',
+    error: function (request, status, error) {
+      handleAjaxError(request, status, error);
+    },
+    success: function (data) {
+      if (data.state != 'ok') {
+        $('#div_alert').showAlert({message: data.result, level: 'danger'});
+        return;
+      }
+      $('#div_schedule').empty();
+      console.log(data);
+      if(data.result.length == 0){
+        $('#div_schedule').append("<center><span style='color:#767676;font-size:1.2em;font-weight: bold;'>{{Vous n'avez encore aucune programmation. Veuillez cliquer <a href='index.php?v=d&m=calendar&p=calendar'>ici</a> pour programmer votre Livebox à l'aide du plugin agenda}}</span></center>");
+      }else{
+        var html = '<legend>{{Liste des programmations du plugin Agenda liées à la Livebox}}</legend>';
+        for (var i in data.result) {
+          var color = init(data.result[i].cmd_param.color, '#2980b9');
+          if(data.result[i].cmd_param.transparent == 1){
+            color = 'transparent';
+          }
+          html += '<span class="label label-info cursor" style="font-size:1.2em;background-color : ' + color + ';color : ' + init(data.result[i].cmd_param.text_color, 'black') + '">';
+          html += '<a href="index.php?v=d&m=calendar&p=calendar&id='+data.result[i].eqLogic_id+'&event_id='+data.result[i].id+'" style="color : ' + init(data.result[i].cmd_param.text_color, 'black') + '">'
+          if (data.result[i].cmd_param.eventName != '') {
+            html += data.result[i].cmd_param.icon + ' ' + data.result[i].cmd_param.eventName;
+          } else {
+            html += data.result[i].cmd_param.icon + ' ' + data.result[i].cmd_param.name;
+          }
+          html += '</a></span>';
+          html += ' ' + data.result[i].startDate.substr(11,5) + ' à ' + data.result[i].endDate.substr(11,5)+'<br\><br\>';
+        }
+        $('#div_schedule').empty().append(html);
+      }
+    }
+  });
+}
+
 function addCmdToTable(_cmd) {
    if (!isset(_cmd)) {
         var _cmd = {configuration: {}};
