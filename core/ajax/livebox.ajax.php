@@ -50,14 +50,8 @@ try {
 		case 'getFavorites':
 			ajax::success(utils::o2a(livebox_calls::allFavorites()));
 			break;
-		case 'saveFavorite':
-			$caller_ajax = json_decode(init('caller'), true);
-			$caller = new livebox_calls;
-			utils::a2o($caller, $caller_ajax);
-			$caller->setStartDate(date('Y-m-d H:i:s'));
-			$caller->setFavorite(1);
-			$caller->save();
-			ajax::success(utils::o2a($caller));
+		case 'saveFavorites':
+			ajax::success(livebox::saveFavorites());
 			break;
 		case 'getLinkCalendar':
 			$livebox = livebox::byId(init('id'));

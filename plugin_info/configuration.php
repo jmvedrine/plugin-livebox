@@ -116,7 +116,40 @@ if (!isConnect()) {
 			}
 		});
 	};
-	 getFavorites();
+
+function livebox_postSaveConfiguration(){
+  var favorites = $('#table_favorites .favorite').getValues('.favoriteAttr');
+  jeedom.config.save({
+	configuration:{'favorites' : favorites},
+	plugin : 'livebox',
+	error: function (error) {
+	  $('#div_alert').showAlert({message: error.message, level: 'danger'});
+	},
+	success: function () {
+
+	}
+  });
+  $.ajax({
+	type: "POST",
+	url: "plugins/livebox/core/ajax/livebox.ajax.php",
+	data: {
+	  action: "saveFavorites",
+	},
+	dataType: 'json',
+	global: false,
+	error: function (request, status, error) {
+	  handleAjaxError(request, status, error);
+	},
+	success: function (data) {
+	  if (data.state != 'ok') {
+		$('#div_alert').showAlert({message: data.result, level: 'danger'});
+		return;
+	  }
+	}
+  });
+}
+
+getFavorites();
 
 $('#bt_addFavorite').off('click').on('click',function(){
   var tr = '<tr class="favorite">';

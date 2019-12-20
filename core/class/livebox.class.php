@@ -33,6 +33,20 @@ class livebox extends eqLogic {
 		}
 	}
 
+	public static function saveFavorites() {
+		$favoris = config::byKey('favorites','livebox', array());
+		livebox_calls::deleteAllFavorites();
+		foreach ( $favoris as $favori ) {
+			$caller = new livebox_calls;
+			$caller->setCallerName($favori['callerName']);
+			$caller->setStartDate(date('Y-m-d H:i:s'));
+			$caller->setPhone($favori['phone']);
+			$caller->setIsFetched(1);
+			$caller->setFavorite(1);
+			$caller->save();
+		}
+	}
+
 	function getCookiesInfo() {
 		if ( ! isset($this->_cookies) )
 		{
@@ -1590,6 +1604,11 @@ class livebox_calls {
 		$sql = 'SELECT ' . DB::buildField(__CLASS__) . '
 		FROM livebox_calls';
 		return DB::Prepare($sql, array(), DB::FETCH_TYPE_ALL, PDO::FETCH_CLASS, __CLASS__);
+	}
+
+	public static function deleteAllFavorites() {
+		$sql = 'DELETE	from `livebox_calls` WHERE favorite = 1';
+		$row =	DB::Prepare($sql, array(), DB::FETCH_TYPE_ROW);
 	}
 
 	public static function allFavorites() {
