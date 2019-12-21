@@ -55,7 +55,7 @@ $eqLogics = eqLogic::byType('livebox');
        $plugin = plugin::byId('calendar');
        if (is_object($plugin)) {
            ?>
-           <li role="presentation"><a href="#scheduletab" aria-controls="profile" role="tab" data-toggle="tab"><i class="ar fa-clock"></i> {{Programmation}}</a></li>
+           <li role="presentation"><a href="#scheduletab" aria-controls="profile" role="tab" data-toggle="tab"><i class="far fa-clock"></i> {{Programmation}}</a></li>
            <?php
        }
    } catch (Exception $e) {

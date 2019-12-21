@@ -2,6 +2,8 @@ Présentation
 ===
 Ce plugin permet de récupérer des informations de la Livebox et de lancer des actions.
 Il a été développé à l'origine par Thomas Guenneguez.
+La fonctionnalité de recherche du nom des appelants (***Utiliser Pages jaunes*** et ***Favoris***) est basée sur l'idée et le code de jpty qui en a aussi assuré le test.
+Merci à lui pour toute l'aide apportée.
 
 Compatibilité :
 ---
@@ -133,8 +135,7 @@ Pour historiser, il faut aller dans le menu Plugin => Communication => Livebox e
 - Livebox 2
 - Livebox Play
 - Livebox 4
-
-Faute de matériel le plugin n'a pas été testé avec la Livebox 5. Merci de remonter les infos sur le forum si vous essayez le plugin avec une livebox 5.
+- Livebox 5 (peu de tests, remontez sur le forum communautaire les problèmes rencontrés)
 
 *Est-ce compatible avec la fibre ?*
 
