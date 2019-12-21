@@ -25,6 +25,7 @@ class livebox extends eqLogic {
 	public $_contextID;
 	public $_version = "2";
 	public $_pagesJaunesRequests = 0;  // Nombre de fois où on a interrogé Pages jaunes
+    const MAX_PAGESJAUNES = 2;         // Nombre maximum de requêtes à Pages Jaunes
 	/* * ***********************Methode static*************************** */
 
 	public static function pull() {
@@ -1368,10 +1369,11 @@ class livebox extends eqLogic {
 	}
 
 	function getCallerName($num) {
-		log::add('livebox','debug','getCallerName : '.$num);
+        log::add('livebox','debug','GetCallername count : '.$this->_pagesJaunesRequests);
 		$normalizedPhone = $this->normalizePhone($num);
-		log::add('livebox','debug','normalized Phone : '.$normalizedPhone);
-
+		if (strlen($num) == 0) {
+            return 'Anonyme';
+        }
 		$responses = livebox_calls::searchByPhone($normalizedPhone);
 		log::add('livebox','debug','caller : '.print_r($responses, true));
 		log::add('livebox','debug','caller count : '.count($responses));
@@ -1382,9 +1384,9 @@ class livebox extends eqLogic {
 			$caller->setStartDate(date('Y-m-d H:i:s'));
 			$caller->setPhone($normalizedPhone);
 			$caller->setFavorite(0);
-			if ($_pagesJaunesRequests < 4 && strlen($num) == 10) {
+			if ($this->_pagesJaunesRequests < self::MAX_PAGESJAUNES && strlen($num) == 10) {
 				log::add('livebox','debug','we fetch the name');
-				$_pagesJaunesRequests++;
+				$this->_pagesJaunesRequests++;
 				$callerName = $this->getPjCallerName($normalizedPhone);
 				$caller->setCallerName($callerName);
 				$caller->setIsFetched(1);
@@ -1401,9 +1403,9 @@ class livebox extends eqLogic {
 			$caller = $responses[0];
 			if ($caller->getIsFetched() == 0 && $caller->getFavorite() == 0) {
 				log::add('livebox','debug','but it is not fetched and not favorite');
-				if ($_pagesJaunesRequests < 4 && strlen($num) == 10) {
+				if ($this->_pagesJaunesRequests < self::MAX_PAGESJAUNES && strlen($num) == 10) {
 					log::add('livebox','debug','we fetch the name');
-					$_pagesJaunesRequests++;
+					$this->_pagesJaunesRequests++;
 					$callerName = $this->getPjCallerName($normalizedPhone);
 					log::add('livebox','debug','response from pages jaunes '.$callerName);
 					$caller->setCallerName($callerName);
@@ -1430,6 +1432,9 @@ class livebox extends eqLogic {
 	}
 
 	function fmt_numtel($num) {
+        if (strlen($num) == 0) {
+            return('****');
+        }
 		if(is_numeric($num)) {
 			if(strlen($num) == 12 && substr($num,0,3) == '033') {
 				$num = '0' . substr($num,3);
