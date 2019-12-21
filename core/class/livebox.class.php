@@ -37,16 +37,17 @@ class livebox extends eqLogic {
 		$favoris = config::byKey('favorites','livebox', array());
 		livebox_calls::deleteAllFavorites();
 		foreach ( $favoris as $favori ) {
-            if ($favori['callerName'] != '' && $favori['phone'] != '') {
-                $caller = new livebox_calls;
-                $caller->setCallerName($favori['callerName']);
-                $caller->setStartDate(date('Y-m-d H:i:s'));
-                $caller->setPhone($favori['phone']);
-                $caller->setIsFetched(1);
-                $caller->setFavorite(1);
-                $caller->save();
-            }
+			if ($favori['callerName'] != '' && $favori['phone'] != '') {
+				$caller = new livebox_calls;
+				$caller->setCallerName(trim($favori['callerName']));
+				$caller->setStartDate(date('Y-m-d H:i:s'));
+				$caller->setPhone(trim($favori['phone']));
+				$caller->setIsFetched(1);
+				$caller->setFavorite(1);
+				$caller->save();
+			}
 		}
+		config::remove(('favorites','livebox');
 	}
 
 	function getCookiesInfo() {
@@ -650,7 +651,7 @@ class livebox extends eqLogic {
 			$content = $this->getPage("voip");
 			if ( $content !== false ) {
 				log::add('livebox','debug','Mode VOIP');
-
+				setlocale(LC_TIME, 'fr_FR.utf8','fra');
 				if ( isset($content["status"]) ) {
 					log::add('livebox','debug','Mode VOIP actif');
 					foreach ( $content["status"] as $voip ) {
@@ -1416,7 +1417,7 @@ class livebox extends eqLogic {
 	}
 
 	function fmt_date($timeStamp) {
-		return date_fr(date('D', $timeStamp)) . ' ' . date('d', $timeStamp) . ' ' . date_fr(date('M', $timeStamp)) . ' ' . date('H:i:s', $timeStamp);
+		return(ucwords(strftime("%a %d %b %T",$timeStamp)));
 	}
 
 	function fmt_duree($duree) {

@@ -25,28 +25,6 @@ try {
 	}
 
 	switch (init('action')){
-		case 'cleanCallsTable':
-			$sql = 'DELETE	from `livebox_calls` WHERE favorite = 0';
-			$row =	DB::Prepare($sql, array(), DB::FETCH_TYPE_ROW);
-			ajax::success();
-			break;
-		case 'deleteCall':
-			$sql = 'DELETE FROM `livebox_calls` WHERE `id`='.init('id');
-			$row =	DB::Prepare($sql, array(), DB::FETCH_TYPE_ROW);
-			ajax::success();
-			break;
-		case 'deletefavorites':
-			$sql = 'DELETE	from `livebox_calls` WHERE favorite = 1';
-			$row =	DB::Prepare($sql, array(), DB::FETCH_TYPE_ROW);
-			ajax::success();
-			break;
-		case 'saveCaller':
-			$caller_ajax = json_decode(init('caller'), true);
-			$caller = new livebox_calls;
-			utils::a2o($caller, $caller_ajax);
-			$caller->save();
-			ajax::success(utils::o2a($caller));
-			break;
 		case 'getFavorites':
 			ajax::success(utils::o2a(livebox_calls::allFavorites()));
 			break;
