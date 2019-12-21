@@ -25,7 +25,7 @@ class livebox extends eqLogic {
 	public $_contextID;
 	public $_version = "2";
 	public $_pagesJaunesRequests = 0;  // Nombre de fois où on a interrogé Pages jaunes
-    const MAX_PAGESJAUNES = 5;         // Nombre maximum de requêtes à Pages Jaunes
+	const MAX_PAGESJAUNES = 5;		   // Nombre maximum de requêtes à Pages Jaunes
 	/* * ***********************Methode static*************************** */
 
 	public static function pull() {
@@ -1370,8 +1370,8 @@ class livebox extends eqLogic {
 	function getCallerName($num) {
 		$normalizedPhone = $this->normalizePhone($num);
 		if (strlen($num) == 0) {
-            return 'Anonyme';
-        }
+			return 'Anonyme';
+		}
 		$responses = livebox_calls::searchByPhone($normalizedPhone);
 		if (!is_array($responses) || count($responses) ===0) {
 			log::add('livebox','debug','caller not stored');
@@ -1415,7 +1415,7 @@ class livebox extends eqLogic {
 	}
 
 	function fmt_date($timeStamp) {
-        setlocale(LC_TIME, 'fr_FR.utf8','fra');
+		setlocale(LC_TIME, 'fr_FR.utf8','fra');
 		return(ucwords(strftime("%a %d %b %T",$timeStamp)));
 	}
 
@@ -1429,9 +1429,9 @@ class livebox extends eqLogic {
 	}
 
 	function fmt_numtel($num) {
-        if (strlen($num) == 0) {
-            return('****');
-        }
+		if (strlen($num) == 0) {
+			return('****');
+		}
 		if(is_numeric($num)) {
 			if(strlen($num) == 12 && substr($num,0,3) == '033') {
 				$num = '0' . substr($num,3);
