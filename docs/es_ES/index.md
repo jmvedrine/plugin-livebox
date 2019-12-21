@@ -48,7 +48,27 @@ Historiser activable pour :
 Installation/Configuration
 ===
 
-Nous allons maintenant paramétrer l'équipement. Pour se faire, cliquer sur **Plugins / Communicaton / Livebox**
+Configuration du plugin
+---
+![configuration01](../images/configuration.png)
+
+- **Utiliser Pages jaunes** : Si cette option est cochée le plugin ira chercher sur le site Pages Jaunes le nom de l'appelant, s'il est disponible
+Ceci ne marche bien sûr que pour un appel en France et le site répond "Oups" si le nom n'est pas disponible, par exemple si ce correspondant est sur liste rouge.
+Le nom n'est recherché qu'une fois sur Pages jaunes, il est mémorisé dans la base de données de jeedom.
+
+- **Durée min appel entrant (s)** : les appels entrants dont la durée en secondes est inférieure à cette valeur seront considérés comme manqués.
+Cela permet par exemple de considérer l'apel comme manqué si le correspondant raccroche dès qu'il constate qu'il est en ligne avec un répondeur.
+
+- **Favoris** : Vous pouvez entrer dans ce tableau des noms et des numéros de téléphone associés. cela permet par exemple de personnaliser le nom d'un correspondant ("Frangin", "Jimmy", ...) 
+ou d'indiquer un nom pour un correspondant étranger. Il y a un bouton pour ajouter une ligne ou supprimer un favori.
+Si un numéro est dans les favoris, le nom associé a toujours priorité et Pages jaunes ne sera pas consulté pour ce numéro.
+
+Attention ! N'oubliez pas de cliquer sur Sauvegarder pour que les favoris soient enregistrés.
+
+Configuration de l'équipement Livebox
+---
+
+Nous allons maintenant paramétrer l'équipement. Pour ce faire, cliquer sur **Plugins / Communicaton / Livebox**
 
 Puis définir :
 
