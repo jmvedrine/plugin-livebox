@@ -25,7 +25,7 @@ class livebox extends eqLogic {
 	public $_contextID;
 	public $_version = "2";
 	public $_pagesJaunesRequests = 0;  // Nombre de fois où on a interrogé Pages jaunes
-    const MAX_PAGESJAUNES = 2;         // Nombre maximum de requêtes à Pages Jaunes
+    const MAX_PAGESJAUNES = 5;         // Nombre maximum de requêtes à Pages Jaunes
 	/* * ***********************Methode static*************************** */
 
 	public static function pull() {
@@ -652,7 +652,6 @@ class livebox extends eqLogic {
 			$content = $this->getPage("voip");
 			if ( $content !== false ) {
 				log::add('livebox','debug','Mode VOIP');
-				setlocale(LC_TIME, 'fr_FR.utf8','fra');
 				if ( isset($content["status"]) ) {
 					log::add('livebox','debug','Mode VOIP actif');
 					foreach ( $content["status"] as $voip ) {
@@ -1369,14 +1368,11 @@ class livebox extends eqLogic {
 	}
 
 	function getCallerName($num) {
-        log::add('livebox','debug','GetCallername count : '.$this->_pagesJaunesRequests);
 		$normalizedPhone = $this->normalizePhone($num);
 		if (strlen($num) == 0) {
             return 'Anonyme';
         }
 		$responses = livebox_calls::searchByPhone($normalizedPhone);
-		log::add('livebox','debug','caller : '.print_r($responses, true));
-		log::add('livebox','debug','caller count : '.count($responses));
 		if (!is_array($responses) || count($responses) ===0) {
 			log::add('livebox','debug','caller not stored');
 			// Il n'est pas dans la base, nouveau caller.
@@ -1419,6 +1415,7 @@ class livebox extends eqLogic {
 	}
 
 	function fmt_date($timeStamp) {
+        setlocale(LC_TIME, 'fr_FR.utf8','fra');
 		return(ucwords(strftime("%a %d %b %T",$timeStamp)));
 	}
 
