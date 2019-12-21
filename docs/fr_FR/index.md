@@ -13,6 +13,7 @@ Le plugin a été testé avec les versions suivantes de la Livebox :
 - Livebox 2
 - Livebox Play
 - Livebox 4 (depuis la version du 09/12/2019)
+- Livebox 4 (depuis la version du 13/12/2019)
 
 Informations visibles :
 ---
@@ -25,13 +26,13 @@ Informations visibles :
 - **IP Wan** : adresse IP publique (IPv4)
 - **IPv6 Wan** : adresse IP publique (IPv6)
 - **Numéro de téléphone** : numéro de téléphone VoIP
-- **Etat Wifi** : état du service Wifi. Pour Livebox 2 : uniquement Wifi 2.4Ghz. Pour les Livebox Play et 4 : état du service Wifi pour les fréquences 2.4Ghz et 5Ghz
+- **Etat Wifi** : état du service Wifi. Pour Livebox 2 : uniquement Wifi 2.4Ghz. Pour les Livebox Play, 4 et 5: état du service Wifi pour les fréquences 2.4Ghz et 5Ghz
 - **Etat Wifi invité** : état du service Wifi invité pour la Livebox 4
 
 Actions possibles :
 ---
 
-- **Activation/Désactivation du WiFi** : permet d'activer ou de désactiver le WiFi. Pour Livebox 2 : uniquement le Wifi 2.4Ghz. Pour Livebox Play et 4 : activation/désactivation par carte WiFi (2.4Ghz et/ou 5Ghz).
+- **Activation/Désactivation du WiFi** : permet d'activer ou de désactiver le WiFi. Pour Livebox 2 : uniquement le Wifi 2.4Ghz. Pour Livebox Play, 4 et 5: activation/désactivation par carte WiFi (2.4Ghz et/ou 5Ghz).
 - **Activation/Désactivation du WiFi invité** : Pour Livebox 4, permet d'activer ou de désactiver le WiFi invité (les fréquences activées sont les mêmes que pour le Wifi privé).
 - **Reboot** : permet de redémarrer la Livebox
 - **Sonner** : permet de faire sonner votre téléphone VoIP pendant 5 secondes (pour tester le fonctionnement entre la Livebox et votre téléphone)
@@ -43,7 +44,7 @@ Historiser activable pour :
 - **Etat synchro** : état de la synchronisation xDSL ou FTTH
 - **Etat TV** : état du service TV
 - **Etat VoIP** : état du service téléphonie par internet
-- **Etat Wifi** : état du service Wifi. Pour Livebox 2 : uniquement Wifi 2.4Ghz. Pour Livebox Play : état du service Wifi pour les fréquences 2.4Ghz et 5Ghz
+- **Etat Wifi** : état du service Wifi. Pour Livebox 2 : uniquement Wifi 2.4Ghz. Pour Livebox Play, 4 et 5 : état du service Wifi pour les fréquences 2.4Ghz et 5Ghz
 
 ![informations01](../images/livebox1.png)
 ![informations02](../images/livebox_screenshot2.png)
