@@ -48,7 +48,7 @@ class livebox extends eqLogic {
 				$caller->save();
 			}
 		}
-		config::remove(('favorites','livebox');
+		config::remove('favorites','livebox');
 	}
 
 	function getCookiesInfo() {
