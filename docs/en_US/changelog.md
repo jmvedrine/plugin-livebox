@@ -37,8 +37,8 @@ Detail complet des mises à jour sur https://github.com/jmvedrine/plugin-livebox
 
 # Version du 25/12/2019
 
-- Widgets pour les durées et ascenseurs pour les tableaux (versions pour Jeedom V3 et V4)
-- Lien avec le plugin agenda 'il est installé pour pouvoir plus facilement programmer les commandes action et voir les programmations
-- Possibilité d'aller chercher sur Pages Jaunes les noms des appelants (à activer dans la configuration du plugin)
-- Gestion d'une liste de Favoris pour afficher leur nom même s'ils n'est pas donné par Pages Jaunes
+- Widgets pour les durées et ascenseurs pour les tableaux (versions pour Jeedom V3 et V4). Widgets contribués par jpty et Nemeraud.
+- Lien avec le plugin agenda s'il est installé pour pouvoir plus facilement programmer les commandes action et voir les programmations
+- Possibilité d'aller chercher sur Pages Jaunes les noms des appelants (à activer dans la configuration du plugin). Fonctionnalité basée sur l'idée et le code de Jpty.
+- Gestion d'une liste de Favoris pour afficher leur nom même s'ils n'est pas donné par Pages Jaunes. Fonctionnalité basée sur l'idée et le code de Jpty.
 - Durée minimum d'un appel pour qu'il ne soit pas considéré comme manqué
