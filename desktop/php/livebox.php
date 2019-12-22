@@ -53,7 +53,7 @@ $eqLogics = eqLogic::byType('livebox');
    <?php
    try {
        $plugin = plugin::byId('calendar');
-       if (is_object($plugin)) {
+       if (is_object($plugin) && $plugin->isActive()) {
            ?>
            <li role="presentation"><a href="#scheduletab" aria-controls="profile" role="tab" data-toggle="tab"><i class="far fa-clock"></i> {{Programmation}}</a></li>
            <?php
