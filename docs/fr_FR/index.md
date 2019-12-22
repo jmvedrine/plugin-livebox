@@ -13,7 +13,7 @@ Le plugin a été testé avec les versions suivantes de la Livebox :
 - Livebox 2
 - Livebox Play
 - Livebox 4 (depuis la version du 09/12/2019)
-- Livebox 4 (depuis la version du 13/12/2019)
+- Livebox 5 (depuis la version du 13/12/2019)
 
 Informations visibles :
 ---
@@ -149,8 +149,8 @@ L'API de la livebox en mode FTTH ne fournit pas le débit. Nous ne pouvons donc 
 
 *Le mot de passe que je saisis ne fonctionne pas.*
 
-Le plugin ne suporte pas certains caractères spéciaux genre # et @.
+Le plugin ne supporte pas certains caractères spéciaux genre # et @.
 
 *Je change de Livebox, faut-il faire quelque chose ?*
 
-Il est nécessaire de resauvegarder l'équipement Livebox pour que le plugin gère bien la détection du modèle.
+Il est nécessaire de sauvegarder l'équipement Livebox pour que le plugin gère bien la détection du modèle.
