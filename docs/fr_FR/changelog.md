@@ -5,23 +5,23 @@ Detail complet des mises à jour sur https://github.com/jmvedrine/plugin-livebox
 
 # Anciennes évolutions :
 
-- Correction lors de la sauvegarde de la livebox
+- Correction lors de la sauvegarde de la Livebox
 - Modification pour compatibilité Jeedom V3
 - Plus de suivi de version
 - Ajout de la commande reboot
-- Ajout du delai de changement d'état de la synchro ADSL en seconde
+- Ajout du délai de changement d'état de la synchro ADSL en seconde
 - Mise a jour des indicateurs, même si la valeur ne change pas pour les graphiques.
 - Ajout de bouton "WPS Push Button"
 - Liste des équipements
-- Correction de variable cachees pour Cookies.
+- Correction de variables cachées pour Cookies.
 - Modification de cron pour plus d'autonomie.
 - Ajout des informations de marge montante et descendante.
-- Support de plusieurs livebox.
+- Support de plusieurs Livebox.
 - Correction par rapport au nouveau core.
 - Correction bug de collecte
-- Correction pour désinstallation sans livebox
+- Correction pour désinstallation sans Livebox
 - Ajout de lien vers les options d'affichage
-- Ajout d'un Etat de livebox
+- Ajout d'un état de la Livebox
 - Correction pour la téléphonie en H.323
 - Optimisation pour ne pas mettre à jour les données si elle le sont déjà.
 - Suppression de commande reset
