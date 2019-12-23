@@ -35,20 +35,31 @@ class livebox extends eqLogic {
 	}
 
 	public static function saveFavorites() {
+		$sql = 'UPDATE livebox_calls
+				SET `favorite`=0, `isFetched`=0
+				WHERE `favorite`=1';
+		try {
+			DB::Prepare($sql, array('value' => $i), DB::FETCH_TYPE_ROW);
+		} catch (Exception $e) {
+
+		}
 		$favoris = config::byKey('favorites','livebox', array());
-		livebox_calls::deleteAllFavorites();
 		foreach ( $favoris as $favori ) {
-			if ($favori['callerName'] != '' && $favori['phone'] != '') {
+			$callerName = trim($favori['callerName']);
+			$phone = trim($favori['phone']);
+			if ($callerName != '' && $phone != '') {
 				$caller = new livebox_calls;
-				$caller->setCallerName(trim($favori['callerName']));
+				if (isset($favori['id']) && $favori['id'] != '') {
+					$caller->setId($favori['id']);
+				}
+				$caller->setCallerName($callerName);
 				$caller->setStartDate(date('Y-m-d H:i:s'));
-				$caller->setPhone(trim($favori['phone']));
+				$caller->setPhone($phone);
 				$caller->setIsFetched(1);
 				$caller->setFavorite(1);
 				$caller->save();
 			}
 		}
-		config::remove('favorites','livebox');
 	}
 
 	function getCookiesInfo() {
@@ -1349,7 +1360,7 @@ class livebox extends eqLogic {
 			libxml_clear_errors();
 			libxml_use_internal_errors($previousValue);
 			if (!is_null($nodes) && $nodes->length > 0) {
-				return strip_tags($nodes[0]->nodeValue);
+				return trim(strip_tags($nodes[0]->nodeValue));
 			} else {
 				return '';
 			}
