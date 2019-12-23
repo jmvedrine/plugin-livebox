@@ -13,7 +13,7 @@ Le plugin a été testé avec les versions suivantes de la Livebox :
 - Livebox 2
 - Livebox Play
 - Livebox 4 (depuis la version du 09/12/2019)
-- Livebox 4 (depuis la version du 13/12/2019)
+- Livebox 5 (depuis la version du 13/12/2019)
 
 Informations visibles :
 ---
@@ -58,7 +58,7 @@ Configuration du plugin
 
 - **Utiliser Pages jaunes** : Si cette option est cochée le plugin ira chercher sur le site Pages Jaunes le nom de l'appelant, s'il est disponible
 Ceci ne marche bien sûr que pour un appel en France et le site répond "Oups" si le nom n'est pas disponible, par exemple si ce correspondant est sur liste rouge.
-Le nom n'est recherché qu'une fois sur Pages jaunes, il est mémorisé dans la base de données de jeedom.
+Le nom n'est recherché qu'une fois sur Pages jaunes, il est mémorisé dans la base de données de Jeedom.
 
 - **Durée min appel entrant (s)** : les appels entrants dont la durée en secondes est inférieure à cette valeur seront considérés comme manqués.
 Cela permet par exemple de considérer l'apel comme manqué si le correspondant raccroche dès qu'il constate qu'il est en ligne avec un répondeur.
@@ -145,12 +145,12 @@ Oui
 
 *Je n'ai pas d'information sur le débit, est-ce normal ?*
 
-L'API de la livebox en mode FTTH ne fournit pas le débit. Nous ne pouvons donc pas le récupérer.
+L'API de la Livebox en mode FTTH ne fournit pas le débit. Nous ne pouvons donc pas le récupérer.
 
 *Le mot de passe que je saisis ne fonctionne pas.*
 
-Le plugin ne suporte pas certains caractères spéciaux genre # et @.
+Le plugin ne supporte pas certains caractères spéciaux genre # et @.
 
 *Je change de Livebox, faut-il faire quelque chose ?*
 
-Il est nécessaire de resauvegarder l'équipement Livebox pour que le plugin gère bien la détection du modèle.
+Il est nécessaire de sauvegarder à nouveau l'équipement Livebox pour que le plugin gère bien la détection du modèle.
