@@ -38,6 +38,12 @@ if (!isConnect()) {
 				<input class="configKey form-control" data-l1key="minincallduration" />
 			</div>
 		</div>
+		<div class="form-group">
+			<label class="col-sm-4 control-label">{{Regroupement par numéro de téléphone dans la liste des appels}}</label>
+			<div class="col-sm-2">
+				<input type="checkbox" class="configKey tooltips" data-l1key="groupCallsByPhone">
+			</div>
+		</div>
 	</fieldset>
 </form>
 <form class="form-horizontal">
