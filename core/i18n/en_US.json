@@ -1,10 +1,10 @@
 {
     "plugins\/livebox\/desktop\/php\/livebox.php": {
-        "401 - Accès non autorisé": "401 - Unauthorized Access",
+        "401 - Accès non autorisé": "401 - Accès non autorisé",
         "Vous n'avez pas encore de Livebox, cliquez sur Ajouter un équipement pour commencer": "Vous n'avez pas encore de Livebox, cliquez sur Ajouter un équipement pour commencer",
-        "Configuration avancée": "Advanced configuration",
-        "Equipement": "Device",
-        "Commandes": "Commands",
+        "Configuration avancée": "Configuration avancée",
+        "Equipement": "Equipement",
+        "Commandes": "Commandes",
         "Général": "General",
         "Nom de la Livebox": "Nom de la Livebox",
         "Objet parent": "Parent object",
@@ -26,7 +26,7 @@
         "Sauvegarder": "Save",
         "Ajouter une Livebox": "Ajouter une Livebox",
         "Rechercher": "Search",
-        "Gestion": "Management",
+        "Gestion": "Gestion",
         "Configuration": "Setup",
         "Mes Livebox": "Mes Livebox",
         "Supprimer": "Delete"
@@ -39,16 +39,16 @@
         "Commande non implémentée actuellement": "Commande non implémentée actuellement'"
     },
     "plugins\/livebox\/desktop\/js\/livebox.js": {
-        "Fabricant": "Manufacturer",
+        "Fabricant": "Fabricant",
         "Type": "Type",
-        "Modèle": "Model",
-        "Numéro de série": "Serial number",
-        "Version hardware": "Hardware version",
-        "Version software": "Software version",
-        "Nom": "Name",
-        "Historiser": "Historize",
-        "Afficher": "Display",
-        "Tester": "Test",
+        "Modèle": "Modèle",
+        "Numéro de série": "Numéro de série",
+        "Version hardware": "Version hardware",
+        "Version software": "Version software",
+        "Nom": "Nom",
+        "Historiser": "Historiser",
+        "Afficher": "Afficher",
+        "Tester": "Tester",
         "Accèder à l'interface de la Livebox": "Accèder à l'interface de la Livebox"
     }
 }
