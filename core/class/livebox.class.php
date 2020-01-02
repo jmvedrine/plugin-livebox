@@ -34,26 +34,50 @@ class livebox extends eqLogic {
 		}
 	}
 
+	public static function normalizePhone($num) {
+		if(is_numeric($num)) {
+			if(strlen($num) == 12 && substr($num,0,3) == '033') {
+				$num = '0' . substr($num,3);
+			}  else if(strlen($num) == 11 && substr($num,0,2) == '33') {
+				$num = '0' . substr($num,2);
+			}
+		}
+		return $num;
+	}
 	public static function addFavorite($num,$name) {
-		log::add('livebox','info', __FUNCTION__ ." Num=$num Name=$name");
 		$responses = livebox_calls::searchByPhone($num);
 		if (!is_array($responses) || count($responses) ===0) {
 			// Il n'est pas dans la base, Ajout.
 			$caller = new livebox_calls;
-			$caller->setStartDate(date('Y-m-d H:i:s'));
-			$caller->setPhone($this->normalizePhone($num));
-			$caller->setCallerName($name);
-			$caller->setFavorite(1);
-			$caller->setIsFetched(1);
-			$caller->save();
+			$caller->setPhone(self::normalizePhone($num));
 		} else {
 			// Il est déjà dans la base
-			log::add('livebox','debug','caller already stored');
 			// On prend le premier retourné car priorité aux favoris et aux plus récents.
 			$caller = $responses[0];
+		}
+		$caller->setStartDate(date('Y-m-d H:i:s'));	 // Important pour qu'il soit bien le plus récent dans tous les cas.
+		$caller->setCallerName($name);
 			$caller->setFavorite(1);
 			$caller->setIsFetched(1);
 			$caller->save();
+		$callerId = $caller->getId();
+		$favoris = config::byKey('favorites','livebox',array());
+		foreach ($favoris as $favori) {
+			if($favori['phone'] == $num){
+				$found = true;
+				break;
+			}
+		}
+		if(!$found){
+			$favoris[] =  array(
+				'id' => $callerId,
+				'callerName' => $name,
+				'phone' => $num,
+				'startDate' => date('Y-m-d H:i:s'),
+				'isFetched' => 1,
+				'favorite' => 1
+			);
+			config::save('favorites',$favoris,'livebox');
 		}
 	}
 
@@ -66,7 +90,7 @@ class livebox extends eqLogic {
 		} catch (Exception $e) {
 
 		}
-	$favoris = config::byKey('favorites','livebox', array());
+		$favoris = config::byKey('favorites','livebox', array());
 		foreach ( $favoris as $favori ) {
 			$callerName = trim($favori['callerName']);
 			$phone = trim($favori['phone']);
@@ -1400,19 +1424,8 @@ class livebox extends eqLogic {
 		}
 	}
 
-	function normalizePhone($num) {
-		if(is_numeric($num)) {
-			if(strlen($num) == 12 && substr($num,0,3) == '033') {
-				$num = '0' . substr($num,3);
-			}  else if(strlen($num) == 11 && substr($num,0,2) == '33') {
-				$num = '0' . substr($num,2);
-			}
-		}
-		return $num;
-	}
-
 	function getCallerName($num,&$favorite=0) {
-		$normalizedPhone = $this->normalizePhone($num);
+		$normalizedPhone = self::normalizePhone($num);
 		if (strlen($num) == 0) {
 			$favorite=1;
 			return 'Anonyme';
