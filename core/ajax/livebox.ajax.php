@@ -25,7 +25,10 @@ try {
 	}
 
 	switch (init('action')){
-		case 'getFavorites':
+        case 'addFavorite':
+            ajax::success(livebox::addFavorite(init('num'), init('name')));
+            break;
+        case 'getFavorites':
 			ajax::success(utils::o2a(livebox_calls::allFavorites()));
 			break;
 		case 'saveFavorites':

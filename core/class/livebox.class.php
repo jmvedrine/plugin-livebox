@@ -34,7 +34,7 @@ class livebox extends eqLogic {
 		}
 	}
 
-	public function addFavorite($num,$name) {
+	public static function addFavorite($num,$name) {
 		log::add('livebox','info', __FUNCTION__ ." Num=$num Name=$name");
 		$responses = livebox_calls::searchByPhone($num);
 		if (!is_array($responses) || count($responses) ===0) {
