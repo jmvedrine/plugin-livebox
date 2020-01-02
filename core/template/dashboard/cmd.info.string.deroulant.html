@@ -1,23 +1,46 @@
 <div style="padding:5px; min-width:30px; min-height:30px;" class="cmd #history# container-fluid tooltips cmd-widget" data-type="info" data-subtype="string" data-cmd_id="#id#" data-cmd_uid="#uid#" data-version="#version#" data-eqLogic_id="#eqLogic_id#">
 	<center>
-      <div class="title #hide_name#">
+	  <div class="title #hide_name#">
 		<div class="cmdName">#name_display#</div>
 		</div>
-      <div class="cmdInfo"></div>
+	  <div class="cmdInfo"></div>
 	</center>
   <style>
-    div.cmdInfo {
+	div.cmdInfo {
 		overflow-y:scroll;
-      	border:#000000 1px solid;
-      	font-size : 12px;
-      	min-height:15px;
-      	font-size:12px;
-      	font-weight: bold;
-      	word-wrap: break-word;
-      	text-align: left
-    }
+		border:#000000 1px solid;
+		font-size : 12px;
+		min-height:15px;
+		font-size:12px;
+		font-weight: bold;
+		word-wrap: break-word;
+		text-align: left
+	}
   </style>
 	<script>
+		function addfavorite(_num, _name) {
+			$.ajax({
+				type: 'POST',
+				url: 'plugins/livebox/core/ajax/livebox.ajax.php',
+				data: {
+					action: 'addFavorite',
+					num: init(_num),
+					name: init(_name),
+					},
+				dataType: 'json',
+					error: function (request, status, error) {
+					handleAjaxError(request, status, error);
+				},
+				success: function (data) {
+					if (data.state != 'ok') {
+						$('#div_alert').showAlert({message: data.result, level: 'danger'});
+						return;
+					}
+                    $('#div_alert').showAlert({message: '{{Favori ajouté avec succès}}', level: 'success'});
+				}
+			});
+		}
+
 		jeedom.cmd.update['#id#'] = function(_options){
 		var cmd = $('.cmd[data-cmd_id=#id#]')
 		var valueH = is_numeric('#hauteurMax#') ? parseFloat('#hauteurMax#'):150;

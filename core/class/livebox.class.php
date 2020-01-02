@@ -1258,7 +1258,7 @@ class livebox extends eqLogic {
 						if($favorite == 1 ) {// Pas de lien sur les favoris
 							$callsTable .= "<td>$callerName</td>";
 						} else {
-							$callsTable .= "<td><a class='btn-sm bt_plus' title='Ajouter $callerName " .$call["num"] ." en favori' target=_blank href=\"" .network::getNetworkAccess('internal', 'proto:ip') ."/plugins/livebox/desktop/php/addFavorite.php?num=".$call["num"]."&name=$callerName\"><i class='far fa-heart'></i></a> $callerName</td>";
+							$callsTable .= "<td><a class='btn-sm bt_plus' title='Ajouter $callerName " .$call["num"] ." en favori' onclick='addfavorite(\"" .$call["num"] . "\",\"" . $callerName . "\")'><i class='icon icon_green fas fa-heart '></i></a> $callerName</td>";
 						}
 						$callsTable .= "<td>".$this->fmt_numtel($call["num"])."</td><td>".$this->fmt_date($call["timestamp"])."</td><td>".$this->fmt_duree($call["duree"])."</td><td>".$call["icon"]."</td></tr>";
 						$call["processed"] = 1;

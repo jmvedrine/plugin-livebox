@@ -17,6 +17,29 @@
 	}
   </style>
 	<script>
+		function addfavorite(_num, _name) {
+			$.ajax({
+				type: 'POST',
+				url: 'plugins/livebox/core/ajax/livebox.ajax.php',
+				data: {
+					action: 'addFavorite',
+					num: init(_num),
+					name: init(_name),
+					},
+				dataType: 'json',
+					error: function (request, status, error) {
+					handleAjaxError(request, status, error);
+				},
+				success: function (data) {
+					if (data.state != 'ok') {
+						$('#div_alert').showAlert({message: data.result, level: 'danger'});
+						return;
+					}
+                    $('#div_alert').showAlert({message: '{{Favori ajouté avec succès}}', level: 'success'});
+				}
+			});
+		}
+
 		jeedom.cmd.update['#id#'] = function(_options){
 			$('.cmdInfo#uid#').html(_options.display_value);
 			$('.cmd[data-cmd_id=#id#]').attr('title','Valeur du '+_options.valueDate+', collectée le '+_options.collectDate);
