@@ -57,9 +57,6 @@ if (!isConnect()) {
 		  <th style="display: none; witdh: auto;">{{Id}}</th>
 		  <th>{{Nom}}</th>
 		  <th>{{Numéro de téléphone}}</th>
-		  <th style="display: none; witdh: auto;">{{Date}}</th>
-		  <th style="display: none; witdh: auto;">{{Pages Jaunes}}</th>
-		  <th style="display: none; witdh: auto;">{{Favori}}</th>
 		  <th>{{Action}}</th>
 		</tr>
 	  </thead>
@@ -93,17 +90,10 @@ jeedom.config.load({
       tr += '<td>';
       tr += '<input class="form-control favoriteAttr" data-l1key="phone" value="'+data[i].phone+'" />';
       tr += '</td>';
-      tr += '<td style="display: none; witdh: auto;">';
-      tr += '<input class="form-control favoriteAttr" data-l1key="startDate" value="'+data[i].startDate+'" disabled />';
-      tr += '</td>';
-      tr += '<td style="display: none; witdh: auto;">';
-      tr += '<input class="form-control favoriteAttr" data-l1key="isFetched" value="'+data[i].isFetched+'" disabled />';
-      tr += '</td>';
-      tr += '<td style="display: none; witdh: auto;">';
-      tr += '<input class="form-control favoriteAttr" data-l1key="favorite" value="'+data[i].favorite+'" disabled />';
-      tr += '</td>';
       tr += '<td>';
       tr += '<a class="btn btn-default btn-xs bt_removeFavorite pull-right"><i class="fas fa-minus"></i></a>';
+      tr += '</td>';
+      tr += '</tr>';
     }
     $('#table_favorites tbody').empty().append(tr);
   }
@@ -151,15 +141,6 @@ $('#bt_addFavorite').off('click').on('click',function(){
   tr += '</td>';
   tr += '<td>';
   tr += '<input class="form-control favoriteAttr" data-l1key="phone" />';
-  tr += '</td>';
-  tr += '<td style="display: none; witdh: auto;">';
-  tr += '<input class="form-control favoriteAttr" data-l1key="startDate" />';
-  tr += '</td>';
-  tr += '<td style="display: none; witdh: auto;">';
-  tr += '<input class="form-control favoriteAttr" data-l1key="isFetched" />';
-  tr += '</td style="display: none; witdh: auto;">';
-  tr += '<td style="display: none; witdh: auto;">';
-  tr += '<input class="form-control favoriteAttr" data-l1key="favorite" />';
   tr += '</td>';
   tr += '</tr>';
   $('#table_favorites tbody').append(tr);
