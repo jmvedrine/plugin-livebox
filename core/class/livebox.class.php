@@ -45,22 +45,6 @@ class livebox extends eqLogic {
 		return $num;
 	}
 	public static function addFavorite($num,$name) {
-		$responses = livebox_calls::searchByPhone($num);
-		if (!is_array($responses) || count($responses) ===0) {
-			// Il n'est pas dans la base, Ajout.
-			$caller = new livebox_calls;
-			$caller->setPhone(self::normalizePhone($num));
-		} else {
-			// Il est déjà dans la base
-			// On prend le premier retourné car priorité aux favoris et aux plus récents.
-			$caller = $responses[0];
-		}
-		$caller->setStartDate(date('Y-m-d H:i:s'));	 // Important pour qu'il soit bien le plus récent dans tous les cas.
-		$caller->setCallerName($name);
-			$caller->setFavorite(1);
-			$caller->setIsFetched(1);
-			$caller->save();
-		$callerId = $caller->getId();
 		$favoris = config::byKey('favorites','livebox',array());
 		foreach ($favoris as $favori) {
 			if($favori['phone'] == $num){
@@ -70,39 +54,10 @@ class livebox extends eqLogic {
 		}
 		if(!$found){
 			$favoris[] =  array(
-				'id' => $callerId,
 				'callerName' => $name,
 				'phone' => $num
 			);
 			config::save('favorites',$favoris,'livebox');
-		}
-	}
-
-	public static function saveFavorites() {
-		$sql = 'UPDATE livebox_calls
-				SET `favorite`=0, `isFetched`=0
-				WHERE `favorite`=1';
-		try {
-			DB::Prepare($sql, array('value' => $i), DB::FETCH_TYPE_ROW);
-		} catch (Exception $e) {
-
-		}
-		$favoris = config::byKey('favorites','livebox', array());
-		foreach ( $favoris as $favori ) {
-			$callerName = trim($favori['callerName']);
-			$phone = trim($favori['phone']);
-			if ($callerName != '' && $phone != '') {
-				$caller = new livebox_calls;
-				if (isset($favori['id']) && $favori['id'] != '') {
-					$caller->setId($favori['id']);
-				}
-				$caller->setCallerName($callerName);
-				$caller->setStartDate(date('Y-m-d H:i:s'));
-				$caller->setPhone($phone);
-				$caller->setIsFetched(1);
-				$caller->setFavorite(1);
-				$caller->save();
-			}
 		}
 	}
 
@@ -1430,6 +1385,14 @@ class livebox extends eqLogic {
 			$favorite=1;
 			return 'Anonyme';
 		}
+		$favoris = config::byKey('favorites','livebox',array());
+		foreach ($favoris as $favori) {
+			if($favori['phone'] == $normalizedPhone){
+				$favorite = 1;
+				return $favori['callerName'];
+			}
+		}
+        // Ce n'est pas un favori
 		$usepagesjaunes = config::byKey('pagesjaunes','livebox', false);
 		$responses = livebox_calls::searchByPhone($normalizedPhone);
 		if (!is_array($responses) || count($responses) ===0) {
@@ -1438,7 +1401,6 @@ class livebox extends eqLogic {
 			$caller = new livebox_calls;
 			$caller->setStartDate(date('Y-m-d H:i:s'));
 			$caller->setPhone($normalizedPhone);
-			$caller->setFavorite(0);
 			$favorite = 0;
 			if($usepagesjaunes == 1) {
 				if ($this->_pagesJaunesRequests < self::MAX_PAGESJAUNES && strlen($num) == 10) {
@@ -1460,11 +1422,11 @@ class livebox extends eqLogic {
 		} else {
 			// Il est déjà dans la base
 			log::add('livebox','debug','caller already stored');
-			// On prend le premier retourné car priorité aux favoris et aux plus récents.
+			// On prend le premier retourné car priorité aux plus récents.
 			$caller = $responses[0];
-			$favorite = $caller->getFavorite();
-			if ($caller->getIsFetched() == 0 && $caller->getFavorite() == 0) {
-				log::add('livebox','debug','but it is not fetched and not favorite');
+            $favorite = 0;
+			if ($caller->getIsFetched() == 0) {
+				log::add('livebox','debug','but it is not fetched');
 				if($usepagesjaunes == 1) {
 					if ($this->_pagesJaunesRequests < self::MAX_PAGESJAUNES && strlen($num) == 10) {
 						log::add('livebox','debug','we fetch the name');
@@ -1648,7 +1610,6 @@ class livebox_calls {
 	private $phone;
 	private $startDate;
 	private $isFetched;
-	private $favorite;
 	protected $_changed = false;
 
 	public static function byId($_id) {
@@ -1668,7 +1629,7 @@ class livebox_calls {
 		log::add('livebox','debug','searchbyphone values ' .print_r($values, true));
 		$sql = 'SELECT ' . DB::buildField(__CLASS__) . '
 		FROM livebox_calls
-		WHERE phone=:phone ORDER BY favorite DESC, startDate DESC';
+		WHERE phone=:phone ORDER BY startDate DESC';
 		log::add('livebox','debug','searchbyphone sql ' .$sql);
 		return DB::Prepare($sql, $values, DB::FETCH_TYPE_ALL, PDO::FETCH_CLASS, __CLASS__);
 	}
@@ -1677,19 +1638,6 @@ class livebox_calls {
 		$sql = 'SELECT ' . DB::buildField(__CLASS__) . '
 		FROM livebox_calls';
 		return DB::Prepare($sql, array(), DB::FETCH_TYPE_ALL, PDO::FETCH_CLASS, __CLASS__);
-	}
-
-	public static function deleteAllFavorites() {
-		$sql = 'DELETE	from `livebox_calls` WHERE favorite = 1';
-		$row =	DB::Prepare($sql, array(), DB::FETCH_TYPE_ROW);
-	}
-
-	public static function allFavorites() {
-		$sql = 'SELECT ' . DB::buildField(__CLASS__) . '
-		FROM livebox_calls
-		WHERE favorite=1';
-		$result = DB::Prepare($sql, array(), DB::FETCH_TYPE_ALL, PDO::FETCH_CLASS, __CLASS__);
-		return $result;
 	}
 
 	/*	   * *********************Methode d'instance************************* */
@@ -1746,15 +1694,6 @@ class livebox_calls {
 	public function setIsFetched($_isFetched) {
 		$this->_changed = utils::attrChanged($this->_changed,$this->isFetched,$_isFetched);
 		$this->isFetched = $_isFetched;
-	}
-
-	public function getFavorite() {
-		return $this->favorite;
-	}
-
-	public function setFavorite($_favorite) {
-		$this->_changed = utils::attrChanged($this->_changed,$this->favorite,$_favorite);
-		$this->favorite = $_favorite;
 	}
 
 	public function getChanged() {
