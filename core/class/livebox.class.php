@@ -1229,7 +1229,12 @@ class livebox extends eqLogic {
 				$noDeroulantWidget = 0;
 				$cmd = $this->getCmd(null, 'callstable');
 				if ( is_object($cmd)) {
-					if ($cmd->getTemplate('dashboard') != 'livebox::deroulant' && $cmd->getTemplate('dashboard') != 'deroulantv3') {
+					$widget_name = $cmd->getTemplate('dashboard');
+					if(strpos($widget_name,'::') !== false){
+						$name = explode('::',$widget_name);
+						$widget_name = $name[1];
+					}
+					if ($widget_name != 'deroulant' && $widget_name != 'deroulantv3') {
 						$noDeroulantWidget = 1;
 					}
 				}
