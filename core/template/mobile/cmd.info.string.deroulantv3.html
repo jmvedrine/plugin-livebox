@@ -1,27 +1,64 @@
 <div style="padding:5px; min-width:30px; min-height:30px;" class="cmd #history# container-fluid tooltips cmd-widget" data-type="info" data-version="#version#" data-eqLogic_id="#eqLogic_id#" data-subtype="other" data-cmd_id="#id#" data-cmd_uid="#uid#">
 	<center>
-      <span class="cmdName #hide_name#">#name_display# </span>
-      <div class="cmdInfo#uid#">#state# #unite#</div>
+	  <span class="cmdName" style="font-weight: bold;font-size : 12px; #hideCmdName#">#name_display#</span>
+	  <div class="cmdInfo#uid#">#state# #unite#</div>
 	</center>
   <style>
-    div.cmdInfo#uid# {
+	div.cmdInfo#uid# {
 		overflow-y:scroll;
-      	border:#000000 1px solid;
-      	font-size : 14px;
-      	width:450px;
-      	min-height:15px;
-      	max-height:150px;
-      	font-size:12px;
-      	font-weight: bold;
-      	word-wrap: break-word;
-      	text-align: left
-    }
+		border:#000000 1px solid;
+		font-size : 12px;
+		min-height:15px;
+		font-weight: bold;
+		word-wrap: break-word;
+		text-align: left
+	}
   </style>
 	<script>
-		jeedom.cmd.update['#id#'] = function(_options){
-			$('.cmdInfo#uid#').html(_options.display_value);
-			$('.cmd[data-cmd_id=#id#]').attr('title','Valeur du '+_options.valueDate+', collectée le '+_options.collectDate);
+    function addFavoriteCB(result,_num) {
+      if (typeof result !== "undefined" && result !== null) {
+        var x = document.getElementById("Phone"+_num);
+        if(x != null) x.innerHTML = result;
+			$.ajax({
+				type: 'POST',
+				url: 'plugins/livebox/core/ajax/livebox.ajax.php',
+				data: {
+					action: 'addFavorite',
+					num: init(_num),
+            name: init(result),
+					},
+				dataType: 'json',
+					error: function (request, status, error) {
+					handleAjaxError(request, status, error);
+				},
+				success: function (data) {
+					if (data.state != 'ok') {
+						$('#div_alert').showAlert({message: data.result, level: 'danger'});
+						return;
+					}
+            $('#div_alert').showAlert({message: 'Favori ajouté avec succès', level: 'success'});
+          }
+        });
+      }
+    }
+
+    function addfavorite(_num, _name) {
+      bootbox.prompt({
+        title: 'Entrez le nom du favori pour le : ' + _num,
+        value: _name,
+        callback: function (result) {
+          addFavoriteCB(result,_num);
+				}
+			});
 		}
-		jeedom.cmd.update['#id#']({display_value:'#state#',valueDate:'#valueDate#',collectDate:'#collectDate#',alertLevel:'#alertLevel#'});
+
+		jeedom.cmd.update['#id#'] = function(_options){
+		var cmd = $('.cmd[data-cmd_id=#id#]')
+		var valueH = is_numeric('#hauteurMax#') ? parseFloat('#hauteurMax#'):150;
+		var valueL = is_numeric('#largeur#') ? parseFloat('#largeur#'):100;
+			cmd.find('.cmdInfo').html(_options.display_value).css({"width":valueL+'%',"max-height":valueH+'px'});
+			cmd.attr('title','Date de valeur : '+_options.valueDate+'<br/>Date de collecte : '+_options.collectDate);
+		}
+		jeedom.cmd.update['#id#']({display_value:'#state#',valueDate:'#valueDate#',collectDate:'#collectDate#'});
 	</script>
 </div>

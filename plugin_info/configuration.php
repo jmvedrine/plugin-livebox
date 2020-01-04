@@ -51,6 +51,7 @@ if (!isConnect()) {
 	<legend>{{Favoris}}
 	  <a class="btn btn-xs btn-success pull-right" id="bt_addFavorite"><i class="fas fa-plus"></i> {{Ajouter}}</a>
 	</legend>
+	<div class="tblfavorites">
 	<table class="table table-bordered table-condensed" id="table_favorites" style="width:50% !important;">
 	  <thead>
 		<tr>
@@ -63,42 +64,52 @@ if (!isConnect()) {
 
 	  </tbody>
 	</table>
+	</div>
   </fieldset>
 </form>
-
+<style>
+	div.tblfavorites {
+		overflow-y:scroll;
+		border:#000000 1px solid;
+		min-height:15px;
+		max-height:180px;
+		width: 50%;
+	}
+</style>
 <script>
 jeedom.config.load({
   configuration: 'favorites',
   plugin : 'livebox',
   error: function (error) {
-    $('#div_alert').showAlert({message: error.message, level: 'danger'});
+	$('#div_alert').showAlert({message: error.message, level: 'danger'});
   },
   success: function (data) {
-    if(data === false){
-      return;
-    }
-    var tr='';
-    for(var i in data){
-      tr += '<tr class="favorite">';
-      tr += '<td>';
-      tr += '<input class="form-control favoriteAttr" data-l1key="callerName" value="'+data[i].callerName+'" />';
-      tr += '</td>';
-      tr += '<td>';
-      tr += '<input class="form-control favoriteAttr" data-l1key="phone" value="'+data[i].phone+'" />';
-      tr += '</td>';
-      tr += '<td>';
-      tr += '<a class="btn btn-default btn-xs bt_removeFavorite pull-right"><i class="fas fa-minus"></i></a>';
-      tr += '</td>';
-      tr += '</tr>';
-    }
-    $('#table_favorites tbody').empty().append(tr);
+	if(data === false){
+	  return;
+	}
+	data.sort((a, b) => a.callerName.localeCompare(b.callerName));
+	var tr='';
+	for(var i in data){
+	  tr += '<tr class="favorite">';
+	  tr += '<td>';
+	  tr += '<input class="form-control favoriteAttr" data-l1key="callerName" value="'+data[i].callerName+'" />';
+	  tr += '</td>';
+	  tr += '<td>';
+	  tr += '<input class="form-control favoriteAttr" data-l1key="phone" value="'+data[i].phone+'" />';
+	  tr += '</td>';
+	  tr += '<td>';
+	  tr += '<a class="btn btn-default btn-xs bt_removeFavorite pull-right"><i class="fas fa-minus"></i></a>';
+	  tr += '</td>';
+	  tr += '</tr>';
+	}
+	$('#table_favorites tbody').empty().append(tr);
   }
 });
 
 function livebox_postSaveConfiguration(){
   var favorites = $('#table_favorites .favorite').getValues('.favoriteAttr');
   for( var i = favorites.length-1; i>=0;i--){
-     if ( favorites[i].phone == '' || favorites[i].callerName == '') favorites.splice(i, 1);
+	 if ( favorites[i].phone == '' || favorites[i].callerName == '') favorites.splice(i, 1);
   }
   jeedom.config.save({
 	configuration:{'favorites' : favorites},

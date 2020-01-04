@@ -11,35 +11,48 @@
 		border:#000000 1px solid;
 		font-size : 12px;
 		min-height:15px;
-		font-size:12px;
 		font-weight: bold;
 		word-wrap: break-word;
 		text-align: left
 	}
   </style>
 	<script>
-		function addfavorite(_num, _name) {
-			$.ajax({
-				type: 'POST',
-				url: 'plugins/livebox/core/ajax/livebox.ajax.php',
-				data: {
-					action: 'addFavorite',
-					num: init(_num),
-					name: init(_name),
-					},
-				dataType: 'json',
-					error: function (request, status, error) {
-					handleAjaxError(request, status, error);
-				},
-				success: function (data) {
-					if (data.state != 'ok') {
-						$('#div_alert').showAlert({message: data.result, level: 'danger'});
-						return;
-					}
-                    $('#div_alert').showAlert({message: '{{Favori ajouté avec succès}}', level: 'success'});
-				}
-			});
-		}
+    function addFavoriteCB(result,_num) {
+      if (typeof result !== "undefined" && result !== null) {
+        var x = document.getElementById("Phone"+_num);
+        if(x != null) x.innerHTML = result;
+        $.ajax({
+          type: 'POST',
+          url: 'plugins/livebox/core/ajax/livebox.ajax.php',
+          data: {
+            action: 'addFavorite',
+            num: init(_num),
+            name: init(result),
+            },
+          dataType: 'json',
+            error: function (request, status, error) {
+            handleAjaxError(request, status, error);
+          },
+          success: function (data) {
+            if (data.state != 'ok') {
+              $('#div_alert').showAlert({message: data.result, level: 'danger'});
+              return;
+            }
+            $('#div_alert').showAlert({message: 'Favori ajouté avec succès', level: 'success'});
+          }
+        });
+      }
+    }
+
+    function addfavorite(_num, _name) {
+      bootbox.prompt({
+        title: 'Entrez le nom du favori pour le : ' + _num,
+        value: _name,
+        callback: function (result) {
+          addFavoriteCB(result,_num);
+        }
+      });
+    }
 
 		jeedom.cmd.update['#id#'] = function(_options){
 		var cmd = $('.cmd[data-cmd_id=#id#]')

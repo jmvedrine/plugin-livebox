@@ -1226,24 +1226,33 @@ class livebox extends eqLogic {
 
 			//	Tous les appels
 			if ($totalCallsNumber > 0) {
+				$noDeroulantWidget = 0;
+				$cmd = $this->getCmd(null, 'callstable');
+				if ( is_object($cmd)) {
+					if ($cmd->getTemplate('dashboard') != 'livebox::deroulant' && $cmd->getTemplate('dashboard') != 'deroulantv3') {
+						$noDeroulantWidget = 1;
+					}
+				}
 				$groupCallsByPhone = config::byKey('groupCallsByPhone',__CLASS__, 0);
 				$callsTable = "$tabstyle<table border=1>";
 				$callsTable .=	"<tr><th>Nom</th><th>Numéro</th><th>Date</th><th>Durée</th><th></th></tr>";
 				$favorite=0;
 				foreach($calls as &$call) {
 					if($call["processed"] == 0) {
-						$callerName = trim($this->getCallerName($call["num"],$favorite));
+						$callNum = trim($call['num']);
+						$callerName = trim($this->getCallerName($callNum,$favorite));
 						$callsTable .= "<tr>";
-						if($favorite == 1 ) {// Pas de lien sur les favoris
-							$callsTable .= "<td>$callerName</td>";
+						$callsTable .= "<td id=\"Phone$callNum\">";
+						if($favorite == 1 || $noDeroulantWidget) {// Pas de lien sur les favoris
+							$callsTable .= "$callerName</td>";
 						} else {
-							$callsTable .= "<td><a class='btn-sm bt_plus' title='Ajouter $callerName " .$call["num"] ." en favori' onclick='addfavorite(\"" .$call["num"] . "\",\"" . $callerName . "\")'><i class='icon icon_green fas fa-heart '></i></a> $callerName</td>";
+							$callsTable .= "<a class='btn-sm bt_plus' title='Ajouter $callerName $callNum en favori' onclick='addfavorite(\"" .$callNum . "\",\"" . $callerName . "\")'><i class='icon icon_green fas fa-heart '></i></a> $callerName</td>";
 						}
-						$callsTable .= "<td>".$this->fmt_numtel($call["num"])."</td><td>".$this->fmt_date($call["timestamp"])."</td><td>".$this->fmt_duree($call["duree"])."</td><td>".$call["icon"]."</td></tr>";
+						$callsTable .= "<td>".$this->fmt_numtel($callNum)."</td><td>".$this->fmt_date($call["timestamp"])."</td><td>".$this->fmt_duree($call["duree"])."</td><td>".$call["icon"]."</td></tr>";
 						$call["processed"] = 1;
 						if($groupCallsByPhone == 1) { // regroupement des appels par numero
 							foreach($calls as &$call2) {
-								if($call2["processed"] == 0 && $call["num"] == $call2["num"]) {
+								if($call2["processed"] == 0 && $callNum == $call2["num"]) {
 									$callsTable .= "<tr><td></td><td></td>";
 									$callsTable .= "<td>".$this->fmt_date($call2["timestamp"])."</td><td>".$this->fmt_duree($call2["duree"])."</td><td>".$call2["icon"]."</td></tr>";
 									$call2["processed"] = 1;
@@ -1392,7 +1401,7 @@ class livebox extends eqLogic {
 				return $favori['callerName'];
 			}
 		}
-        // Ce n'est pas un favori
+		// Ce n'est pas un favori
 		$usepagesjaunes = config::byKey('pagesjaunes','livebox', false);
 		$responses = livebox_calls::searchByPhone($normalizedPhone);
 		if (!is_array($responses) || count($responses) ===0) {
@@ -1424,7 +1433,7 @@ class livebox extends eqLogic {
 			log::add('livebox','debug','caller already stored');
 			// On prend le premier retourné car priorité aux plus récents.
 			$caller = $responses[0];
-            $favorite = 0;
+			$favorite = 0;
 			if ($caller->getIsFetched() == 0) {
 				log::add('livebox','debug','but it is not fetched');
 				if($usepagesjaunes == 1) {
