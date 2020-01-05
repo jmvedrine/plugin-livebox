@@ -52,7 +52,7 @@ if (!isConnect()) {
 	  <a class="btn btn-xs btn-success pull-right" id="bt_addFavorite"><i class="fas fa-plus"></i> {{Ajouter}}</a>
 	</legend>
 	<div class="tblfavorites">
-	<table class="table table-bordered table-condensed" id="table_favorites" style="width:50% !important;">
+	<table class="table table-bordered table-condensed" id="table_favorites">
 	  <thead>
 		<tr>
 		  <th>{{Nom}}</th>
