@@ -35,10 +35,11 @@ Detail complet des mises à jour sur https://github.com/jmvedrine/plugin-livebox
 - Ajout des caractéristiques de la box dans la page équipement
 - Nouvelles commandes pour les appels entrants, sortants et manqués (nombre et tableau des appels)
 
-# Version du 25/12/2019
+# Version du 06/01/2020
 
 - Widgets pour les durées et ascenseurs pour les tableaux (versions pour Jeedom V3 et V4). Widgets contribués par jpty et Nemeraud.
 - Lien avec le plugin agenda s'il est installé pour pouvoir plus facilement programmer les commandes action et voir les programmations
 - Possibilité d'aller chercher sur Pages Jaunes les noms des appelants (à activer dans la configuration du plugin). Fonctionnalité basée sur l'idée et le code de Jpty.
 - Gestion d'une liste de Favoris pour afficher leur nom même s'il n'est pas donné par Pages Jaunes. Fonctionnalité basée sur l'idée et le code de Jpty.
+- Possibilité de regrouper les appels par numéros
 - Durée minimum d'un appel pour qu'il soit considéré comme manqué
