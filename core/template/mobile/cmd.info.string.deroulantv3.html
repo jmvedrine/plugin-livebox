@@ -56,7 +56,7 @@
 		var cmd = $('.cmd[data-cmd_id=#id#]')
 		var valueH = is_numeric('#hauteurMax#') ? parseFloat('#hauteurMax#'):150;
 		var valueL = is_numeric('#largeur#') ? parseFloat('#largeur#'):100;
-			cmd.find('.cmdInfo').html(_options.display_value).css({"width":valueL+'%',"max-height":valueH+'px'});
+			cmd.find('.cmdInfo#uid#').html(_options.display_value).css({"width":valueL+'%',"max-height":valueH+'px'});
 			cmd.attr('title','Date de valeur : '+_options.valueDate+'<br/>Date de collecte : '+_options.collectDate);
 		}
 		jeedom.cmd.update['#id#']({display_value:'#state#',valueDate:'#valueDate#',collectDate:'#collectDate#'});
