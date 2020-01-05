@@ -13,7 +13,7 @@ Le plugin a été testé avec les versions suivantes de la Livebox :
 - Livebox 2
 - Livebox Play
 - Livebox 4 (depuis la version du 09/12/2019)
-- Livebox 5 (depuis la version du 13/12/2019)
+- Livebox 5 ou Livebox Fibre (depuis la version du 13/12/2019)
 
 Informations visibles :
 ---
@@ -28,6 +28,21 @@ Informations visibles :
 - **Numéro de téléphone** : numéro de téléphone VoIP
 - **Etat Wifi** : état du service Wifi. Pour Livebox 2 : uniquement Wifi 2.4Ghz. Pour les Livebox Play, 4 et 5: état du service Wifi pour les fréquences 2.4Ghz et 5Ghz
 - **Etat Wifi invité** : état du service Wifi invité pour la Livebox 4
+- **Nombre des appels entrants**
+- **Nombre des appels sortants**
+- **Nombre des appels manqués**
+- **Nombre total des appels**
+- **Liste des appels entrants**
+- **Liste des appels sortants**
+- **Liste des appels manqués**
+- **Liste des appels**
+
+Pour les 4 listes des appels un widget (deroulant avec Jeedom V4 et deroulantv3 avec Jeedom V3) est disponible qui permet d'avoir une liste déroulante avec un ascenseur 
+pour limiter la place prise par la liste sur le dashboard. Avec Jeedom V3 ce widget est copié dans le plugin Widget lors de l'installation pour être plus facilement disponible.
+
+Dans la table **Liste des appels** un petit cœur (vert si vous avez activé les icônes colorées) permet d'ajouter un correspondant dans la liste des favoris s'il n'y est pas déjà
+en indiquant au passage le nom sous lequel on souhaite voir listés ses appels. Attention cette fonctionnalité est dépendante du widget deroulant ou deroulantv3. 
+Si vous avez choisi un autre widget elle ne sera pas disponible.
 
 Actions possibles :
 ---
@@ -63,9 +78,13 @@ Le nom n'est recherché qu'une fois sur Pages jaunes, il est mémorisé dans la 
 - **Durée min appel entrant (s)** : les appels entrants dont la durée en secondes est inférieure à cette valeur seront considérés comme manqués.
 Cela permet par exemple de considérer l'apel comme manqué si le correspondant raccroche dès qu'il constate qu'il est en ligne avec un répondeur.
 
+- **Regroupement par numéro de téléphone dans la liste des appels** Si cette option est conchée, les appels seront regroupés par numéro d'appel. Dans le cas de plusieurs
+appels d'un même correspondant le nom et le numéro ne sont pas répétés dans la table.
+
 - **Favoris** : Vous pouvez entrer dans ce tableau des noms et des numéros de téléphone associés. cela permet par exemple de personnaliser le nom d'un correspondant ("Frangin", "Jimmy", ...) 
 ou d'indiquer un nom pour un correspondant étranger. Il y a un bouton pour ajouter une ligne ou supprimer un favori.
 Si un numéro est dans les favoris, le nom associé a toujours priorité et Pages jaunes ne sera pas consulté pour ce numéro.
+Il est possible d'utiliser les favoris même si **Utiliser Pages jaunes** n'est pas coché.
 
 Attention ! N'oubliez pas de cliquer sur Sauvegarder pour que les favoris soient enregistrés.
 
@@ -113,6 +132,8 @@ Les paramètres suivants ne sont visibles qu'en connexion de type dsl ou vdsl :
 - Marge de bruit montant
 - Marge de bruit descendant
 
+Si le plugin Agenda est installé et activé un onglet **Programmation** permet de programmer les commandes action du plugin dans un agenda et fournit leur liste s'il y en a.
+
 FAQ
 ===
 
@@ -154,3 +175,8 @@ Le plugin ne supporte pas certains caractères spéciaux genre # et @.
 *Je change de Livebox, faut-il faire quelque chose ?*
 
 Il est nécessaire de sauvegarder à nouveau l'équipement Livebox pour que le plugin gère bien la détection du modèle.
+
+*Pourquoi ces "Oups" dans la liste des appels ?*
+
+C'est ce que répond Pages jaunes s'il ne peut révéler le nom du correspondant (liste rouge, ligne interne à une entreprise, ...).
+Si vous connaissez e nom du correspondant vous pouvez l'indiquer en favori pour éviter le Oups.
