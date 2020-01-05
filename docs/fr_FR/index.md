@@ -78,7 +78,7 @@ Le nom n'est recherché qu'une fois sur Pages jaunes, il est mémorisé dans la 
 - **Durée min appel entrant (s)** : les appels entrants dont la durée en secondes est inférieure à cette valeur seront considérés comme manqués.
 Cela permet par exemple de considérer l'apel comme manqué si le correspondant raccroche dès qu'il constate qu'il est en ligne avec un répondeur.
 
-- **Regroupement par numéro de téléphone dans la liste des appels** Si cette option est conchée, les appels seront regroupés par numéro d'appel. Dans le cas de plusieurs
+- **Regroupement par numéro de téléphone dans la liste des appels** Si cette option est cochée, les appels seront regroupés par numéro d'appel. Dans le cas de plusieurs
 appels d'un même correspondant le nom et le numéro ne sont pas répétés dans la table.
 
 - **Favoris** : Vous pouvez entrer dans ce tableau des noms et des numéros de téléphone associés. cela permet par exemple de personnaliser le nom d'un correspondant ("Frangin", "Jimmy", ...) 
@@ -179,4 +179,4 @@ Il est nécessaire de sauvegarder à nouveau l'équipement Livebox pour que le p
 *Pourquoi ces "Oups" dans la liste des appels ?*
 
 C'est ce que répond Pages jaunes s'il ne peut révéler le nom du correspondant (liste rouge, ligne interne à une entreprise, ...).
-Si vous connaissez e nom du correspondant vous pouvez l'indiquer en favori pour éviter le Oups.
+Si vous connaissez le nom du correspondant vous pouvez l'indiquer en favori pour éviter le Oups.
