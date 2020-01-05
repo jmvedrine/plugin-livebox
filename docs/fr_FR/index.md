@@ -40,6 +40,12 @@ Informations visibles :
 Pour les 4 listes des appels un widget (deroulant avec Jeedom V4 et deroulantv3 avec Jeedom V3) est disponible qui permet d'avoir une liste déroulante avec un ascenseur 
 pour limiter la place prise par la liste sur le dashboard. Avec Jeedom V3 ce widget est copié dans le plugin Widget lors de l'installation pour être plus facilement disponible.
 
+Pour les widgets deroulant et deroulantv3 les paramètres optionnels suivants sont disponibles pour ajuster leurs dimensions (merci à Salvialf pour ce code)
+
+**hauteurMax** : hauteur maximum en pixels. Valeur par défaut = 150
+
+**largeur** : largeur en %. Valeur par défaut = 100
+
 Dans la table **Liste des appels** un petit cœur (vert si vous avez activé les icônes colorées) permet d'ajouter un correspondant dans la liste des favoris s'il n'y est pas déjà
 en indiquant au passage le nom sous lequel on souhaite voir listés ses appels. Attention cette fonctionnalité est dépendante du widget deroulant ou deroulantv3. 
 Si vous avez choisi un autre widget elle ne sera pas disponible.
@@ -47,7 +53,7 @@ Si vous avez choisi un autre widget elle ne sera pas disponible.
 Actions possibles :
 ---
 
-- **Activation/Désactivation du WiFi** : permet d'activer ou de désactiver le WiFi. Pour Livebox 2 : uniquement le Wifi 2.4Ghz. Pour Livebox Play, 4 et 5: activation/désactivation par carte WiFi (2.4Ghz et/ou 5Ghz).
+- **Activation/Désactivation du WiFi** : permet d'activer ou de désactiver le WiFi. Pour Livebox 2 : uniquement le Wifi 2.4Ghz. Pour Livebox Play, 4 et 5: activation/désactivation par fréquence WiFi (2.4Ghz et/ou 5Ghz).
 - **Activation/Désactivation du WiFi invité** : Pour Livebox 4, permet d'activer ou de désactiver le WiFi invité (les fréquences activées sont les mêmes que pour le Wifi privé).
 - **Reboot** : permet de redémarrer la Livebox
 - **Sonner** : permet de faire sonner votre téléphone VoIP pendant 5 secondes (pour tester le fonctionnement entre la Livebox et votre téléphone)
