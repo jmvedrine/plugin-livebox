@@ -46,7 +46,7 @@ class livebox extends eqLogic {
 	}
 	public static function addFavorite($num,$name) {
 		$favoris = config::byKey('favorites','livebox',array());
-        $found = false;
+		$found = false;
 		foreach ($favoris as $favori) {
 			if($favori['phone'] == $num){
 				$found = true;
@@ -1485,10 +1485,10 @@ class livebox extends eqLogic {
 				$fmt = substr($num,0,2) .' '.substr($num,2,2) .' '.substr($num,4,2) .' '.substr($num,6,2) .' '.substr($num,8);
 				$usepagesjaunes = config::byKey('pagesjaunes','livebox', false);
 				if($usepagesjaunes == 1) {
-                    return($fmt);
+					return($fmt);
 				} else {
-                    return("<a target=_blank href=\"https://www.pagesjaunes.fr/annuaireinverse/recherche?quoiqui=".$num."&proximite=0\">".$fmt."</a>");
-                }
+					return("<a target=_blank href=\"https://www.pagesjaunes.fr/annuaireinverse/recherche?quoiqui=".$num."&proximite=0\">".$fmt."</a>");
+				}
 			}
 		}
 		return($num);
