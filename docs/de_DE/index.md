@@ -186,3 +186,8 @@ Il est nécessaire de sauvegarder à nouveau l'équipement Livebox pour que le p
 
 C'est ce que répond Pages jaunes s'il ne peut révéler le nom du correspondant (liste rouge, ligne interne à une entreprise, ...).
 Si vous connaissez le nom du correspondant vous pouvez l'indiquer en favori pour éviter le Oups.
+
+*Sur Jeedom Smart comment faire pour que les dates des appels soient en français*
+
+Malheureusement le package locale français ne semble pas installé sur Smart. Passez la commande sudo dpkg-reconfigure locales pour installer le package fr_FR.UTF-8.
+La commande locale -a permet de lister les locales disponibles.
