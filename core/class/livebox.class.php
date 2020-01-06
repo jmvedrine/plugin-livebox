@@ -1482,13 +1482,12 @@ class livebox extends eqLogic {
 			}
 			if(strlen($num) == 10) {
 				$fmt = substr($num,0,2) .' '.substr($num,2,2) .' '.substr($num,4,2) .' '.substr($num,6,2) .' '.substr($num,8);
-				return("<a target=_blank href=\"https://www.pagesjaunes.fr/annuaireinverse/recherche?quoiqui=".$num."&proximite=0\">".$fmt."</a>");
-			} else {
-				return("<a target=_blank href=\"https://www.pagesjaunes.fr/annuaireinverse/recherche?quoiqui=".$num."&proximite=0\">".$num."</a>");
+				$usepagesjaunes = config::byKey('pagesjaunes','livebox', false);
+				if($usepagesjaunes == 1) return($fmt);
+				else return("<a target=_blank href=\"https://www.pagesjaunes.fr/annuaireinverse/recherche?quoiqui=".$num."&proximite=0\">".$fmt."</a>");
 			}
-		} else {
-			return($num);
 		}
+		return($num);
 	}
 }
 
