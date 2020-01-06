@@ -46,6 +46,7 @@ class livebox extends eqLogic {
 	}
 	public static function addFavorite($num,$name) {
 		$favoris = config::byKey('favorites','livebox',array());
+		$found = 0;
 		foreach ($favoris as $favori) {
 			if($favori['phone'] == $num){
 				$found = true;
