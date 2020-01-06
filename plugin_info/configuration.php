@@ -87,7 +87,7 @@ jeedom.config.load({
 	if(data === false){
 	  return;
 	}
-	data.sort((a, b) => a.callerName.localeCompare(b.callerName));
+	if (data.length > 1 ) data.sort((a, b) => a.callerName.localeCompare(b.callerName));
 	var tr='';
 	for(var i in data){
 	  tr += '<tr class="favorite">';
