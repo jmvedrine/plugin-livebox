@@ -1465,11 +1465,12 @@ class livebox extends eqLogic {
 	}
 
 	function fmt_duree($duree) {
+		if (floor($duree)==0) return '0s';
 		$h = floor($duree/3600); $m = floor(($duree%3600)/60); $s = $duree%60;
 		$fmt = '';
 		if($h>0) $fmt .= $h.'h ';
-		if($m>0) $fmt .= $m.'mn ';
-		$fmt .= $s.'s';
+		if($m>0) $fmt .= $m.'min ';
+		if($s>0) $fmt .= $s.'s';
 		return($fmt);
 	}
 
