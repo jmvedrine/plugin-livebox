@@ -1,4 +1,4 @@
-Présentation
+Presentation
 ===
 Ce plugin permet de récupérer des informations de la Livebox et de lancer des actions.
 Il a été développé à l'origine par Thomas Guenneguez.
@@ -6,10 +6,10 @@ Il a été développé à l'origine par Thomas Guenneguez.
 La fonctionnalité de recherche du nom des appelants (***Utiliser Pages jaunes***et***Favoris***) est basée sur l'idée et le code de jpty qui en a aussi assuré le test.
 Merci à lui pour toute l'aide apportée.
 
-Compatibilité :
+Compatibility:
 ---
 
-Le plugin a été testé avec les versions suivantes de la Livebox :
+The plugin has been tested with the following versions of the Livebox:
 - Livebox 2
 - Livebox Play
 - Livebox 4 (depuis la version du 09/12/2019)
