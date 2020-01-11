@@ -12,6 +12,6 @@ Il permet de contrôler la box Internet du founisseur d'accès Orange. Les modè
 
 Le plugin a été développé à l'origine par Thomas Guenneguez.
 
-Le plugin a été testé avec les Livebox version 2, Play et 4. Faute de matériel il n'a pas été testé avec la Livebox 5.
+Le plugin a été testé avec les Livebox version 2, Play, 4 et 5 (aussi appelée Livebox Fibre).
 
-Si vous procédez à des tests, signalez le résultat de vos essais sur le forum Communautaire Jeedom Catégorie Plugins -> Communication avec le tag "plugin-livebox". Merci
+Pour signaler des problèmes, demander des conseils ou proposer des évolutions, utilisez le forum Communautaire Jeedom Catégorie Plugins -> Communication avec le tag "plugin-livebox". Merci
