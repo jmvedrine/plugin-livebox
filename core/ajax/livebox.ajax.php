@@ -58,6 +58,31 @@ try {
 			}
 			ajax::success(utils::o2a($return));
 			break;
+		case 'syncLivebox':
+			if (!isConnect('admin')) {
+				throw new \Exception('401 Unauthorized');
+			}
+			if(init('what'))
+				$param=init('what');
+			else
+				$param=null;
+			livebox::syncLivebox($param);
+			ajax::success();
+			break;
+		case 'deleteDisabledEQ':
+			if (!isConnect('admin')) {
+				throw new \Exception('401 Unauthorized');
+			}
+			livebox::deleteDisabledEQ(init('what'));
+			ajax::success();
+			break;
+		case 'noMoreIgnore':
+			if (!isConnect('admin')) {
+				throw new \Exception('401 Unauthorized');
+			}
+			livebox::noMoreIgnore(init('what'));
+			ajax::success();
+			break;
 	}
 	throw new \Exception('Aucune méthode correspondante');
 } catch (\Exception $e) {

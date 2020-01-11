@@ -25,6 +25,37 @@ if (!isConnect()) {
 
 <form class="form-horizontal">
 	<fieldset>
+		<legend>
+			<i class="fa fa-list-alt"></i> {{Paramètres}}
+		</legend>
+		<div class="form-group">
+		  <label class="col-lg-4 control-label" >{{Pièce par défaut pour les Clients}}</label>
+		  <div class="col-lg-3">
+			<select id="sel_object" class="configKey form-control" data-l1key="defaultParentObject">
+			  <option value="">{{Aucune}}</option>
+			  <?php
+				foreach (jeeObject::all() as $object) {
+				  echo '<option value="' . $object->getId() . '">' . $object->getName() . '</option>';
+				}
+			  ?>
+			</select>
+		  </div>
+		</div>
+<?php
+	$ignoredClients=config::byKey('ignoredClients','livebox',[],true);
+	if(count($ignoredClients)) :
+?>
+		<div class="form-group">
+			<label class="col-lg-4 control-label">{{Réinitialiser}}</label>
+			<div class="col-lg-3">
+				<a class="btn btn-default" id="bt_noMoreIgnore"><i class='fa fa-trash'></i> {{Ne plus ignorer les clients supprimés}}</a>
+			</div>
+		</div>
+<?php
+	endif;
+?>
+	</fieldset>
+	<fieldset>
 		<div class="form-group">
 			<label class="col-sm-4 control-label">{{Utiliser Pages jaunes}}</label>
 			<div class="col-sm-2">
@@ -77,6 +108,28 @@ if (!isConnect()) {
 	}
 </style>
 <script>
+$('#bt_noMoreIgnore').on('click', function () {
+	$.ajax({// fonction permettant de faire de l'ajax
+		type: "POST", // methode de transmission des données au fichier php
+		url: "plugins/livebox/core/ajax/livebox.ajax.php", // url du fichier php
+		data: {
+			action: "noMoreIgnore",
+			what: "clients"
+		},
+		dataType: 'json',
+		error: function (request, status, error) {
+			handleAjaxError(request, status, error);
+		},
+		success: function (data) { // si l'appel a bien fonctionné
+		if (data.state != 'ok') {
+			$('#div_alert').showAlert({message: data.result, level: 'danger'});
+			return;
+		}
+		$('#div_alert').showAlert({message: '{{Action réussie}}', level: 'success'});
+	  }
+	});
+});
+
 jeedom.config.load({
   configuration: 'favorites',
   plugin : 'livebox',
