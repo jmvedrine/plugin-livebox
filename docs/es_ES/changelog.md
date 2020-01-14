@@ -42,4 +42,4 @@ Detail complet des mises à jour sur https://github.com/jmvedrine/plugin-livebox
 - Possibilité d'aller chercher sur Pages Jaunes les noms des appelants (à activer dans la configuration du plugin). Fonctionnalité basée sur l'idée et le code de Jpty.
 - Gestion d'une liste de Favoris pour afficher leur nom même s'il n'est pas donné par Pages Jaunes. Fonctionnalité basée sur l'idée et le code de Jpty.
 - Possibilité de regrouper les appels par numéros
-- Durée minimum d'un appel pour qu'il soit considéré comme manqué
+- Durée minimum d'un appel pour qu'il ne soit pas considéré comme manqué

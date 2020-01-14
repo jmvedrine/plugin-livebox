@@ -36,7 +36,26 @@
         "La Livebox ne répond pas.": "La Livebox ne répond pas.",
         "Le compte est incorrect.": "Le compte est incorrect.",
         "Equipement desactivé impossible d'éxecuter la commande : ": "Equipement desactivé impossible d'éxecuter la commande : ",
-        "Commande non implémentée actuellement": "Commande non implémentée actuellement'"
+        "Commande non implémentée actuellement": "Commande non implémentée actuellement'",
+        "Inconnu": "Inconnu",
+        "Autorisation permanente": "Autorisation permanente",
+        "Blocage permanent": "Blocage permanent",
+        "Planification": "Planification",
+        "Client inclus avec succès : ": "Client inclus avec succès : ",
+        "Debit montant": "Debit montant",
+        "Debit descendant": "Debit descendant",
+        "Marge de bruit montant": "Marge de bruit montant",
+        "Marge de bruit descendant": "Marge de bruit descendant",
+        "Dernière connexion": "Dernière connexion",
+        "Première connexion": "Première connexion",
+        "Dernier changement": "Dernier changement",
+        "Présent": "Présent",
+        "Adresse IP": "Adresse IP",
+        "Accès Internet": "Accès Internet",
+        "Bloquer en permanence": "Bloquer en permanence",
+        "Autoriser en permanence": "Autoriser en permanence",
+        "Planifier": "Planifier"
+        
     },
     "plugins\/livebox\/desktop\/js\/livebox.js": {
         "Fabricant": "Fabricant",
