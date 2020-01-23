@@ -1641,7 +1641,7 @@ class livebox extends eqLogic {
 			$activeclients = array();
 			if ( isset($content["status"]) ) {
 				foreach ( $content["status"] as $client ) {
-					if ( isset($client["IPAddressSource"]) && ($client["IPAddressSource"] == "DHCP" || $equipement["IPAddressSource"] == "Static")) {
+					if ( isset($client["IPAddressSource"]) && ($client["IPAddressSource"] == "DHCP" || $client["IPAddressSource"] == "Static")) {
 						array_push($devicelist, $client["Name"]);
 						$mac = $client['Key'];
 						$activeclients[$mac] = $client['Active'];
