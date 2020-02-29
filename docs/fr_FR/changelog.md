@@ -43,3 +43,8 @@ Detail complet des mises à jour sur https://github.com/jmvedrine/plugin-livebox
 - Gestion d'une liste de Favoris pour afficher leur nom même s'il n'est pas donné par Pages Jaunes. Fonctionnalité basée sur l'idée et le code de Jpty.
 - Possibilité de regrouper les appels par numéros
 - Durée minimum d'un appel pour qu'il soit considéré comme manqué
+
+# Version du 29/02/2020
+
+- Ajout des commandes lastmissedcall, lastincomingcall et lastoutgoingcall (merci jpty)
+- Ajout d'un lien sur les numéros de tel non favori et différent de Oups pour permettre d'avoir plus d'infos sur cet appelant que je ne connais pas. (merci jpty)
