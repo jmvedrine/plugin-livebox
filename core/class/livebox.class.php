@@ -77,30 +77,30 @@ class livebox extends eqLogic {
 			}
 			return false;
 	}
-    
-    public static function createClient($client, $boxId) {
-        $eqLogicClient = new livebox();
-        $mac = $client['Key'];
-        $defaultRoom = intval(config::byKey('defaultParentObject','livebox','',true));
-        $name= (isset($client["Name"]) && $client["Name"]) ? $client["Name"] : $mac;
-        if(self::nameExists($name)) {
-            log::add('livebox', 'debug', "Nom en double ".$name." renommé en ".$name.'_'.$mac);
-            $name = $name.'_'.$mac;
-        }
-        log::add('livebox', 'info', "Trouvé Client ".$name."(".$mac."):".json_encode($client));
-        $eqLogicClient->setName($name);
-        $eqLogicClient->setIsEnable(1);
-        $eqLogicClient->setIsVisible(0);
-        $eqLogicClient->setLogicalId($mac);
-        $eqLogicClient->setEqType_name('livebox');
-        if($defaultRoom) $eqLogicClient->setObject_id($defaultRoom);
-        $eqLogicClient->setConfiguration('type', 'cli');
-        $eqLogicClient->setConfiguration('boxId', $boxId);
-        $eqLogicClient->setConfiguration('macAddress',$mac);
-        $eqLogicClient->setConfiguration('deviceType',$client["DeviceType"]);
-        $eqLogicClient->setConfiguration('image',$eqLogicClient->getImage());
-        $eqLogicClient->save();
-    }
+
+	public static function createClient($client, $boxId) {
+		$eqLogicClient = new livebox();
+		$mac = $client['Key'];
+		$defaultRoom = intval(config::byKey('defaultParentObject','livebox','',true));
+		$name= (isset($client["Name"]) && $client["Name"]) ? $client["Name"] : $mac;
+		if(self::nameExists($name)) {
+			log::add('livebox', 'debug', "Nom en double ".$name." renommé en ".$name.'_'.$mac);
+			$name = $name.'_'.$mac;
+		}
+		log::add('livebox', 'info', "Trouvé Client ".$name."(".$mac."):".json_encode($client));
+		$eqLogicClient->setName($name);
+		$eqLogicClient->setIsEnable(1);
+		$eqLogicClient->setIsVisible(0);
+		$eqLogicClient->setLogicalId($mac);
+		$eqLogicClient->setEqType_name('livebox');
+		if($defaultRoom) $eqLogicClient->setObject_id($defaultRoom);
+		$eqLogicClient->setConfiguration('type', 'cli');
+		$eqLogicClient->setConfiguration('boxId', $boxId);
+		$eqLogicClient->setConfiguration('macAddress',$mac);
+		$eqLogicClient->setConfiguration('deviceType',$client["DeviceType"]);
+		$eqLogicClient->setConfiguration('image',$eqLogicClient->getImage());
+		$eqLogicClient->save();
+	}
 
 	public static function syncLivebox($what='all') {
 		log::add('livebox', 'info', "syncLivebox");
@@ -121,12 +121,12 @@ class livebox extends eqLogic {
 								if(!in_array($mac,$ignoredClients)) {
 									$lbcli = livebox::byLogicalId($mac, 'livebox');
 									if (!is_object($lbcli)) {
-                                        livebox::createClient($client, $eqLogic->getId());
-                                        event::add('jeedom::alert', array(
-                                            'level' => 'warning',
-                                            'page' => 'livebox',
-                                            'message' => __('Client inclus avec succès : ' .$mac, __FILE__),
-                                        ));
+										livebox::createClient($client, $eqLogic->getId());
+										event::add('jeedom::alert', array(
+											'level' => 'warning',
+											'page' => 'livebox',
+											'message' => __('Client inclus avec succès : ' .$mac, __FILE__),
+										));
 									}
 								}
 							}
@@ -366,29 +366,29 @@ class livebox extends eqLogic {
 			case "listcalls":
 				$listpage = array("sysbus/VoiceService.VoiceApplication:getCallList" => "");
 				break;
-            case "getschedule":
+			case "getschedule":
 				$listpage = array("sysbus/Scheduler:getSchedule" => '"type":"ToD","ID":"'.$option['mac'].'"');
 				break;
-            case "setschedule":
-                $listpage = array();
-                // First we get the schedule.
-                $param = '{"service":"Scheduler", "method":"getSchedule", "parameters": {"type":"ToD","ID":"'.$option['mac'].'"}}';
-                log::add('livebox','debug', 'in setschedule param = ' . $param);
-                $content = @file_get_contents('http://'.$this->getConfiguration('ip').'/ws', false, $this->getContext($param));
+			case "setschedule":
+				$listpage = array();
+				// First we get the schedule.
+				$param = '{"service":"Scheduler", "method":"getSchedule", "parameters": {"type":"ToD","ID":"'.$option['mac'].'"}}';
+				log::add('livebox','debug', 'in setschedule param = ' . $param);
+				$content = @file_get_contents('http://'.$this->getConfiguration('ip').'/ws', false, $this->getContext($param));
 				// $listpage = array("sysbus/Scheduler:addSchedule" => '"type":"ToD","ID":"'.$option['mac'].'"');
-                log::add('livebox','debug', 'in setschedule result of request = ' . $content);
-                if ( $content !== false) {
-                    $json = json_decode($content, true);
-                    if ( $json["status"] == true) {
-                        log::add('livebox','debug', 'in setschedule status ok');
-                        $schedule = $json["data"]["scheduleInfo"];
-                        log::add('livebox','debug', 'in setschedule schedule = ' . print_r($schedule, true));
-                        $schedule["override"] = $option['override'];
-                        log::add('livebox','debug', 'in setschedule schedule after modif = ' . print_r($schedule, true));
-                        $listpage = array("sysbus/Scheduler:addSchedule" => '"type":"ToD","info":' . json_encode($schedule));
-                        log::add('livebox','debug', 'in setschedule test = ' . print_r($test, true));
-                    }
-                }
+				log::add('livebox','debug', 'in setschedule result of request = ' . $content);
+				if ( $content !== false) {
+					$json = json_decode($content, true);
+					if ( $json["status"] == true) {
+						log::add('livebox','debug', 'in setschedule status ok');
+						$schedule = $json["data"]["scheduleInfo"];
+						log::add('livebox','debug', 'in setschedule schedule = ' . print_r($schedule, true));
+						$schedule["override"] = $option['override'];
+						log::add('livebox','debug', 'in setschedule schedule after modif = ' . print_r($schedule, true));
+						$listpage = array("sysbus/Scheduler:addSchedule" => '"type":"ToD","info":' . json_encode($schedule));
+						log::add('livebox','debug', 'in setschedule test = ' . print_r($test, true));
+					}
+				}
 				break;
 		}
 		$statuscmd = $this->getCmd(null, 'state');
@@ -522,7 +522,7 @@ class livebox extends eqLogic {
 					$cmd = $this->getCmd(null, 'margebruitmontant');
 					if ( ! is_object($cmd)) {
 						$cmd = new liveboxCmd();
-                            $cmd->setName(__('Marge de bruit montant', __FILE__));
+							$cmd->setName(__('Marge de bruit montant', __FILE__));
 						$cmd->setEqLogic_id($this->getId());
 						$cmd->setLogicalId('margebruitmontant');
 						$cmd->setUnite('dB');
@@ -535,7 +535,7 @@ class livebox extends eqLogic {
 					$cmd = $this->getCmd(null, 'margebruitdescendant');
 					if ( ! is_object($cmd)) {
 						$cmd = new liveboxCmd();
-                            $cmd->setName(__('Marge de bruit descendant', __FILE__));
+							$cmd->setName(__('Marge de bruit descendant', __FILE__));
 						$cmd->setEqLogic_id($this->getId());
 						$cmd->setLogicalId('margebruitdescendant');
 						$cmd->setUnite('dB');
@@ -1138,7 +1138,7 @@ class livebox extends eqLogic {
 			$cmd = $this->getCmd(null, 'lastlogin');
 			if ( ! is_object($cmd)) {
 				$cmd = new liveboxCmd();
-                $cmd->setName(__('Dernière connexion', __FILE__));
+				$cmd->setName(__('Dernière connexion', __FILE__));
 				$cmd->setEqLogic_id($this->getId());
 				$cmd->setLogicalId('lastlogin');
 				$cmd->setType('info');
@@ -1151,7 +1151,7 @@ class livebox extends eqLogic {
 			$cmd = $this->getCmd(null, 'firstseen');
 			if ( ! is_object($cmd)) {
 				$cmd = new liveboxCmd();
-                $cmd->setName(__('Première connexion', __FILE__));
+				$cmd->setName(__('Première connexion', __FILE__));
 				$cmd->setEqLogic_id($this->getId());
 				$cmd->setLogicalId('firstseen');
 				$cmd->setType('info');
@@ -1164,7 +1164,7 @@ class livebox extends eqLogic {
 			$cmd = $this->getCmd(null, 'lastchanged');
 			if ( ! is_object($cmd)) {
 				$cmd = new liveboxCmd();
-                $cmd->setName(__('Dernier changement', __FILE__));
+				$cmd->setName(__('Dernier changement', __FILE__));
 				$cmd->setEqLogic_id($this->getId());
 				$cmd->setLogicalId('lastchanged');
 				$cmd->setType('info');
@@ -1177,7 +1177,7 @@ class livebox extends eqLogic {
 			$cmd = $this->getCmd(null, 'present');
 			if ( ! is_object($cmd)) {
 				$cmd = new liveboxCmd();
-                $cmd->setName(__('Présent', __FILE__));
+				$cmd->setName(__('Présent', __FILE__));
 				$cmd->setEqLogic_id($this->getId());
 				$cmd->setLogicalId('present');
 				$cmd->setType('info');
@@ -1190,7 +1190,7 @@ class livebox extends eqLogic {
 			$cmd = $this->getCmd(null, 'ip');
 			if ( ! is_object($cmd)) {
 				$cmd = new liveboxCmd();
-                $cmd->setName(__('Adresse IP', __FILE__));
+				$cmd->setName(__('Adresse IP', __FILE__));
 				$cmd->setEqLogic_id($this->getId());
 				$cmd->setLogicalId('ip');
 				$cmd->setType('info');
@@ -1203,7 +1203,7 @@ class livebox extends eqLogic {
 			$cmd = $this->getCmd(null, 'access');
 			if ( ! is_object($cmd)) {
 				$cmd = new liveboxCmd();
-                $cmd->setName(__('Accès Internet', __FILE__));
+				$cmd->setName(__('Accès Internet', __FILE__));
 				$cmd->setEqLogic_id($this->getId());
 				$cmd->setLogicalId('access');
 				$cmd->setType('info');
@@ -1217,7 +1217,7 @@ class livebox extends eqLogic {
 			$cmd = $this->getCmd(null, 'block');
 			if ( ! is_object($cmd)) {
 				$cmd = new liveboxCmd();
-                $cmd->setName(__('Bloquer en permanence', __FILE__));
+				$cmd->setName(__('Bloquer en permanence', __FILE__));
 				$cmd->setEqLogic_id($this->getId());
 				$cmd->setLogicalId('block');
 				$cmd->setType('action');
@@ -1286,53 +1286,53 @@ class livebox extends eqLogic {
 			}
 		}
 	}
-    function refreshClientInfo($client, $lbcli) {
-        $clicmd = $lbcli->getCmd(null, 'lastlogin');
-        if (is_object($clicmd) && isset($client["LastConnection"]) && $client["LastConnection"] !== '') {
-                $value = livebox::format_time($client['LastConnection']);
-                $lbcli->checkAndUpdateCmd('lastlogin', $value);
-        }
-        $clicmd = $lbcli->getCmd(null, 'firstseen');
-        if (is_object($clicmd) && isset($client["FirstSeen"]) && $client["FirstSeen"] !== '') {
-            $value = livebox::format_time($client['FirstSeen']);
-            $lbcli->checkAndUpdateCmd('firstseen', $value);
-        }
-        $clicmd = $lbcli->getCmd(null, 'lastchanged');
-        if (is_object($clicmd) && isset($client["LastChanged"]) && $client["LastChanged"] !== '') {
-                $value = livebox::format_time($client['LastChanged']);
-                $lbcli->checkAndUpdateCmd('lastchanged', $value);
-        }
-        $clicmd = $lbcli->getCmd(null, 'ip');
-        if (is_object($clicmd) && isset($client["IPAddress"])) {
-                $lbcli->checkAndUpdateCmd('ip', $client['IPAddress']);
-        }
-        //Schedule
-        $scheduleclient = $this->getPage("getschedule", array('mac' => $lbcli->getConfiguration('macAddress')));
-        if ( $scheduleclient !== false ) {
-            log::add('livebox', 'debug', "Client ". $lbcli->getName() . " get schedule ".print_r($scheduleclient, true));
-            if (isset($scheduleclient["data"]["scheduleInfo"]["override"])) {
-                log::add('livebox', 'debug', "Client ". $lbcli->getName() . " schedule override ".$scheduleclient["data"]["scheduleInfo"]["override"]);
-                $value = __('Inconnu', __FILE__);
-                switch ($scheduleclient["data"]["scheduleInfo"]["override"]) {
-                    case 'Enable':
-                        $value = __('Autorisation permanente', __FILE__);
-                        break;
-                    case 'Disable':
-                        $value = __('Blocage permanent', __FILE__);
-                        break;
-                    case '':
-                        $value = __('Planification', __FILE__);
-                        break;
-                }
-                $clicmd = $lbcli->getCmd(null, 'access');
-                if (is_object($clicmd)) {
-                    $lbcli->checkAndUpdateCmd('access', $value);
-                }
-            }
-        } else {
-            log::add('livebox', 'debug', "Client ". $lbcli->getName() . " pas de schedule");
-        }
-    }
+	function refreshClientInfo($client, $lbcli) {
+		$clicmd = $lbcli->getCmd(null, 'lastlogin');
+		if (is_object($clicmd) && isset($client["LastConnection"]) && $client["LastConnection"] !== '') {
+				$value = livebox::format_time($client['LastConnection']);
+				$lbcli->checkAndUpdateCmd('lastlogin', $value);
+		}
+		$clicmd = $lbcli->getCmd(null, 'firstseen');
+		if (is_object($clicmd) && isset($client["FirstSeen"]) && $client["FirstSeen"] !== '') {
+			$value = livebox::format_time($client['FirstSeen']);
+			$lbcli->checkAndUpdateCmd('firstseen', $value);
+		}
+		$clicmd = $lbcli->getCmd(null, 'lastchanged');
+		if (is_object($clicmd) && isset($client["LastChanged"]) && $client["LastChanged"] !== '') {
+				$value = livebox::format_time($client['LastChanged']);
+				$lbcli->checkAndUpdateCmd('lastchanged', $value);
+		}
+		$clicmd = $lbcli->getCmd(null, 'ip');
+		if (is_object($clicmd) && isset($client["IPAddress"])) {
+				$lbcli->checkAndUpdateCmd('ip', $client['IPAddress']);
+		}
+		//Schedule
+		$scheduleclient = $this->getPage("getschedule", array('mac' => $lbcli->getConfiguration('macAddress')));
+		if ( $scheduleclient !== false ) {
+			log::add('livebox', 'debug', "Client ". $lbcli->getName() . " get schedule ".print_r($scheduleclient, true));
+			if (isset($scheduleclient["data"]["scheduleInfo"]["override"])) {
+				log::add('livebox', 'debug', "Client ". $lbcli->getName() . " schedule override ".$scheduleclient["data"]["scheduleInfo"]["override"]);
+				$value = __('Inconnu', __FILE__);
+				switch ($scheduleclient["data"]["scheduleInfo"]["override"]) {
+					case 'Enable':
+						$value = __('Autorisation permanente', __FILE__);
+						break;
+					case 'Disable':
+						$value = __('Blocage permanent', __FILE__);
+						break;
+					case '':
+						$value = __('Planification', __FILE__);
+						break;
+				}
+				$clicmd = $lbcli->getCmd(null, 'access');
+				if (is_object($clicmd)) {
+					$lbcli->checkAndUpdateCmd('access', $value);
+				}
+			}
+		} else {
+			log::add('livebox', 'debug', "Client ". $lbcli->getName() . " pas de schedule");
+		}
+	}
 
 	function refreshInfo() {
 		$content = $this->getPage('deviceinfo');
@@ -1646,16 +1646,16 @@ class livebox extends eqLogic {
 						$mac = $client['Key'];
 						$activeclients[$mac] = $client['Active'];
 						$lbcli = livebox::byLogicalId($mac, 'livebox');
-                        if (!is_object($lbcli)) {
+						if (!is_object($lbcli)) {
 							// Nouveau client.
-                            livebox::createClient($client, $this->getId());
-                            $lbcli = livebox::byLogicalId($mac, 'livebox');
-                        }
+							livebox::createClient($client, $this->getId());
+							$lbcli = livebox::byLogicalId($mac, 'livebox');
+						}
 						if (is_object($lbcli) && $lbcli->getConfiguration('type','') == 'cli') {
-                            if ($lbcli->getIsEnable()){
-                                 $this->refreshClientInfo($client, $lbcli);
-                             }
-							
+							if ($lbcli->getIsEnable()){
+								 $this->refreshClientInfo($client, $lbcli);
+							 }
+
 						}
 					}
 				}
@@ -1936,28 +1936,28 @@ class liveboxCmd extends cmd
 				switch ($this->getLogicalId()) {
 					case "block":
 						log::add('livebox','debug','Le client ' . $eqLogic->getName() . ' est bloqué');
-                        $option = array('mac' => $mac,'override' => 'Disable');
+						$option = array('mac' => $mac,'override' => 'Disable');
 						$page = "setschedule";
 						break;
 					case "authorize":
 						log::add('livebox','debug','Le client ' . $eqLogic->getName() . ' est autorisé');
-                        $option = array('mac' => $mac,'override' => 'Enable');
+						$option = array('mac' => $mac,'override' => 'Enable');
 						$page = "setschedule";
 						break;
 					case "schedule":
 						log::add('livebox','debug','Le client ' . $eqLogic->getName() . ' est planifié');
-                        $option = array('mac' => $mac,'override' => '');
+						$option = array('mac' => $mac,'override' => '');
 						$page = "setschedule";
 						break;
 				}
-                if ( $page != null ) {
-                    $boxEqLogic->getCookiesInfo();
-                    $content = $boxEqLogic->getPage($page, $option);
-                    $boxEqLogic->refreshInfo();
-                    $boxEqLogic->logOut();
-                } else {
-                    throw new Exception(__('Commande non implémentée actuellement', __FILE__));
-                }
+				if ( $page != null ) {
+					$boxEqLogic->getCookiesInfo();
+					$content = $boxEqLogic->getPage($page, $option);
+					$boxEqLogic->refreshInfo();
+					$boxEqLogic->logOut();
+				} else {
+					throw new Exception(__('Commande non implémentée actuellement', __FILE__));
+				}
 			} else {
 				log::add('livebox','debug','Problème pour trouver la livebox commande '.$this->getHumanName().' client ' . $eqLogic->getName());
 			}
