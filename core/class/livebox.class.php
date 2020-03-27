@@ -126,7 +126,8 @@ class livebox extends eqLogic {
 							$statuscmd->event(0);
 						}
 					}
-					log::add('livebox','error',__('La Livebox ne répond pas à la demande de cookie.',__FILE__)." ".$this->getName()." : ".curl_error ($session));
+					$msg = __('La Livebox ne répond pas à la demande de cookie.',__FILE__)." ".$this->getName()." : ".curl_error ($session) . " (" . curl_errno($session) . ")";
+					log::add('livebox','debug', $msg);
 					throw new Exception(__('La Livebox ne répond pas à la demande de cookie.', __FILE__));
 					return false;
 				}

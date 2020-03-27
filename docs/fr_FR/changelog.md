@@ -48,3 +48,7 @@ Detail complet des mises à jour sur https://github.com/jmvedrine/plugin-livebox
 
 - Ajout des commandes lastmissedcall, lastincomingcall et lastoutgoingcall (merci jpty)
 - Ajout d'un lien sur les numéros de tel non favori et différent de Oups pour permettre d'avoir plus d'infos sur cet appelant que je ne connais pas. (merci jpty)
+
+# Version du 27/03/2020
+
+Version du maintenance, le seul changement est le passage en debug du message d'erreur quand le plugin n'arrive pas à récupérer le cookie de la livebox (cf messages sur le forum voir https://community.jeedom.com/t/desactiver-alerte-du-plugin/21067 ).
