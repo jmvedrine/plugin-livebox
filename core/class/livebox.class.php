@@ -1200,6 +1200,19 @@ class livebox extends eqLogic {
 				$cmd->setIsHistorized(0);
 				$cmd->save();
 			}
+			$cmd = $this->getCmd(null, 'macaddress');
+			if ( ! is_object($cmd)) {
+				$cmd = new liveboxCmd();
+				$cmd->setName(__('Adresse Mac', __FILE__));
+				$cmd->setEqLogic_id($this->getId());
+				$cmd->setLogicalId('macaddress');
+				$cmd->setType('info');
+				$cmd->setSubType('string');
+				$cmd->setGeneric_type( 'GENERIC_INFO');
+				$cmd->setIsVisible(1);
+				$cmd->setIsHistorized(0);
+				$cmd->save();
+			}
 			$cmd = $this->getCmd(null, 'access');
 			if ( ! is_object($cmd)) {
 				$cmd = new liveboxCmd();
@@ -1305,6 +1318,10 @@ class livebox extends eqLogic {
 		$clicmd = $lbcli->getCmd(null, 'ip');
 		if (is_object($clicmd) && isset($client["IPAddress"])) {
 				$lbcli->checkAndUpdateCmd('ip', $client['IPAddress']);
+		}
+		$clicmd = $lbcli->getCmd(null, 'macaddress');
+		if (is_object($clicmd) && isset($client['Key'])) {
+				$lbcli->checkAndUpdateCmd('macaddress', $client['Key']);
 		}
 		//Schedule
 		$scheduleclient = $this->getPage("getschedule", array('mac' => $lbcli->getConfiguration('macAddress')));
