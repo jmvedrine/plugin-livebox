@@ -1286,7 +1286,7 @@ class livebox extends eqLogic {
 			if(file_exists(__DIR__.'/../../../../'.$filename)){
 				return $filename;
 			}
-			return 'plugins/livebox/core/config/cli/wired.png';
+			return 'plugins/livebox/core/config/cli/Default.png';
 		}
 		return 'plugins/livebox/plugin_info/livebox_icon.png';
 	}
