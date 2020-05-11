@@ -75,7 +75,10 @@ Installation/Configuration
 
 Configuration du plugin
 ---
-![configuration01](../images/configuration.png)
+![configuration01](../images/configuration_livebox.png)
+
+ **Pièce par défaut pour les clients** : Comme le plugin crée un objet pour chaque client connecté à la Livebox en filaire ou en Wifi, si votre réseau comporte beaucoup de clients il est
+ fastidieux d'avoir à placer chauqe objet client dans une pièce. Pour simplifier ce travail il est possible d'indiquer ici une pièce par défaut pour les nouveaux clients.
 
 - **Utiliser Pages jaunes** : Si cette option est cochée le plugin ira chercher sur le site Pages Jaunes le nom de l'appelant, s'il est disponible
 Ceci ne marche bien sûr que pour un appel en France et le site répond "Oups" si le nom n'est pas disponible, par exemple si ce correspondant est sur liste rouge.
@@ -139,6 +142,45 @@ Les paramètres suivants ne sont visibles qu'en connexion de type dsl ou vdsl :
 - Marge de bruit descendant
 
 Si le plugin Agenda est installé et activé un onglet **Programmation** permet de programmer les commandes action du plugin dans un agenda et fournit leur liste s'il y en a.
+
+Gestion des clients
+---
+
+Dans la page de l'équipement Livebox chaque client apparaît dans la section **Mes clients**. 
+
+![clients01](../images/clients.png)
+
+Le petit bouton en forme de cible permet de synchroniser le plugin avec la Livebox et de découvrir les nouveaux clients. 
+Pour éviter de surcharger le Dashboard les nouveaux clients sont créés sous la forme d'un objet activé, non visible, et dans la pièce par défaut si vous en avez spécifié une dans la configuration du plugin.
+
+Le petit bouton en forme de poubelle permet de supprimer les clients non actifs ((c'est à dire ou la case Actif n’est pas cochée)**et de les ignorer lors des prochaines synchro**. Cela permet d'avoir des clients "ignorés" qui n'apparaissent pas dans le plugin.
+
+S'il existe des clients ignorés, un bouton **Ne plus ignorer les clients supprimés** apparaît dans la configuration du plugin et permet de cesser de les ignorer.
+
+![clients02](../images/widget_client.png)
+
+Commandes info disponibles pour les clients
+
+- Accès internet
+- Adresse IP
+- Adresse MAC
+- Dernier changement
+- Dernière connexion
+- Première connexion
+- Présent (binaire)
+
+Commandes action disponibles pour les clients
+
+- Autoriser en permanence
+- Bloquer en permanence
+- Planifier
+
+Ces trois commandes ont une action identiques aux 3 boutons disponibles dans l'administration de la Livebox pour chaque équipement sous la rubrique "Paramétrer son accès à Internet". 
+
+![clients03](../images/acces_internet.png)
+
+Il faut noter la commande **Planifier** ne permet pas pour le moment de définir le planning d'activation. Vous devez définir ce planning dans l'administration de la Livebox. La commande du plugin permet juste d'activer ce planning.
+
 
 FAQ
 ===

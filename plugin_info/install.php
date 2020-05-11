@@ -85,6 +85,10 @@ function livebox_update() {
 		}
 	}
 	foreach (eqLogic::byType('livebox') as $eqLogic) {
+		if ($eqLogic->getConfiguration('type') == '') {
+			$eqLogic->setConfiguration('type', 'box');
+		}
+		if ($eqLogic->getConfiguration('type') == 'box') {
 		// Suppression du Wifi invité pour les anciennes LB
 		if ($eqLogic->getConfiguration('productClass','') !== 'Livebox 4' && $eqLogic->getConfiguration('productClass','') !== 'Livebox Fibre') {
 			$cmd = $eqLogic->getCmd(null, 'guestwifion');
@@ -141,6 +145,7 @@ function livebox_update() {
 		$cmd = $eqLogic->getCmd(null, 'voipstatus');
 		if ( is_object($cmd)) {
 			$cmd->remove();
+			}
 		}
 		$eqLogic->save();
 	}
