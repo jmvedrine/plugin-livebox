@@ -231,7 +231,8 @@ class livebox extends eqLogic {
 							$statuscmd->event(0);
 						}
 					}
-					log::add('livebox','error',__('La Livebox ne répond pas à la demande de cookie.',__FILE__)." ".$this->getName()." : ".curl_error ($session));
+					$msg = __('La Livebox ne répond pas à la demande de cookie.',__FILE__)." ".$this->getName()." : ".curl_error ($session) . " (" . curl_errno($session) . ")";
+					log::add('livebox','debug', $msg);
 					throw new Exception(__('La Livebox ne répond pas à la demande de cookie.', __FILE__));
 					return false;
 				}
@@ -977,6 +978,42 @@ class livebox extends eqLogic {
 					}
 					$cmd->save();
 				}
+				$cmd = $this->getCmd(null, 'lastmissedcall');
+				if ( ! is_object($cmd)) {
+					$cmd = new liveboxCmd();
+					$cmd->setName('Dernier appel manqué');
+					$cmd->setEqLogic_id($this->getId());
+					$cmd->setLogicalId('lastmissedcall');
+					$cmd->setUnite('');
+					$cmd->setType('info');
+					$cmd->setSubType('string');
+					$cmd->setIsHistorized(0);
+					$cmd->save();
+				}
+				$cmd = $this->getCmd(null, 'lastincomingcall');
+				if ( ! is_object($cmd)) {
+					$cmd = new liveboxCmd();
+					$cmd->setName('Dernier appel entrant');
+					$cmd->setEqLogic_id($this->getId());
+					$cmd->setLogicalId('lastincomingcall');
+					$cmd->setUnite('');
+					$cmd->setType('info');
+					$cmd->setSubType('string');
+					$cmd->setIsHistorized(0);
+					$cmd->save();
+				}
+				$cmd = $this->getCmd(null, 'lastoutgoingcall');
+				if ( ! is_object($cmd)) {
+					$cmd = new liveboxCmd();
+					$cmd->setName('Dernier appel sortant');
+					$cmd->setEqLogic_id($this->getId());
+					$cmd->setLogicalId('lastoutgoingcall');
+					$cmd->setUnite('');
+					$cmd->setType('info');
+					$cmd->setSubType('string');
+					$cmd->setIsHistorized(0);
+					$cmd->save();
+				}
 			}
 
 			$cmd = $this->getCmd(null, 'updatetime');
@@ -1579,6 +1616,7 @@ class livebox extends eqLogic {
 				$callsTable = "$tabstyle<table border=1>";
 				$callsTable .=	"<tr><th>Nom</th><th>Numéro</th><th>Date</th><th>Durée</th><th></th></tr>";
 				$favorite=0;
+				$firstmissed=0; $firstincoming=0; $firstoutgoing=0;
 				foreach($calls as &$call) {
 					if($call["processed"] == 0) {
 						$callNum = trim($call['num']);
@@ -1590,7 +1628,19 @@ class livebox extends eqLogic {
 						} else {
 							$callsTable .= "<a class='btn-sm bt_plus' title='Ajouter $callerName $callNum en favori' onclick='addfavorite(\"" .$callNum . "\",\"" . $callerName . "\")'><i class='icon icon_green fas fa-heart '></i></a> $callerName</td>";
 						}
-						$callsTable .= "<td>".$this->fmt_numtel($callNum)."</td><td>".$this->fmt_date($call["timestamp"])."</td><td>".$this->fmt_duree($call["duree"])."</td><td>".$call["icon"]."</td></tr>";
+						$callsTable .= "<td>".$this->fmt_numtel($callNum,$callerName,$favorite)."</td><td>".$this->fmt_date($call["timestamp"])."</td><td>".$this->fmt_duree($call["duree"])."</td><td>".$call["icon"]."</td></tr>";
+            if($firstmissed == 0 && $call['in'] == 1 && $call['missed'] == 1) {
+              $this->checkAndUpdateCmd('lastmissedcall', "$callNum le " .$this->fmt_date($call["timestamp"])." de $callerName. Durée: ".$this->fmt_duree($call["duree"]));
+              $firstmissed++;
+            }
+            else if($firstincoming == 0 && $call['in'] == 1 && $call['missed'] == 0) {
+              $this->checkAndUpdateCmd('lastincomingcall', "$callNum le " .$this->fmt_date($call["timestamp"])." de $callerName. Durée: ".$this->fmt_duree($call["duree"]));
+              $firstincoming++;
+            }
+            else if($firstoutgoing == 0 && $call['in'] == 0 && $call['missed'] == 0) {
+              $this->checkAndUpdateCmd('lastoutgoingcall', "$callNum le " .$this->fmt_date($call["timestamp"])." vers $callerName. Durée: ".$this->fmt_duree($call["duree"]));
+              $firstoutgoing++;
+            }
 						$call["processed"] = 1;
 						if($groupCallsByPhone == 1) { // regroupement des appels par numero
 							foreach($calls as &$call2) {
@@ -1837,7 +1887,7 @@ class livebox extends eqLogic {
 		return($fmt);
 	}
 
-	function fmt_numtel($num) {
+	function fmt_numtel($num,$callerName= '',$fav=0) {
 		if (strlen($num) == 0) {
 			return('****');
 		}
@@ -1849,7 +1899,11 @@ class livebox extends eqLogic {
 				$fmt = substr($num,0,2) .' '.substr($num,2,2) .' '.substr($num,4,2) .' '.substr($num,6,2) .' '.substr($num,8);
 				$usepagesjaunes = config::byKey('pagesjaunes','livebox', false);
 				if($usepagesjaunes == 1) {
+					if ($callerName != '' && $callerName != 'Oups' && $fav == 0) {
+            return("<a target=_blank href=\"https://www.pagesjaunes.fr/annuaireinverse/recherche?quoiqui=".$num."&proximite=0\">".$fmt."</a>");
+          } else {
 					return($fmt);
+					}
 				} else {
 					return("<a target=_blank href=\"https://www.pagesjaunes.fr/annuaireinverse/recherche?quoiqui=".$num."&proximite=0\">".$fmt."</a>");
 				}
