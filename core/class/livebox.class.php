@@ -163,6 +163,15 @@ class livebox extends eqLogic {
 
 	}
 
+	public static function removeAllClients($boxId) {
+		$eqLogics = eqLogic::byType('livebox');
+		foreach ($eqLogics as $eqLogic) {
+			if($eqLogic->getConfiguration('type') == 'cli' && $eqLogic->getConfiguration('boxId') == $boxId) {
+				$eqLogic->remove();
+			}
+		}
+	}
+
 	public static function noMoreIgnore($what = 'clients') {
 		config::remove('ignoredClients','livebox');
 	}
@@ -1308,12 +1317,7 @@ class livebox extends eqLogic {
 
 	public function preRemove() {
 		if ($this->getConfiguration('type') == "box") { // Si c'est un type box il faut supprimer ses clients
-			$eqLogics = eqLogic::byType('livebox');
-			foreach ($eqLogics as $eqLogic) {
-				if($eqLogic->getConfiguration('type') == 'cli' && $eqLogic->getConfiguration('boxId') == $this->getId()){
-					$eqLogic->remove();
-				}
-			}
+			self::removeAllClients($this->getId());
 		}
 	}
 
@@ -1713,7 +1717,7 @@ class livebox extends eqLogic {
 						$mac = $client['Key'];
 						$activeclients[$mac] = $client['Active'];
 						$lbcli = livebox::byLogicalId($mac, 'livebox');
-						if (!is_object($lbcli)) {
+						if (!is_object($lbcli) && config::byKey('createClients','livebox',0)) {
 							// Nouveau client.
 							livebox::createClient($client, $this->getId());
 							$lbcli = livebox::byLogicalId($mac, 'livebox');

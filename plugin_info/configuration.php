@@ -29,7 +29,13 @@ if (!isConnect()) {
 			<i class="fa fa-list-alt"></i> {{Paramètres}}
 		</legend>
 		<div class="form-group">
-		  <label class="col-lg-4 control-label" >{{Pièce par défaut pour les Clients}}</label>
+			<label class="col-sm-4 control-label">{{Créer un objet pour chaque nouveau client}}</label>
+			<div class="col-sm-2">
+				<input type="checkbox" class="configKey tooltips" data-l1key="createClients">
+			</div>
+		</div>
+		<div class="form-group">
+		  <label class="col-lg-4 control-label" >{{Pièce par défaut pour les nouveaux clients}}</label>
 		  <div class="col-lg-3">
 			<select id="sel_object" class="configKey form-control" data-l1key="defaultParentObject">
 			  <option value="">{{Aucune}}</option>
