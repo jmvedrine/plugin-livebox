@@ -1745,11 +1745,9 @@ class livebox extends eqLogic {
 					}
 				}
 			}
-			if ($eqLogic_cmd->execCmd() != $eqLogic_cmd->formatValue(join(', ', $devicelist))) {
-				log::add('livebox','debug','Maj devicelist');
-				$eqLogic_cmd->setCollectDate('');
-				$eqLogic_cmd->event(join(', ', $devicelist));
-			}
+			$devicestring = join(', ', $devicelist);
+			log::add('livebox','debug','Maj devicelist ' . $devicestring);
+			$this->checkAndUpdateCmd('devicelist', $devicestring);
 		}
 		if ($this->getConfiguration('productClass','') == 'Livebox 4' || $this->getConfiguration('productClass','') == 'Livebox Fibre') {
 			$content = $this->getPage("guestwifistate");
