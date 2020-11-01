@@ -83,6 +83,13 @@ if (!isConnect()) {
 
 		</div>
 		<div class="form-group">
+			<label class="col-sm-4 control-label">{{Nom par défaut pour les inconnus}}</label>
+			<div class="col-sm-2">
+				<input id="unknowndefault" class="configKey form-control" data-l1key="nominconnu" placeholder="{{Oups}}"/>
+			</div>
+
+		</div>
+		<div class="form-group">
 			<label class="col-sm-4 control-label">{{Durée min appel entrant (s)}}</label>
 			<div class="col-sm-2">
 				<input class="configKey form-control" data-l1key="minincallduration" />

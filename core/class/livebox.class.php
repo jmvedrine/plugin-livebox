@@ -1717,10 +1717,10 @@ class livebox extends eqLogic {
 						if (is_object($clicmd)) {
 							if (isset($activeclients[$eqLogicClient->getLogicalId()]) && $activeclients[$eqLogicClient->getLogicalId()] == true) {
 								log::add('livebox','debug','Le client '.$eqLogicClient->getHumanName() . 'est actif');
-								$eqLogicClient->checkAndUpdateCmd('present', true);
+								$eqLogicClient->checkAndUpdateCmd('present', 1);
 							} else {
 								log::add('livebox','debug','Le client '.$eqLogicClient->getHumanName() . 'est inactif');
-								$eqLogicClient->checkAndUpdateCmd('present', false);
+								$eqLogicClient->checkAndUpdateCmd('present', 0);
 							}
 						}
 					}
@@ -1773,7 +1773,7 @@ class livebox extends eqLogic {
 		if ( $pj !== false ) {
 			$oups = strpos($pj,"Oups… nous");
 			if ($oups > 0) {
-				return "Oups";
+				return config::byKey('nominconnu', 'livebox','Oups');
 			}
 			// echo $pj;
 			$previousValue = libxml_use_internal_errors(true);
@@ -1883,7 +1883,7 @@ class livebox extends eqLogic {
 				$fmt = substr($num,0,2) .' '.substr($num,2,2) .' '.substr($num,4,2) .' '.substr($num,6,2) .' '.substr($num,8);
 				$usepagesjaunes = config::byKey('pagesjaunes','livebox', false);
 				if($usepagesjaunes == 1) {
-					if ($callerName != '' && $callerName != 'Oups' && $fav == 0) {
+					if ($callerName != '' && $callerName != 'Oups' && $callerName != config::byKey('nominconnu', 'livebox','Oups') && $fav == 0) {
 						return("<a target=_blank href=\"https://www.pagesjaunes.fr/annuaireinverse/recherche?quoiqui=".$num."&proximite=0\">".$fmt."</a>");
 					} else {
 						return($fmt);

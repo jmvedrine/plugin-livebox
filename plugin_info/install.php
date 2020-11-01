@@ -19,6 +19,7 @@
 require_once dirname(__FILE__) . '/../../../core/php/core.inc.php';
 
 function livebox_install() {
+	config::save('nominconnu', 'Oups', 'livebox');
 	$sql = file_get_contents(dirname(__FILE__) . '/install.sql');
 	DB::Prepare($sql, array(), DB::FETCH_TYPE_ROW);
 	config::save('autorefresh', '* * * * *', 'surepetcare');
@@ -54,6 +55,10 @@ function livebox_install() {
 }
 
 function livebox_update() {
+	$unknownname = config::byKey('nominconnu','livebox');
+	if($unknownname =='') {
+		config::save('nominconnu', 'Oups', 'livebox');
+	}
 	$sql = file_get_contents(dirname(__FILE__) . '/install.sql');
 	DB::Prepare($sql, array(), DB::FETCH_TYPE_ROW);
 	$autorefresh = config::byKey('autorefresh','surepetcare');
