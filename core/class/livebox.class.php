@@ -1581,7 +1581,7 @@ class livebox extends eqLogic {
 			log::add('livebox','debug','Nombre total appels '.$totalCallsNumber);
 			$this->checkAndUpdateCmd('totalcallsnumber', $totalCallsNumber);
 
-			$tabstyle = "<style> th, td { padding : 2px !important; } </style><style> th { text-align:center; } </style><style> td { text-align:right; } </style>";
+			$tabstyle = "<style> .thLboxC { text-align:center;padding : 2px !important; } .tdLboxR { text-align:right;padding : 2px !important; } .tdLboxL { text-align:left;padding : 2px !important; } </style>";
 
 			//	Tous les appels
 			if ($totalCallsNumber > 0) {
@@ -1599,7 +1599,7 @@ class livebox extends eqLogic {
 				}
 				$groupCallsByPhone = config::byKey('groupCallsByPhone',__CLASS__, 0);
 				$callsTable = "$tabstyle<table border=1>";
-				$callsTable .=	"<tr><th>Nom</th><th>Numéro</th><th>Date</th><th>Durée</th><th></th></tr>";
+				$callsTable .=	"<tr><th class=\"thLboxC\">Nom</th><th class=\"thLboxC\">Numéro</th><th class=\"thLboxC\">Date</th><th class=\"thLboxC\">Durée</th><th></th></tr>";
 				$favorite=0;
 				$firstmissed=0; $firstincoming=0; $firstoutgoing=0;
 				foreach($calls as &$call) {
@@ -1607,13 +1607,13 @@ class livebox extends eqLogic {
 						$callNum = trim($call['num']);
 						$callerName = trim($this->getCallerName($callNum,$favorite));
 						$callsTable .= "<tr>";
-						$callsTable .= "<td id=\"Phone$callNum\">";
+						$callsTable .= "<td id=\"Phone$callNum\"";
 						if($favorite == 1 || $noDeroulantWidget) {// Pas de lien sur les favoris
-							$callsTable .= "$callerName</td>";
+							$callsTable .= " class=\"tdLboxR\">$callerName</td>";
 						} else {
-							$callsTable .= "<a class='btn-sm bt_plus' title='Ajouter $callerName $callNum en favori' onclick='addfavorite(\"" .$callNum . "\",\"" . $callerName . "\")'><i class='icon icon_green fas fa-heart '></i></a> $callerName</td>";
+							$callsTable .= "class=\"tdLboxL\"><a class='btn-sm bt_plus' title='Ajouter $callerName $callNum en favori' onclick='addfavorite(\"" .$callNum . "\",\"" . $callerName . "\")'><i class='icon icon_green fas fa-heart '></i></a> $callerName</td>";
 						}
-						$callsTable .= "<td>".$this->fmt_numtel($callNum,$callerName,$favorite)."</td><td>".$this->fmt_date($call["timestamp"])."</td><td>".$this->fmt_duree($call["duree"])."</td><td>".$call["icon"]."</td></tr>";
+						$callsTable .= "<td class=\"tdLboxL\">".$this->fmt_numtel($callNum,$callerName,$favorite)."</td><td class=\"tdLboxL\">".$this->fmt_date($call["timestamp"])."</td><td class=\"tdLboxR\">".$this->fmt_duree($call["duree"])."</td><td class=\"tdLboxL\">".$call["icon"]."</td></tr>";
             if($firstmissed == 0 && $call['in'] == 1 && $call['missed'] == 1) {
               $this->checkAndUpdateCmd('lastmissedcall', "$callNum le " .$this->fmt_date($call["timestamp"])." de $callerName. Durée: ".$this->fmt_duree($call["duree"]));
               $firstmissed++;
@@ -1631,7 +1631,7 @@ class livebox extends eqLogic {
 							foreach($calls as &$call2) {
 								if($call2["processed"] == 0 && $callNum == $call2["num"]) {
 									$callsTable .= "<tr><td></td><td></td>";
-									$callsTable .= "<td>".$this->fmt_date($call2["timestamp"])."</td><td>".$this->fmt_duree($call2["duree"])."</td><td>".$call2["icon"]."</td></tr>";
+									$callsTable .= "<td class=\"tdLboxL\">".$this->fmt_date($call2["timestamp"])."</td><td class=\"tdLboxR\">".$this->fmt_duree($call2["duree"])."</td><td class=\"tdLboxL\">".$call2["icon"]."</td></tr>";
 									$call2["processed"] = 1;
 								}
 							}
@@ -1644,10 +1644,10 @@ class livebox extends eqLogic {
 			//	Appels sortants
 			if ($outCallsNumber > 0) {
 				$outCallsTable = "$tabstyle<table border=1>";
-				$outCallsTable .= "<tr><th>Numéro</th><th>Date</th><th>Durée</th></tr>";
+				$outCallsTable .= "<tr><th class=\"thLboxC\">Numéro</th><th class=\"thLboxC\">Date</th><th class=\"thLboxC\">Durée</th></tr>";
 				foreach($calls as $call) {
 					if($call["in"] == 0) {
-						$outCallsTable .= "<tr><td>".$this->fmt_numtel($call["num"])."</td><td>".$this->fmt_date($call["timestamp"])."</td><td>".$this->fmt_duree($call["duree"])."</td></tr>";
+						$outCallsTable .= "<tr><td class=\"tdLboxL\">".$this->fmt_numtel($call["num"])."</td><td class=\"tdLboxL\">".$this->fmt_date($call["timestamp"])."</td><td class=\"tdLboxR\">".$this->fmt_duree($call["duree"])."</td></tr>";
 					}
 				}
 				$outCallsTable .= "</table>";
@@ -1656,10 +1656,10 @@ class livebox extends eqLogic {
 			// Appels manqués
 			if ($missedCallsNumber > 0) {
 				$missedCallsTable =	 "$tabstyle<table border=1>";
-				$missedCallsTable .=  "<tr><th>Numéro</th><th>Date</th></tr>";
+				$missedCallsTable .=  "<tr><th class=\"thLboxC\">Numéro</th><th class=\"thLboxC\">Date</th></tr>";
 				foreach($calls as $call) {
 					if($call["missed"] == 1) {
-						$missedCallsTable .=  "<tr><td>".$this->fmt_numtel($call["num"])."</td><td>".$this->fmt_date($call["timestamp"])."</td></tr>";
+						$missedCallsTable .=  "<tr><td class=\"tdLboxL\">".$this->fmt_numtel($call["num"])."</td><td class=\"tdLboxL\">".$this->fmt_date($call["timestamp"])."</td></tr>";
 					}
 				}
 				$missedCallsTable .=  "</table>";
@@ -1668,10 +1668,10 @@ class livebox extends eqLogic {
 			// Appels recus
 			if ($inCallsNumber > 0) {
 				$inCallsTable = "$tabstyle<table border=1>";
-				$inCallsTable .= "<tr><th>Numéro</th><th>Date</th><th>Durée</th></tr>";
+				$inCallsTable .= "<tr><th class=\"thLboxC\">Numéro</th><th class=\"thLboxC\">Date</th><th class=\"thLboxC\">Durée</th></tr>";
 				foreach($calls as $call) {
 					if($call["in"] == 1 && $call["missed"] == 0) {
-						$inCallsTable .= "<tr><td>".$this->fmt_numtel($call["num"])."</td><td>".$this->fmt_date($call["timestamp"])."</td><td>".$this->fmt_duree($call["duree"])."</td></tr>";
+						$inCallsTable .= "<tr><td class=\"tdLboxL\">".$this->fmt_numtel($call["num"])."</td><td class=\"tdLboxL\">".$this->fmt_date($call["timestamp"])."</td><td class=\"tdLboxR\">".$this->fmt_duree($call["duree"])."</td></tr>";
 					}
 				}
 				$inCallsTable .= "</table>";
