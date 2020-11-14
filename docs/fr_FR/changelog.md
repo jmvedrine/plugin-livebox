@@ -52,3 +52,11 @@ Detail complet des mises à jour sur https://github.com/jmvedrine/plugin-livebox
 # Version du 27/03/2020
 
 Version du maintenance, le seul changement est le passage en debug du message d'erreur quand le plugin n'arrive pas à récupérer le cookie de la livebox (cf messages sur le forum voir https://community.jeedom.com/t/desactiver-alerte-du-plugin/21067 ).
+
+# Version du 01/11/2020
+
+Le nom des appelants qui était Oups est maintenant configurable dans la page de configuration
+
+# Version du 13/11/2020
+
+Ajout de styles spécifiques à ce plugin pour les listes d'appels. Auparavant les styles de Jeedom utilisés par d'autre plugin étaient redéfinis. Merci à jpty pour cette correction.
