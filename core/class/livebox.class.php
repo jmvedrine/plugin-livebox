@@ -115,7 +115,7 @@ class livebox extends eqLogic {
 					$content = $eqLogic->getPage("devicelist");
 					if ( isset($content["status"]) ) {
 						foreach ( $content["status"] as $client ) {
-							if ( isset($client["IPAddressSource"]) && ($client["IPAddressSource"] == "DHCP" || $equipement["IPAddressSource"] == "Static")) {
+							if ( isset($client["IPAddressSource"]) && ($client["IPAddressSource"] == "DHCP" || $client["IPAddressSource"] == "Static")) {
 								$ignoredClients=config::byKey('ignoredClients','livebox',[],true);
 								$mac = $client['Key'];
 								if(!in_array($mac,$ignoredClients)) {
@@ -279,7 +279,7 @@ class livebox extends eqLogic {
 				log::add('livebox','debug','unable to read cookie file');
 				return false;
 			}
-			$cookie= fread($file, 100000000);
+			$cookie = fread($file, filesize($cookiefile));
 			fclose($file);
 			unlink($cookiefile);
 
