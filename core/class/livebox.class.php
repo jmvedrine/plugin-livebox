@@ -28,12 +28,6 @@ class livebox extends eqLogic {
 	const MAX_PAGESJAUNES = 5;		   // Nombre maximum de requêtes à Pages Jaunes
 	/* * ***********************Methode static*************************** */
 
-	public static function pull() {
-		foreach (self::byType('livebox') as $eqLogic) {
-			//$eqLogic->scan();
-		}
-	}
-
 	public static function cron() {
 		log::add('livebox', 'debug','cron');
 		foreach (eqLogic::byType('livebox', true) as $eqLogic) {
@@ -42,7 +36,6 @@ class livebox extends eqLogic {
 				try {
 					$c = new Cron\CronExpression(checkAndFixCron($autorefresh), new Cron\FieldFactory);
 					if ($c->isDue()) {
-						//$eqLogic->scan();
 						$eqLogic->refresh();
 					}
 				} catch (Exception $exc) {
