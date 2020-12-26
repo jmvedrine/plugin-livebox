@@ -135,7 +135,9 @@ function addCmdToTable(_cmd) {
     if (!isset(_cmd.configuration)) {
         _cmd.configuration = {};
     }
-
+    if (init(_cmd.logicalId) == 'refresh') {
+        return;
+    }
     if (init(_cmd.type) == 'info') {
         var tr = '<tr class="cmd" data-cmd_id="' + init(_cmd.id) + '" >';
         if (init(_cmd.logicalId) == 'brut') {

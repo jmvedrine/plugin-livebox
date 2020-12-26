@@ -30,7 +30,7 @@ class livebox extends eqLogic {
 
 	public static function pull() {
 		foreach (self::byType('livebox') as $eqLogic) {
-			$eqLogic->scan();
+			//$eqLogic->scan();
 		}
 	}
 
@@ -42,8 +42,8 @@ class livebox extends eqLogic {
 				try {
 					$c = new Cron\CronExpression(checkAndFixCron($autorefresh), new Cron\FieldFactory);
 					if ($c->isDue()) {
-						$eqLogic->scan();
-						//$eqLogic->refresh();
+						//$eqLogic->scan();
+						$eqLogic->refresh();
 					}
 				} catch (Exception $exc) {
 					log::add('livebox', 'error', __('Expression cron non valide pour ', __FILE__) . $eqLogic->getHumanName() . ' : ' . $autorefresh);
@@ -517,6 +517,26 @@ class livebox extends eqLogic {
 
 	public function postSave() {
 		if ($this->getConfiguration('type','') == 'box') {
+		$createRefreshCmd = true;
+		$refresh = $this->getCmd(null, 'refresh');
+		if (!is_object($refresh)) {
+			$refresh = cmd::byEqLogicIdCmdName($this->getId(), __('Rafraichir', __FILE__));
+			if (is_object($refresh)) {
+				$createRefreshCmd = false;
+			}
+		}
+		if ($createRefreshCmd) {
+			if (!is_object($refresh)) {
+				$refresh = new liveboxCmd();
+				$refresh->setLogicalId('refresh');
+				$refresh->setIsVisible(1);
+				$refresh->setName(__('Rafraichir', __FILE__));
+			}
+			$refresh->setType('action');
+			$refresh->setSubType('other');
+			$refresh->setEqLogic_id($this->getId());
+			$refresh->save();
+		}
 		if ( $this->getIsEnable() ) {
 			$content = $this->getPage("internet");
 			if ( $content !== false ) {
@@ -1350,7 +1370,7 @@ class livebox extends eqLogic {
 		return 'plugins/livebox/plugin_info/livebox_icon.png';
 	}
 
-	public function scan() {
+	public function refresh() {
 		if ( $this->getIsEnable() && $this->getConfiguration('type') == 'box') {
 			if ( $this->getCookiesInfo() ) {
 				$this->refreshInfo();
@@ -1932,6 +1952,10 @@ class liveboxCmd extends cmd
 			throw new Exception(__("Equipement désactivé impossible d'exécuter la commande : " . $this->getHumanName(), __FILE__));
 		}
 		log::add('livebox','debug','execute '.$this->getLogicalId());
+		if ($this->getLogicalId() == 'refresh') {
+			$eqLogic->refresh();
+			return;
+		}
 		if ($eqLogic->getConfiguration('type','') == 'box') {
 		$option = array();
 		if ($eqLogic->getConfiguration('productClass','') == 'Livebox 4' || $eqLogic->getConfiguration('productClass','') == 'Livebox Fibre') {
