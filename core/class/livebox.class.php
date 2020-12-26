@@ -1932,13 +1932,17 @@ class liveboxCmd extends cmd
 {
 	/*	   * *************************Attributs****************************** */
 
-
 	/*	   * ***********************Methode static*************************** */
-
 
 	/*	   * *********************Methode d'instance************************* */
 
-	/*	   * **********************Getteur Setteur*************************** */
+	public function dontRemoveCmd() {
+		if ($this->getLogicalId() == 'refresh') {
+			return true;
+		}
+		return false;
+	}
+
 	public function execute($_options = null) {
 		$eqLogic = $this->getEqLogic();
 		if (!is_object($eqLogic) || $eqLogic->getIsEnable() != 1) {
@@ -2088,6 +2092,9 @@ class liveboxCmd extends cmd
 		}
 		return $_value;
 	}
+
+	/*	   * **********************Getteur Setteur*************************** */
+
 }
 
 class livebox_calls {
