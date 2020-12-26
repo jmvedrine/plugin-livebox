@@ -34,6 +34,24 @@ class livebox extends eqLogic {
 		}
 	}
 
+	public static function cron() {
+		log::add('livebox', 'debug','cron');
+		foreach (eqLogic::byType('livebox', true) as $eqLogic) {
+			$autorefresh = $eqLogic->getConfiguration('autorefresh');
+			if ($autorefresh != '') {
+				try {
+					$c = new Cron\CronExpression(checkAndFixCron($autorefresh), new Cron\FieldFactory);
+					if ($c->isDue()) {
+						$eqLogic->scan();
+						//$eqLogic->refresh();
+					}
+				} catch (Exception $exc) {
+					log::add('livebox', 'error', __('Expression cron non valide pour ', __FILE__) . $eqLogic->getHumanName() . ' : ' . $autorefresh);
+				}
+			}
+		}
+	}
+
 	public static function normalizePhone($num) {
 		if(is_numeric($num)) {
 			if(strlen($num) == 12 && substr($num,0,3) == '033') {
