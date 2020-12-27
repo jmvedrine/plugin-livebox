@@ -78,6 +78,11 @@ function livebox_update() {
 			$eqLogic->setConfiguration('type', 'box');
 		}
 		if ($eqLogic->getConfiguration('type') == 'box') {
+		// Migration du cron sur la LB
+		$autorefresh = $eqLogic->getConfiguration('autorefresh');
+		if ($autorefresh == '') {
+			$eqLogic->setConfiguration('autorefresh', '* * * * *');
+		}
 		// Suppression du Wifi invité pour les anciennes LB
 		if ($eqLogic->getConfiguration('productClass','') !== 'Livebox 4' && $eqLogic->getConfiguration('productClass','') !== 'Livebox Fibre') {
 			$cmd = $eqLogic->getCmd(null, 'guestwifion');
