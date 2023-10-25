@@ -82,7 +82,7 @@ foreach ($eqLogics as $eqLogic) {
 		}
 		echo '<td><span class="label label-info" style="font-size : 1em;">' . $value . '</span></td>';
 	} else {
-		echo '<td></td><td></td><td></td>';
+		echo '<td></td><td></td><td></td><td></td>';
 	}
 	echo '</tr>';
 }

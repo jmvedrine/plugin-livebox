@@ -331,6 +331,15 @@ class livebox extends eqLogic {
 			case "dsl":
 				$listpage = array("sysbus/NeMo/Intf/data:getMIBs" => '"mibs":"dsl","flag":"","traverse":"down"');
 				break;
+			case "ont":
+				$listpage = array("sysbus/NeMo.Intf.veip0:getMIBs" => '"mibs":"gpon","flag":"","traverse":"down"');
+				break;
+			case "dhcp":
+				$listpage = array("sysbus/NeMo/Intf/data:getMIBs" => '"mibs":"dhcp","flag":"","traverse":"down"');
+				break;
+			case "lan":
+				$listpage = array("sysbus/NeMo/Intf/lan:getMIBs" => '"mibs":"dhcp","flag":"","traverse":"down"');
+				break;
 			case "voip":
 				$listpage = array("sysbus/VoiceService/VoiceApplication:listTrunks" => "");
 				break;
@@ -411,8 +420,8 @@ class livebox extends eqLogic {
 			} else {
 				$param = '{"parameters":{'.$param.'}}';
 			}
-			log::add('livebox','debug',$page.' => get http://'.$this->getConfiguration('ip').'/'.$pageuri);
-			log::add('livebox','debug',$page.' => param '.$param);
+			log::add('livebox','debug','getPage '.$page.' => get http://'.$this->getConfiguration('ip').'/'.$pageuri);
+			log::add('livebox','debug','getPage '.$page.' => param '.$param);
 			$content = @file_get_contents('http://'.$this->getConfiguration('ip').'/'.$pageuri, false, $this->getContext($param));
 			if ( $content === false ) {
 				log::add('livebox','debug',$page.' => second attempt get http://'.$this->getConfiguration('ip').'/'.$pageuri);
@@ -428,7 +437,7 @@ class livebox extends eqLogic {
 					log::add('livebox','error',__('La Livebox ne répond pas.',__FILE__)." ".$this->getName());
 					return false;
 				}
-					log::add('livebox','debug','content '.$content);
+					log::add('livebox','debug','getPage content '.$content);
 				if (is_object($statuscmd) && $statuscmd->execCmd() != 1) {
 					$statuscmd->setCollectDate('');
 					$statuscmd->event(1);
@@ -1396,29 +1405,39 @@ class livebox extends eqLogic {
 		$content = $this->getPage('deviceinfo');
 		if ( $content !== false ) {
 			$eqLogic_cmd = $this->getCmd(null, 'uptime');
-			$this->checkAndUpdateCmd('uptime', $content["status"]["UpTime"]);
+			if (is_object($eqLogic_cmd)) {
+			    $this->checkAndUpdateCmd('uptime', $content["status"]["UpTime"]);
+			}
 		}
 		$content = $this->getPage("internet");
 		if ( $content !== false ) {
 			if (isset($content["data"]["LinkState"])) {
 				$eqLogic_cmd = $this->getCmd(null, 'linkstate');
-				log::add('livebox','debug','Maj linkstate ' . $eqLogic_cmd->formatValue($content["data"]["LinkState"]));
-				$this->checkAndUpdateCmd('linkstate', $eqLogic_cmd->formatValue($content["data"]["LinkState"]));
+				if (is_object($eqLogic_cmd)) {
+				    log::add('livebox','debug','Maj linkstate ' . $eqLogic_cmd->formatValue($content["data"]["LinkState"]));
+				    $this->checkAndUpdateCmd('linkstate', $eqLogic_cmd->formatValue($content["data"]["LinkState"]));
+				}
 			}
 			if (isset($content["data"]["ConnectionState"])) {
 				$eqLogic_cmd = $this->getCmd(null, 'connectionstate');
-				log::add('livebox','debug','Maj connectionstate ' . $eqLogic_cmd->formatValue($content["data"]["ConnectionState"]));
-				$this->checkAndUpdateCmd('connectionstate', $eqLogic_cmd->formatValue($content["data"]["ConnectionState"]));
+				if (is_object($eqLogic_cmd)) {
+				    log::add('livebox','debug','Maj connectionstate ' . $eqLogic_cmd->formatValue($content["data"]["ConnectionState"]));
+				    $this->checkAndUpdateCmd('connectionstate', $eqLogic_cmd->formatValue($content["data"]["ConnectionState"]));
+				}
 			}
 			if (isset($content["data"]["IPAddress"])) {
 				$eqLogic_cmd = $this->getCmd(null, 'ipwan');
-				log::add('livebox','debug','Maj ipwan ' . $eqLogic_cmd->formatValue($content["data"]["IPAddress"]));
-				$this->checkAndUpdateCmd('ipwan', $eqLogic_cmd->formatValue($content["data"]["IPAddress"]));
+				if (is_object($eqLogic_cmd)) {
+					log::add('livebox','debug','Maj ipwan ' . $eqLogic_cmd->formatValue($content["data"]["IPAddress"]));
+					$this->checkAndUpdateCmd('ipwan', $eqLogic_cmd->formatValue($content["data"]["IPAddress"]));
+				}
 			}
 			if (isset($content["data"]["IPv6Address"])) {
 				$eqLogic_cmd = $this->getCmd(null, 'ipv6wan');
-				log::add('livebox','debug','Maj ipv6wan ' . $eqLogic_cmd->formatValue($content["data"]["IPv6Address"]));
-				$this->checkAndUpdateCmd('ipv6wan', $eqLogic_cmd->formatValue($content["data"]["IPv6Address"]));
+				if (is_object($eqLogic_cmd)) {
+					log::add('livebox','debug','Maj ipv6wan ' . $eqLogic_cmd->formatValue($content["data"]["IPv6Address"]));
+					$this->checkAndUpdateCmd('ipv6wan', $eqLogic_cmd->formatValue($content["data"]["IPv6Address"]));
+				}
 			}
 
 			if ( $content["data"]["LinkType"] == "dsl" || $content["data"]["LinkType"] == "vdsl" ) {
@@ -1426,31 +1445,47 @@ class livebox extends eqLogic {
 				if ( $content !== false ) {
 					if (isset($content["status"]["dsl"]["dsl0"]["UpstreamCurrRate"])) {
 						$eqLogic_cmd = $this->getCmd(null, 'debitmontant');
-						log::add('livebox','debug','Maj debitmontant ' . $eqLogic_cmd->formatValue($content["status"]["dsl"]["dsl0"]["UpstreamCurrRate"]));
-						$this->checkAndUpdateCmd('debitmontant', $eqLogic_cmd->formatValue($content["status"]["dsl"]["dsl0"]["UpstreamCurrRate"]));
+						if (is_object($eqLogic_cmd)) {
+							log::add('livebox','debug','Maj debitmontant ' . $eqLogic_cmd->formatValue($content["status"]["dsl"]["dsl0"]["UpstreamCurrRate"]));
+							$this->checkAndUpdateCmd('debitmontant', $eqLogic_cmd->formatValue($content["status"]["dsl"]["dsl0"]["UpstreamCurrRate"]));
+						}
 					}
 					if (isset($content["status"]["dsl"]["dsl0"]["DownstreamCurrRate"])) {
 						$eqLogic_cmd = $this->getCmd(null, 'debitdescendant');
-						log::add('livebox','debug','Maj debitdescendant ' . $eqLogic_cmd->formatValue($content["status"]["dsl"]["dsl0"]["DownstreamCurrRate"]));
-						$this->checkAndUpdateCmd('debitdescendant', $eqLogic_cmd->formatValue($content["status"]["dsl"]["dsl0"]["DownstreamCurrRate"]));
+						if (is_object($eqLogic_cmd)) {
+							log::add('livebox','debug','Maj debitdescendant ' . $eqLogic_cmd->formatValue($content["status"]["dsl"]["dsl0"]["DownstreamCurrRate"]));
+							$this->checkAndUpdateCmd('debitdescendant', $eqLogic_cmd->formatValue($content["status"]["dsl"]["dsl0"]["DownstreamCurrRate"]));
+						}
 					}
 					if (isset($content["status"]["dsl"]["dsl0"]["UpstreamNoiseMargin"])) {
 						$eqLogic_cmd = $this->getCmd(null, 'margebruitmontant');
-						log::add('livebox','debug','Maj margebruitmontant ' . $eqLogic_cmd->formatValue($content["status"]["dsl"]["dsl0"]["UpstreamNoiseMargin"])/10);
-						$this->checkAndUpdateCmd('margebruitmontant', $eqLogic_cmd->formatValue($content["status"]["dsl"]["dsl0"]["UpstreamNoiseMargin"])/10);
+						if (is_object($eqLogic_cmd)) {
+							log::add('livebox','debug','Maj margebruitmontant ' . $eqLogic_cmd->formatValue($content["status"]["dsl"]["dsl0"]["UpstreamNoiseMargin"])/10);
+							$this->checkAndUpdateCmd('margebruitmontant', $eqLogic_cmd->formatValue($content["status"]["dsl"]["dsl0"]["UpstreamNoiseMargin"])/10);
+						}
 					}
 					if (isset($content["status"]["dsl"]["dsl0"]["DownstreamNoiseMargin"])) {
 						$eqLogic_cmd = $this->getCmd(null, 'margebruitdescendant');
-						log::add('livebox','debug','Maj margebruitdescendant ' . $eqLogic_cmd->formatValue($content["status"]["dsl"]["dsl0"]["DownstreamNoiseMargin"])/10);
-						$this->checkAndUpdateCmd('margebruitdescendant', $eqLogic_cmd->formatValue($content["status"]["dsl"]["dsl0"]["DownstreamNoiseMargin"])/10);
+						if (is_object($eqLogic_cmd)) {
+							log::add('livebox','debug','Maj margebruitdescendant ' . $eqLogic_cmd->formatValue($content["status"]["dsl"]["dsl0"]["DownstreamNoiseMargin"])/10);
+							$this->checkAndUpdateCmd('margebruitdescendant', $eqLogic_cmd->formatValue($content["status"]["dsl"]["dsl0"]["DownstreamNoiseMargin"])/10);
+						}
 					}
 					if (isset($content["status"]["dsl"]["dsl0"]["LastChange"])) {
 						$eqLogic_cmd = $this->getCmd(null, 'lastchange');
-						log::add('livebox','debug','Maj lastchange ' . $eqLogic_cmd->formatValue($content["status"]["dsl"]["dsl0"]["LastChange"]));
-						$this->checkAndUpdateCmd('lastchange', $eqLogic_cmd->formatValue($content["status"]["dsl"]["dsl0"]["LastChange"]));
+						if (is_object($eqLogic_cmd)) {
+							log::add('livebox','debug','Maj lastchange ' . $eqLogic_cmd->formatValue($content["status"]["dsl"]["dsl0"]["LastChange"]));
+							$this->checkAndUpdateCmd('lastchange', $eqLogic_cmd->formatValue($content["status"]["dsl"]["dsl0"]["LastChange"]));
+						}
 					}
 				}
+			} else {
+				$content = $this->getPage("dhcp");
+				if ( $content !== false ) {
+					/* A voir ce qu'on peut faire dans ce cas là */
+				}
 			}
+				
 		}
 		$content = $this->getPage("voip");
 		if ( $content !== false ) {
@@ -1479,8 +1514,10 @@ class livebox extends eqLogic {
 		if ( $content !== false ) {
 			if (isset($content["data"]["IPTVStatus"])) {
 				$eqLogic_cmd = $this->getCmd(null, 'tvstatus');
-				log::add('livebox','debug','Maj tvstatus ' . $eqLogic_cmd->formatValue($content["data"]["IPTVStatus"]));
-				$this->checkAndUpdateCmd('tvstatus',  $eqLogic_cmd->formatValue($content["data"]["IPTVStatus"]));
+				if (is_object($eqLogic_cmd)) {
+					log::add('livebox','debug','Maj tvstatus ' . $eqLogic_cmd->formatValue($content["data"]["IPTVStatus"]));
+					$this->checkAndUpdateCmd('tvstatus',  $eqLogic_cmd->formatValue($content["data"]["IPTVStatus"]));
+				}
 			}
 		}
 		$content = $this->getPage("wifilist");
@@ -1490,8 +1527,10 @@ class livebox extends eqLogic {
 				if ( $content !== false ) {
 					if (isset($content["status"]["wlanvap"]["wl0"]["VAPStatus"])) {
 						$eqLogic_cmd = $this->getCmd(null, 'wifistatus');
-						log::add('livebox','debug','Maj wifistatus ' . $eqLogic_cmd->formatValue($content["status"]["wlanvap"]["wl0"]["VAPStatus"]));
-						$this->checkAndUpdateCmd('wifistatus',  $eqLogic_cmd->formatValue($content["status"]["wlanvap"]["wl0"]["VAPStatus"]));
+						if (is_object($eqLogic_cmd)) {
+							log::add('livebox','debug','Maj wifistatus ' . $eqLogic_cmd->formatValue($content["status"]["wlanvap"]["wl0"]["VAPStatus"]));
+							$this->checkAndUpdateCmd('wifistatus',  $eqLogic_cmd->formatValue($content["status"]["wlanvap"]["wl0"]["VAPStatus"]));
+						}
 					}
 				}
 			} elseif ( count($content["status"]) == 2 ) {
@@ -1499,25 +1538,29 @@ class livebox extends eqLogic {
 				if ( $content !== false ) {
 					if (isset($content["status"]["wlanvap"]["wl0"]["VAPStatus"])) {
 						$eqLogic_cmd = $this->getCmd(null, 'wifi2.4status');
-						log::add('livebox','debug','Maj wifi2.4status ' . $eqLogic_cmd->formatValue($content["status"]["wlanvap"]["wl0"]["VAPStatus"]));
-						$this->checkAndUpdateCmd('wifi2.4status', $eqLogic_cmd->formatValue($content["status"]["wlanvap"]["wl0"]["VAPStatus"]));
+						if (is_object($eqLogic_cmd)) {
+							log::add('livebox','debug','Maj wifi2.4status ' . $eqLogic_cmd->formatValue($content["status"]["wlanvap"]["wl0"]["VAPStatus"]));
+							$this->checkAndUpdateCmd('wifi2.4status', $eqLogic_cmd->formatValue($content["status"]["wlanvap"]["wl0"]["VAPStatus"]));
+						}
 					}
 					$eqLogic_cmd = $this->getCmd(null, 'wifi5status');
-					if (isset($content["status"]["wlanvap"]["eth6"])) {
-						// Livebox 4.
-						$this->setConfiguration('wifi5Name', 'eth6');
-						$statusvalue = $content["status"]["wlanvap"]["eth6"]["VAPStatus"];
-					} else if (isset($content["status"]["wlanvap"]["eth4"])) {
-						// Livebox 5.
-						$this->setConfiguration('wifi5Name', 'eth4');
-						$statusvalue = $content["status"]["wlanvap"]["eth4"]["VAPStatus"];
-					} else {
-						// Livebox Play.
-						$this->setConfiguration('wifi5Name', 'wl1');
-						$statusvalue = $content["status"]["wlanvap"]["wl1"]["VAPStatus"];
+					if (is_object($eqLogic_cmd)) {
+						if (isset($content["status"]["wlanvap"]["eth6"])) {
+							// Livebox 4.
+							$this->setConfiguration('wifi5Name', 'eth6');
+							$statusvalue = $content["status"]["wlanvap"]["eth6"]["VAPStatus"];
+						} else if (isset($content["status"]["wlanvap"]["eth4"])) {
+							// Livebox 5.
+							$this->setConfiguration('wifi5Name', 'eth4');
+							$statusvalue = $content["status"]["wlanvap"]["eth4"]["VAPStatus"];
+						} else {
+							// Livebox Play.
+							$this->setConfiguration('wifi5Name', 'wl1');
+							$statusvalue = $content["status"]["wlanvap"]["wl1"]["VAPStatus"];
+						}
+						log::add('livebox','debug','Maj wifi5status ' .$eqLogic_cmd->formatValue($statusvalue));
+						$this->checkAndUpdateCmd('wifi5status', $eqLogic_cmd->formatValue($statusvalue));
 					}
-					log::add('livebox','debug','Maj wifi5status ' .$eqLogic_cmd->formatValue($statusvalue));
-					$this->checkAndUpdateCmd('wifi5status', $eqLogic_cmd->formatValue($statusvalue));
 				}
 			}
 		}
