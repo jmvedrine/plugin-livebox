@@ -211,6 +211,7 @@ class livebox extends eqLogic {
 				log::add('livebox','debug','version 4');
 				$this->_version = "4";
 				curl_close($session);
+				unset($session);
 				$session = curl_init();
 
 				$paramInternet = '{"service":"sah.Device.Information","method":"createContext","parameters":{"applicationName":"so_sdkut","username":"'.$this->getConfiguration('username').'","password":"'.$this->getConfiguration('password').'"}}';
@@ -253,6 +254,7 @@ class livebox extends eqLogic {
 			}
 			$info = curl_getinfo($session);
 			curl_close($session);
+			unset($session);
 			$obj = json_decode($json);
 			if ( ! isset($obj->data->contextID) ) {
 				log::add('livebox','debug','unable to get contextID');
@@ -307,7 +309,8 @@ class livebox extends eqLogic {
 							"Accept-Encoding: gzip, deflate, br\r\n" .
 							"Accept-Language: fr-FR,fr;q=0.8,en-US;q=0.6,en;q=0.4\r\n" .
 							"Cookie: ".$this->_cookies."; ; sah/contextId=".$this->_contextID,
-			 'content' => $paramInternet
+			 'content' => $paramInternet,
+			 'protocol_version' => '1.0'
 			)
 		);
 		return stream_context_create($httpInternet);
