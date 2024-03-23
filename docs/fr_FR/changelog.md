@@ -60,3 +60,7 @@ Le nom des appelants qui était Oups est maintenant configurable dans la page de
 # Version du 13/11/2020
 
 Ajout de styles spécifiques à ce plugin pour les listes d'appels. Auparavant les styles de Jeedom utilisés par d'autre plugin étaient redéfinis. Merci à jpty pour cette correction.
+
+# Version du 23/03/2024
+
+Compatibilité avec PHP 8
