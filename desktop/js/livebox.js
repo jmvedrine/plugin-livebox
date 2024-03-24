@@ -28,11 +28,13 @@ $('#bt_resetEqlogicSearch2').on('click', function () {
 
 $('.eqLogicAttr[data-l1key=configuration][data-l2key=type]').on('change',function(){
 	if ($(this).value() == 'box') {
+		$('#div_cron').show();
 		$('#div_goCarte').show();
 		$('#div_ipBox').show();
 		$('#div_adminBox').show();
 		$('#div_passBox').show();
 	} else {
+		$('#div_cron').hide();
 		$('#div_goCarte').hide();
 		$('#div_ipBox').hide();
 		$('#div_adminBox').hide();
@@ -64,6 +66,7 @@ function printEqLogic(_eqLogic) {
     printEqLogicHelper("{{Version hardware}}","hardwareVersion",_eqLogic);
     printEqLogicHelper("{{Version software}}","softwareVersion",_eqLogic);
 		printEqLogicHelper("{{Adresse MAC}}","BaseMAC",_eqLogic);
+		$('#div_cron').show();
 		$('#div_goCarte').show();
 		$('#div_ipBox').show();
 		$('#div_adminBox').show();
@@ -72,6 +75,7 @@ function printEqLogic(_eqLogic) {
 	if (_eqLogic.configuration.type=="cli") {
 		printEqLogicHelper("{{Type}}","deviceType",_eqLogic);
 		printEqLogicHelper("{{Adresse MAC}}","macAddress",_eqLogic);
+		$('#div_cron').hide();
 		$('#div_goCarte').hide();
 		$('#div_ipBox').hide();
 		$('#div_adminBox').hide();
@@ -217,6 +221,12 @@ function addCmdToTable(_cmd) {
         });
     }
 }
+
+$('#bt_cronGenerator').on('click', function(){
+  jeedom.getCronSelectModal({},function (result) {
+    $('.eqLogicAttr[data-l1key=configuration][data-l2key=autorefresh]').value(result.value);
+  });
+});
 
 $('#bt_goCarte').on('click', function() {
     $('#md_modal').dialog({title: "{{Accèder à l'interface de la livebox}}"});

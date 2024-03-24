@@ -28,9 +28,20 @@ class livebox extends eqLogic {
 	const MAX_PAGESJAUNES = 5;		   // Nombre maximum de requêtes à Pages Jaunes
 	/* * ***********************Methode static*************************** */
 
-	public static function pull() {
-		foreach (self::byType('livebox') as $eqLogic) {
-			$eqLogic->scan();
+	public static function cron() {
+		log::add('livebox', 'debug','cron');
+		foreach (eqLogic::byType('livebox', true) as $eqLogic) {
+			$autorefresh = $eqLogic->getConfiguration('autorefresh');
+			if ($autorefresh != '') {
+				try {
+					$c = new Cron\CronExpression(checkAndFixCron($autorefresh), new Cron\FieldFactory);
+					if ($c->isDue()) {
+						$eqLogic->refresh();
+					}
+				} catch (Exception $exc) {
+					log::add('livebox', 'error', __('Expression cron non valide pour ', __FILE__) . $eqLogic->getHumanName() . ' : ' . $autorefresh);
+				}
+			}
 		}
 	}
 
@@ -1344,7 +1355,7 @@ class livebox extends eqLogic {
 		return 'plugins/livebox/plugin_info/livebox_icon.png';
 	}
 
-	public function scan() {
+	public function refresh() {
 		if ( $this->getIsEnable() && $this->getConfiguration('type') == 'box') {
 			if ( $this->getCookiesInfo() ) {
 				$this->refreshInfo();
