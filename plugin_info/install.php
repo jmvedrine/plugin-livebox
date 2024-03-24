@@ -22,7 +22,6 @@ function livebox_install() {
 	config::save('nominconnu', 'Oups', 'livebox');
 	$sql = file_get_contents(dirname(__FILE__) . '/install.sql');
 	DB::Prepare($sql, array(), DB::FETCH_TYPE_ROW);
-	config::save('autorefresh', '* * * * *', 'surepetcare');
 	$cron = cron::byClassAndFunction('livebox', 'pull');
 	if ( ! is_object($cron)) {
 		$cron = new cron();
@@ -30,7 +29,7 @@ function livebox_install() {
 		$cron->setFunction('pull');
 		$cron->setEnable(1);
 		$cron->setDeamon(0);
-		$cron->setSchedule(config::byKey('autorefresh','surepetcare'));
+		$cron->setSchedule('* * * * *');
 		$cron->save();
 	}
 	if ( version_compare(jeedom::version(), "4", "<")) {
@@ -61,10 +60,6 @@ function livebox_update() {
 	}
 	$sql = file_get_contents(dirname(__FILE__) . '/install.sql');
 	DB::Prepare($sql, array(), DB::FETCH_TYPE_ROW);
-	$autorefresh = config::byKey('autorefresh','surepetcare');
-	if($autorefresh =='') {
-		config::save('autorefresh', '* * * * *', 'surepetcare');
-	}
 	$cron = cron::byClassAndFunction('livebox', 'pull');
 	if ( ! is_object($cron)) {
 		$cron = new cron();
@@ -73,7 +68,7 @@ function livebox_update() {
 	$cron->setFunction('pull');
 	$cron->setEnable(1);
 	$cron->setDeamon(0);
-	$cron->setSchedule(config::byKey('autorefresh','surepetcare'));
+	$cron->setSchedule('* * * * *');
 	$cron->save();
 	if ( version_compare(jeedom::version(), "4", "<")) {
 		// Copie des templates dans le répertoire du plugin widget pour pouvoir éditer les commandes sans perte de la template associée.
