@@ -522,6 +522,17 @@ class livebox extends eqLogic {
 
 	public function postSave() {
 		if ($this->getConfiguration('type','') == 'box') {
+		$refresh = $this->getCmd(null, 'refresh');
+		if (!is_object($refresh)) {
+			$refresh = new liveboxCmd();
+			$refresh->setLogicalId('refresh');
+			$refresh->setIsVisible(1);
+			$refresh->setName(__('Rafraichir', __FILE__));
+		}
+		$refresh->setType('action');
+		$refresh->setSubType('other');
+		$refresh->setEqLogic_id($this->getId());
+		$refresh->save();
 		if ( $this->getIsEnable() ) {
 			$content = $this->getPage("internet");
 			if ( $content !== false ) {
@@ -1965,12 +1976,24 @@ class liveboxCmd extends cmd
 	/*	   * *********************Methode d'instance************************* */
 
 	/*	   * **********************Getteur Setteur*************************** */
+
+	public function dontRemoveCmd() {
+		if ($this->getLogicalId() == 'refresh') {
+			return true;
+		}
+		return false;
+	}
+
 	public function execute($_options = null) {
 		$eqLogic = $this->getEqLogic();
 		if (!is_object($eqLogic) || $eqLogic->getIsEnable() != 1) {
 			throw new Exception(__("Equipement désactivé impossible d'exécuter la commande : " . $this->getHumanName(), __FILE__));
 		}
 		log::add('livebox','debug','execute '.$this->getLogicalId());
+		if ($this->getLogicalId() == 'refresh') {
+			$eqLogic->refresh();
+			return;
+		}
 		if ($eqLogic->getConfiguration('type','') == 'box') {
 		$option = array();
 		if ($eqLogic->getConfiguration('productClass','') == 'Livebox 4' || $eqLogic->getConfiguration('productClass','') == 'Livebox Fibre') {
