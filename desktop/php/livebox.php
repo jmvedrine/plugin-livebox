@@ -208,6 +208,9 @@ foreach ($eqLogics as $eqLogic) {
                     <div class="col-lg-3">
                         <input type="password" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="password"/>
                     </div>
+                    <div class="col-lg-1">
+                        <i class="fas fa-eye-slash" id="bt_showPassword"></i>
+		    </div>
                 </div>
             </fieldset>
         </form>

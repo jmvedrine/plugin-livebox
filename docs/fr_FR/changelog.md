@@ -64,3 +64,10 @@ Ajout de styles spécifiques à ce plugin pour les listes d'appels. Auparavant l
 # Version du 23/03/2024
 
 Compatibilité avec PHP 8
+
+# Version du 25/03/2024
+
+- Ajout de la configuration de la fréquence d'actualisation (cron) sur l'équipement livebox
+- Ajout d'un bouton pour forcer le rafraichissement des informations
+- Ajout d'un bouton permettant l'affichage du mot de password de la livebox
+- Ajout d'un panneau sur le bureau (à configurer dans le plugin)

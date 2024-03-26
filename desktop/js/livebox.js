@@ -136,6 +136,9 @@ function addCmdToTable(_cmd) {
         _cmd.configuration = {};
     }
 
+    if (init(_cmd.logicalId) == 'refresh') {
+        return;
+    }
     if (init(_cmd.type) == 'info') {
         var tr = '<tr class="cmd" data-cmd_id="' + init(_cmd.id) + '" >';
         if (init(_cmd.logicalId) == 'brut') {
@@ -231,6 +234,19 @@ $('#bt_cronGenerator').on('click', function(){
 $('#bt_goCarte').on('click', function() {
     $('#md_modal').dialog({title: "{{Accèder à l'interface de la livebox}}"});
 	window.open('http://'+$('.eqLogicAttr[data-l2key=ip]').value()+'/');
+});
+
+$('#bt_showPassword').on('click', function() {
+        event.preventDefault();
+        if($('.eqLogicAttr[data-l1key=configuration][data-l2key=password]').attr('type') == 'text'){
+            $('.eqLogicAttr[data-l1key=configuration][data-l2key=password]').attr('type', 'password');
+            $('#bt_showPassword').addClass('fa-eye-slash');
+            $('#bt_showPassword').removeClass('fa-eye');
+        }else if($('.eqLogicAttr[data-l1key=configuration][data-l2key=password]').attr('type') == 'password'){
+            $('.eqLogicAttr[data-l1key=configuration][data-l2key=password]').attr('type', 'text');
+            $('#bt_showPassword').removeClass('fa-eye-slash');
+            $('#bt_showPassword').addClass('fa-eye');
+        }
 });
 
 $('.eqLogicAction[data-action=discover]').on('click', function (e) {
