@@ -60,3 +60,14 @@ Le nom des appelants qui était Oups est maintenant configurable dans la page de
 # Version du 13/11/2020
 
 Ajout de styles spécifiques à ce plugin pour les listes d'appels. Auparavant les styles de Jeedom utilisés par d'autre plugin étaient redéfinis. Merci à jpty pour cette correction.
+
+# Version du 23/03/2024
+
+Compatibilité avec PHP 8
+
+# Version du 25/03/2024
+
+- Ajout de la configuration de la fréquence d'actualisation (cron) sur l'équipement livebox
+- Ajout d'un bouton pour forcer le rafraichissement des informations
+- Ajout d'un bouton permettant l'affichage du mot de password de la livebox
+- Ajout d'un panneau sur le bureau (à configurer dans le plugin)

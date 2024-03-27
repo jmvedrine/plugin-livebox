@@ -28,9 +28,20 @@ class livebox extends eqLogic {
 	const MAX_PAGESJAUNES = 5;		   // Nombre maximum de requêtes à Pages Jaunes
 	/* * ***********************Methode static*************************** */
 
-	public static function pull() {
-		foreach (self::byType('livebox') as $eqLogic) {
-			$eqLogic->scan();
+	public static function cron() {
+		log::add('livebox', 'debug','cron');
+		foreach (eqLogic::byType('livebox', true) as $eqLogic) {
+			$autorefresh = $eqLogic->getConfiguration('autorefresh');
+			if ($autorefresh != '') {
+				try {
+					$c = new Cron\CronExpression(checkAndFixCron($autorefresh), new Cron\FieldFactory);
+					if ($c->isDue()) {
+						$eqLogic->refresh();
+					}
+				} catch (Exception $exc) {
+					log::add('livebox', 'error', __('Expression cron non valide pour ', __FILE__) . $eqLogic->getHumanName() . ' : ' . $autorefresh);
+				}
+			}
 		}
 	}
 
@@ -211,6 +222,7 @@ class livebox extends eqLogic {
 				log::add('livebox','debug','version 4');
 				$this->_version = "4";
 				curl_close($session);
+				unset($session);
 				$session = curl_init();
 
 				$paramInternet = '{"service":"sah.Device.Information","method":"createContext","parameters":{"applicationName":"so_sdkut","username":"'.$this->getConfiguration('username').'","password":"'.$this->getConfiguration('password').'"}}';
@@ -253,6 +265,7 @@ class livebox extends eqLogic {
 			}
 			$info = curl_getinfo($session);
 			curl_close($session);
+			unset($session);
 			$obj = json_decode($json);
 			if ( ! isset($obj->data->contextID) ) {
 				log::add('livebox','debug','unable to get contextID');
@@ -307,7 +320,8 @@ class livebox extends eqLogic {
 							"Accept-Encoding: gzip, deflate, br\r\n" .
 							"Accept-Language: fr-FR,fr;q=0.8,en-US;q=0.6,en;q=0.4\r\n" .
 							"Cookie: ".$this->_cookies."; ; sah/contextId=".$this->_contextID,
-			 'content' => $paramInternet
+			 'content' => $paramInternet,
+			 'protocol_version' => '1.0'
 			)
 		);
 		return stream_context_create($httpInternet);
@@ -508,6 +522,17 @@ class livebox extends eqLogic {
 
 	public function postSave() {
 		if ($this->getConfiguration('type','') == 'box') {
+		$refresh = $this->getCmd(null, 'refresh');
+		if (!is_object($refresh)) {
+			$refresh = new liveboxCmd();
+			$refresh->setLogicalId('refresh');
+			$refresh->setIsVisible(1);
+			$refresh->setName(__('Rafraichir', __FILE__));
+		}
+		$refresh->setType('action');
+		$refresh->setSubType('other');
+		$refresh->setEqLogic_id($this->getId());
+		$refresh->save();
 		if ( $this->getIsEnable() ) {
 			$content = $this->getPage("internet");
 			if ( $content !== false ) {
@@ -1341,7 +1366,7 @@ class livebox extends eqLogic {
 		return 'plugins/livebox/plugin_info/livebox_icon.png';
 	}
 
-	public function scan() {
+	public function refresh() {
 		if ( $this->getIsEnable() && $this->getConfiguration('type') == 'box') {
 			if ( $this->getCookiesInfo() ) {
 				$this->refreshInfo();
@@ -1951,12 +1976,24 @@ class liveboxCmd extends cmd
 	/*	   * *********************Methode d'instance************************* */
 
 	/*	   * **********************Getteur Setteur*************************** */
+
+	public function dontRemoveCmd() {
+		if ($this->getLogicalId() == 'refresh') {
+			return true;
+		}
+		return false;
+	}
+
 	public function execute($_options = null) {
 		$eqLogic = $this->getEqLogic();
 		if (!is_object($eqLogic) || $eqLogic->getIsEnable() != 1) {
 			throw new Exception(__("Equipement désactivé impossible d'exécuter la commande : " . $this->getHumanName(), __FILE__));
 		}
 		log::add('livebox','debug','execute '.$this->getLogicalId());
+		if ($this->getLogicalId() == 'refresh') {
+			$eqLogic->refresh();
+			return;
+		}
 		if ($eqLogic->getConfiguration('type','') == 'box') {
 		$option = array();
 		if ($eqLogic->getConfiguration('productClass','') == 'Livebox 4' || $eqLogic->getConfiguration('productClass','') == 'Livebox Fibre') {

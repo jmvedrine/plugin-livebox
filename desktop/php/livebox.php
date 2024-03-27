@@ -10,6 +10,7 @@ $has = ["box"=>false,"cli"=>false];
 foreach ($eqLogics as $eqLogic) {
     if ($eqLogic->getConfiguration('type') == '') {
         $eqLogic->setConfiguration('type', 'box');
+        $eqLogic->setConfiguration('autorefresh', '* * * * *');
         $eqLogic->save();
     }
     $type=$eqLogic->getConfiguration('type','');
@@ -175,6 +176,15 @@ foreach ($eqLogics as $eqLogic) {
                     </div>
 
                 </div>
+                <div class="form-group" id="div_cron" style="display: none;">
+                  <label class="col-sm-2 control-label">{{Auto-actualisation (cron)}}</label>
+                    <div class="col-sm-3">
+                      <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="autorefresh" placeholder="{{Auto-actualisation (cron)}}"/>
+                    </div>
+                    <div class="col-sm-1">
+                      <i class="fas fa-question-circle cursor floatright" id="bt_cronGenerator"></i>
+                    </div>
+                </div>
                 <div class="form-group" id="div_goCarte" style="display: none;">
                     <label class="col-lg-2 control-label" >{{Accéder à la Livebox}}</label>
                     <div class="col-lg-3">
@@ -198,6 +208,9 @@ foreach ($eqLogics as $eqLogic) {
                     <div class="col-lg-3">
                         <input type="password" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="password"/>
                     </div>
+                    <div class="col-lg-1">
+                        <i class="fas fa-eye-slash" id="bt_showPassword"></i>
+		    </div>
                 </div>
             </fieldset>
         </form>
