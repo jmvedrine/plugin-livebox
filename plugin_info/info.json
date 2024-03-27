@@ -9,6 +9,8 @@
 	"display" : "panel",
 	"changelog" : "https://jmvedrine.github.io/plugin-livebox/#language#/changelog",
 	"documentation" : "https://jmvedrine.github.io/plugin-livebox/#language#/",
+	"changelog_beta" : "https://raw.githubusercontent.com/jmvedrine/plugin-livebox/beta/docs/fr_FR/changelog.md",
+	"documentation_beta" : "https://jmvedrine.github.io/plugin-livebox/#language#/",
 	"language" : ["fr_FR","en_US","de_DE","sp_SP","ru_RU","id_ID","it_IT"],
 	"compatibility" : ["miniplus","smart","rpi","docker","diy", "v4"]
 }
