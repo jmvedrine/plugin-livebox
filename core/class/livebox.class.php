@@ -36,7 +36,11 @@ class livebox extends eqLogic {
 				try {
 					$c = new Cron\CronExpression(checkAndFixCron($autorefresh), new Cron\FieldFactory);
 					if ($c->isDue()) {
-						$eqLogic->refresh();
+						try {
+							$eqLogic->refresh();
+						} catch (Exception $exc) {
+							log::add('livebox', 'error', __('Error in ', __FILE__) . $eqLogic->getHumanName() . ' : ' . $exc->getMessage());
+						}
 					}
 				} catch (Exception $exc) {
 					log::add('livebox', 'error', __('Expression cron non valide pour ', __FILE__) . $eqLogic->getHumanName() . ' : ' . $autorefresh);
