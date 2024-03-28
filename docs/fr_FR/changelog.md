@@ -71,3 +71,8 @@ Compatibilité avec PHP 8
 - Ajout d'un bouton pour forcer le rafraichissement des informations
 - Ajout d'un bouton permettant l'affichage du mot de password de la livebox
 - Ajout d'un panneau sur le bureau (à configurer dans le plugin)
+
+# Version du 28/03/2024
+
+- Compatibilité avec Livebox 6 et 7
+- Compatibilité avec core jeedom 4.4 (la version minimum exigée du core jeedom passe de 3.3.28 à 4.1.28)

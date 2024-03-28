@@ -1,10 +1,10 @@
 {
 	"id" : "livebox",
 	"name" : "Livebox",
-	"description" : "Plugin pour Livebox 2, play, 4",
+	"description" : "Plugin pour Livebox 2, Play, 4, Fibre, 6, 7",
 	"licence" : "AGPL",
 	"author" : "JMVedrine",
-	"require" : "3.3.28",
+	"require" : "4.1.28",
 	"category" : "communication",
 	"display" : "panel",
 	"changelog" : "https://jmvedrine.github.io/plugin-livebox/#language#/changelog",
