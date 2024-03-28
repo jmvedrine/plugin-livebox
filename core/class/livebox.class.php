@@ -380,7 +380,7 @@ class livebox extends eqLogic {
 				$listpage = array("sysbus/VoiceService/VoiceApplication:ring" => "");
 				break;
 			case "changewifi":
-				if ($this->getConfiguration('productClass','') == 'Livebox 4' || $this->getConfiguration('productClass','') == 'Livebox Fibre') {
+				if (preg_match("/Livebox (4|Fibre|6|7)/i", $this->getConfiguration('productClass',''))) {
 					$listpage = array("sysbus/NeMo/Intf/lan:setWLANConfig" => '"mibs":{"penable":{"'.$option['mibs'].'":{"PersistentEnable":'.$option['value'].',"Enable":'.$option['value'].'}}}');
 				} else {
 					$listpage = array("sysbus/NeMo/Intf/lan:setWLANConfig" => '"mibs":{"penable":{"'.$option['mibs'].'":{"PersistentEnable":'.$option['value'].',"Enable":'.$option['value'].'}}}');
@@ -1802,7 +1802,7 @@ class livebox extends eqLogic {
 			log::add('livebox','debug','Maj devicelist ' . $devicestring);
 			$this->checkAndUpdateCmd('devicelist', $devicestring);
 		}
-		if ($this->getConfiguration('productClass','') == 'Livebox 4' || $this->getConfiguration('productClass','') == 'Livebox Fibre') {
+		if (preg_match("/Livebox (4|Fibre|6|7)/i", $this->getConfiguration('productClass',''))) {
 			$content = $this->getPage("guestwifistate");
 			if ( $content !== false ) {
 				log::add('livebox','debug', 'Gest Wifi ' . print_r($content, true));
@@ -2000,7 +2000,7 @@ class liveboxCmd extends cmd
 		}
 		if ($eqLogic->getConfiguration('type','') == 'box') {
 		$option = array();
-		if ($eqLogic->getConfiguration('productClass','') == 'Livebox 4' || $eqLogic->getConfiguration('productClass','') == 'Livebox Fibre') {
+		if (preg_match("/Livebox (4|Fibre|6|7)/i", $this->getConfiguration('productClass',''))) {
 			$mibs0 = 'wifi0_bcm';
 			$mibs1 = 'wifi0_quan';
 		} else {
