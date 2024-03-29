@@ -165,6 +165,9 @@ function addCmdToTable(_cmd) {
         tr += '</td>';
 //		tr += '<td><i class="fas fa-minus-circle pull-right cmdAction cursor" data-action="remove"></i></td>';		
         tr += '<td>';
+        tr += '<span class="cmdAttr" data-l1key="htmlstate"></span>'; 
+        tr += '</td>';	
+        tr += '<td>';
         if (is_numeric(_cmd.id)) {
             tr += '<a class="btn btn-default btn-xs cmdAction" data-action="configure"><i class="fas fa-cogs"></i></a> ';
             tr += '<a class="btn btn-default btn-xs cmdAction" data-action="test"><i class="fas fa-rss"></i> {{Tester}}</a>';
@@ -195,6 +198,9 @@ function addCmdToTable(_cmd) {
         tr += '</td>';
         tr += '<td>';
         tr += '<span><input type="checkbox" class="cmdAttr" data-l1key="isVisible" checked/> {{Afficher}}<br/></span>';
+        tr += '</td>';
+        tr += '<td>';
+        tr += '<span class="cmdAttr" data-l1key="htmlstate"></span>'; 
         tr += '</td>';
         tr += '<td>';
         if (is_numeric(_cmd.id)) {

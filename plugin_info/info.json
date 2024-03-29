@@ -1,7 +1,9 @@
 {
 	"id" : "livebox",
 	"name" : "Livebox",
-	"description" : "Plugin pour Livebox 2, Play, 4, Fibre, 6, 7",
+	"description": {
+		"fr_FR": "Plugin pour Livebox 2, Play, 4, Fibre, 6, 7"
+	},
 	"licence" : "AGPL",
 	"author" : "JMVedrine",
 	"require" : "4.1.28",
@@ -12,5 +14,5 @@
 	"changelog_beta" : "https://raw.githubusercontent.com/jmvedrine/plugin-livebox/beta/docs/fr_FR/changelog.md",
 	"documentation_beta" : "https://jmvedrine.github.io/plugin-livebox/#language#/",
 	"language" : ["fr_FR","en_US","de_DE","sp_SP","ru_RU","id_ID","it_IT"],
-	"compatibility" : ["miniplus","smart","rpi","docker","diy", "v4"]
+	"compatibility" : ["smart","luna","atlas","rpi","docker","diy"]
 }

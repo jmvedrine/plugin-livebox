@@ -234,11 +234,12 @@ foreach ($eqLogics as $eqLogic) {
         <table id="table_cmd" class="table table-bordered table-condensed">
             <thead>
                 <tr>
-                    <th style="width: 100px;">#</th>
-                    <th style="width: 300px;">{{Nom}}</th>
-                    <th style="width: 120px;">{{Icône-action}}</th>
-                    <th style="width: 120px;">{{Sous-Type}}</th>
-                    <th style="width: 120px;">{{Options}}</th>
+                    <th>#</th>
+                    <th>{{Nom}}</th>
+                    <th>{{Icône-action}}</th>
+                    <th>{{Sous-Type}}</th>
+                    <th>{{Options}}</th>
+                    <th>{{Etat}}</th>
                     <th style="width: 100px;">{{Actions}}</th>
                 </tr>
             </thead>

@@ -605,10 +605,7 @@ class livebox extends eqLogic {
 						$cmd->setType('info');
 						$cmd->setSubType('numeric');
 						$cmd->setIsHistorized(1);
-						if ( version_compare(jeedom::version(), "4", "<")) {
-							$cmd->setTemplate('dashboard', 'dureev3');
-							$cmd->setTemplate('mobile', 'dureev3');
-						} else {
+						if (version_compare(jeedom::version(), "4.4", "<")) {
 							$cmd->setTemplate('dashboard', 'livebox::duree');
 							$cmd->setTemplate('mobile', 'livebox::duree');
 						}
@@ -804,8 +801,7 @@ class livebox extends eqLogic {
 				}
 				$content2 = $this->getPage("deviceinfo");
 				if ( $content2 !== false ) {
-					if ($content2['status']['ProductClass'] == 'Livebox 4' || $content2['status']['ProductClass'] == 'Livebox Fibre') {
-						log::add('livebox','debug','Mode Wifi Guest');
+					if (preg_match("/Livebox (4|Fibre|6|7)/i", $content2['status']['ProductClass'])) {
 						$cmd = $this->getCmd(null, 'guestwifion');
 						if ( ! is_object($cmd) ) {
 							$cmd = new liveboxCmd();
@@ -1004,14 +1000,9 @@ class livebox extends eqLogic {
 					$cmd->setSubType('string');
 					$cmd->setIsVisible(0);
 					$cmd->setIsHistorized(0);
-					if ( version_compare(jeedom::version(), "4", "<")) {
-						$cmd->setTemplate('dashboard', 'deroulantv3');
-						$cmd->setTemplate('mobile', 'deroulantv3');
-					} else {
 						$cmd->setTemplate('dashboard', 'livebox::deroulant');
 						$cmd->setTemplate('mobile', 'livebox::deroulant');
 					}
-				}
 				$cmd->save();
 
 				$cmd = $this->getCmd(null, 'incallstable');
@@ -1025,14 +1016,9 @@ class livebox extends eqLogic {
 					$cmd->setSubType('string');
 					$cmd->setIsVisible(0);
 					$cmd->setIsHistorized(0);
-					if ( version_compare(jeedom::version(), "4", "<")) {
-						$cmd->setTemplate('dashboard', 'deroulantv3');
-						$cmd->setTemplate('mobile', 'deroulantv3');
-					} else {
 						$cmd->setTemplate('dashboard', 'livebox::deroulant');
 						$cmd->setTemplate('mobile', 'livebox::deroulant');
 					}
-				}
 				$cmd->save();
 
 				$cmd = $this->getCmd(null, 'missedcallstable');
@@ -1046,14 +1032,9 @@ class livebox extends eqLogic {
 					$cmd->setSubType('string');
 					$cmd->setIsVisible(0);
 					$cmd->setIsHistorized(0);
-					if ( version_compare(jeedom::version(), "4", "<")) {
-						$cmd->setTemplate('dashboard', 'deroulantv3');
-						$cmd->setTemplate('mobile', 'deroulantv3');
-					} else {
 						$cmd->setTemplate('dashboard', 'livebox::deroulant');
 						$cmd->setTemplate('mobile', 'livebox::deroulant');
 					}
-				}
 				$cmd->save();
 
 				$cmd = $this->getCmd(null, 'callstable');
@@ -1066,14 +1047,9 @@ class livebox extends eqLogic {
 					$cmd->setType('info');
 					$cmd->setSubType('string');
 					$cmd->setIsHistorized(0);
-					if ( version_compare(jeedom::version(), "4", "<")) {
-						$cmd->setTemplate('dashboard', 'deroulantv3');
-						$cmd->setTemplate('mobile', 'deroulantv3');
-					} else {
 						$cmd->setTemplate('dashboard', 'livebox::deroulant');
 						$cmd->setTemplate('mobile', 'livebox::deroulant');
 					}
-				}
 				$cmd->save();
 
 				$cmd = $this->getCmd(null, 'lastmissedcall');
@@ -1200,10 +1176,7 @@ class livebox extends eqLogic {
 				$cmd->setUnite('s');
 				$cmd->setType('info');
 				$cmd->setSubType('numeric');
-				if ( version_compare(jeedom::version(), "4", "<")) {
-					$cmd->setTemplate('dashboard', 'dureev3');
-					$cmd->setTemplate('mobile', 'dureev3');
-				} else {
+				if (version_compare(jeedom::version(), "4.4", "<")) {
 					$cmd->setTemplate('dashboard', 'livebox::duree');
 					$cmd->setTemplate('mobile', 'livebox::duree');
 				}
