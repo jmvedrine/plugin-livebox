@@ -554,10 +554,6 @@ class livebox extends eqLogic {
 						$cmd->setSubType('numeric');
 						$cmd->setIsHistorized(0);
 					}
-					if (version_compare(jeedom::version(), "4.4", ">")) {
-						$cmd->setDisplay('forceReturnLineBefore', 1);
-						$cmd->setDisplay('forceReturnLineAfter', 1);
-					}
 					$cmd->save();
 
 					$cmd = $this->getCmd(null, 'debitdescendant');
@@ -571,10 +567,6 @@ class livebox extends eqLogic {
 						$cmd->setSubType('numeric');
 						$cmd->setIsHistorized(0);
 					}
-					if (version_compare(jeedom::version(), "4.4", ">")) {
-						$cmd->setDisplay('forceReturnLineBefore', 1);
-						$cmd->setDisplay('forceReturnLineAfter', 1);
-					}
 					$cmd->save();
 
 					$cmd = $this->getCmd(null, 'margebruitmontant');
@@ -586,11 +578,7 @@ class livebox extends eqLogic {
 						$cmd->setUnite('dB');
 						$cmd->setType('info');
 						$cmd->setSubType('numeric');
-						$cmd->setIsHistorized(1);
-					}
-					if (version_compare(jeedom::version(), "4.4", ">")) {
-						$cmd->setDisplay('forceReturnLineBefore', 1);
-						$cmd->setDisplay('forceReturnLineAfter', 1);
+						$cmd->setIsHistorized(0);
 					}
 					$cmd->save();
 
@@ -604,10 +592,6 @@ class livebox extends eqLogic {
 						$cmd->setType('info');
 						$cmd->setSubType('numeric');
 						$cmd->setIsHistorized(0);
-					}
-					if (version_compare(jeedom::version(), "4.4", ">")) {
-						$cmd->setDisplay('forceReturnLineBefore', 1);
-						$cmd->setDisplay('forceReturnLineAfter', 1);
 					}
 					$cmd->save();
 
@@ -1390,10 +1374,6 @@ class livebox extends eqLogic {
 				$cmd->setSubType('binary');
 				$cmd->setIsVisible(1);
 				$cmd->setIsHistorized(1);
-			}
-			if (version_compare(jeedom::version(), "4.4", ">")) {
-				$cmd->setDisplay('forceReturnLineBefore', 1);
-				$cmd->setDisplay('forceReturnLineAfter', 1);
 			}
 			$cmd->save();
 
