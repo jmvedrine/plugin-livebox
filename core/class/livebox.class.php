@@ -85,8 +85,8 @@ class livebox extends eqLogic {
 
 	}
 
-	public static function nameExists($name) {
-			$allLivebox=eqLogic::byType('livebox');
+	public static function nameExists($name, $objectId=null) {
+			$allLivebox = eqLogic::byObjectId($objectId,false);
 			foreach($allLivebox as $u) {
 				if($name == $u->getName()) return true;
 			}
@@ -98,9 +98,17 @@ class livebox extends eqLogic {
 		$mac = $client['Key'];
 		$defaultRoom = intval(config::byKey('defaultParentObject','livebox','',true));
 		$name= (isset($client["Name"]) && $client["Name"]) ? $client["Name"] : $mac;
-		if(self::nameExists($name)) {
-			log::add('livebox', 'debug', "Nom en double ".$name." renommé en ".$name.'_'.$mac);
-			$name = $name.'_'.$mac;
+		if($defaultRoom) {
+			if(self::nameExists($name, $defaultRoom)) {
+				log::add('livebox', 'debug', "Nom en double dans la même pièce ".$name." renommé en LB_".$name.'_'.$mac);
+				$name = 'LB_'.$name.'_'.$mac;
+			}
+			$eqLogicClient->setObject_id($defaultRoom);
+		} else {
+			if(self::nameExists($name)) {
+				log::add('livebox', 'debug', "Nom en double ".$name." renommé en LB_".$name.'_'.$mac);
+				$name = 'LB_'.$name.'_'.$mac;
+			}
 		}
 		log::add('livebox', 'info', "Trouvé Client ".$name."(".$mac."):".json_encode($client));
 		$eqLogicClient->setName($name);
@@ -108,7 +116,6 @@ class livebox extends eqLogic {
 		$eqLogicClient->setIsVisible(0);
 		$eqLogicClient->setLogicalId($mac);
 		$eqLogicClient->setEqType_name('livebox');
-		if($defaultRoom) $eqLogicClient->setObject_id($defaultRoom);
 		$eqLogicClient->setConfiguration('type', 'cli');
 		$eqLogicClient->setConfiguration('boxId', $boxId);
 		$eqLogicClient->setConfiguration('macAddress',$mac);
