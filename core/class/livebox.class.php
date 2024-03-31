@@ -160,7 +160,6 @@ class livebox extends eqLogic {
 	}
 
 	public static function deleteDisabledEQ($what = 'clients') {
-		log::add('livebox', 'info', "deleteDisabledEQ");
 
 		$ignoredNew=[];
 		if($what == 'all' || $what == 'clients') {
@@ -1886,14 +1885,14 @@ class livebox extends eqLogic {
 				}
 			}
 
-			log::add('livebox','debug','Appels '.print_r($calls, true));
-			log::add('livebox','debug','Nombre appels manqués '.$missedCallsNumber);
+			// log::add('livebox','debug','Appels '.print_r($calls, true));
+			// log::add('livebox','debug','Nombre appels manqués '.$missedCallsNumber);
 			$this->checkAndUpdateCmd('missedcallsnumber', $missedCallsNumber);
-			log::add('livebox','debug','Nombre appels entrants '.$inCallsNumber);
+			// log::add('livebox','debug','Nombre appels entrants '.$inCallsNumber);
 			$this->checkAndUpdateCmd('incallsnumber', $inCallsNumber);
-			log::add('livebox','debug','Nombre appels sortants '.$outCallsNumber);
+			// log::add('livebox','debug','Nombre appels sortants '.$outCallsNumber);
 			$this->checkAndUpdateCmd('outcallsnumber', $outCallsNumber);
-			log::add('livebox','debug','Nombre total appels '.$totalCallsNumber);
+			// log::add('livebox','debug','Nombre total appels '.$totalCallsNumber);
 			$this->checkAndUpdateCmd('totalcallsnumber', $totalCallsNumber);
 
 			$tabstyle = "<style> .thLboxC { text-align:center;padding : 2px !important; } .tdLboxR { text-align:right;padding : 2px !important; } .tdLboxL { text-align:left;padding : 2px !important; } </style>";
@@ -1994,11 +1993,11 @@ class livebox extends eqLogic {
 		}
 
 		$this->checkAndUpdateCmd('callstable', $callsTable);
-		log::add('livebox','debug','Appels entrants'.$inCallsTable);
+		// log::add('livebox','debug','Appels entrants'.$inCallsTable);
 		$this->checkAndUpdateCmd('incallstable', $inCallsTable);
-		log::add('livebox','debug','Appels sortants'.$outCallsTable);
+		// log::add('livebox','debug','Appels sortants'.$outCallsTable);
 		$this->checkAndUpdateCmd('outcallstable', $outCallsTable);
-		log::add('livebox','debug','Appels manqués'.$missedCallsTable);
+		// log::add('livebox','debug','Appels manqués'.$missedCallsTable);
 		$this->checkAndUpdateCmd('missedcallstable', $missedCallsTable);
 
 		$content = $this->getPage("devicelist");
@@ -2123,7 +2122,7 @@ class livebox extends eqLogic {
 		$usepagesjaunes = config::byKey('pagesjaunes','livebox', false);
 		$responses = livebox_calls::searchByPhone($normalizedPhone);
 		if (!is_array($responses) || count($responses) ===0) {
-			log::add('livebox','debug','caller not stored');
+			// log::add('livebox','debug','caller not stored');
 			// Il n'est pas dans la base, nouveau caller.
 			$caller = new livebox_calls;
 			$caller->setStartDate(date('Y-m-d H:i:s'));
@@ -2131,13 +2130,13 @@ class livebox extends eqLogic {
 			$favorite = 0;
 			if($usepagesjaunes == 1) {
 				if ($this->_pagesJaunesRequests < self::MAX_PAGESJAUNES && strlen($num) == 10) {
-					log::add('livebox','debug','we fetch the name');
+					// log::add('livebox','debug','we fetch the name');
 					$this->_pagesJaunesRequests++;
 					$callerName = $this->getPjCallerName($normalizedPhone);
 					$caller->setCallerName($callerName);
 					$caller->setIsFetched(1);
 				} else {
-					log::add('livebox','debug','store it but not fetched');
+					// log::add('livebox','debug','store it but not fetched');
 					$caller->setCallerName('');
 					$caller->setIsFetched(0);
 				}
@@ -2148,21 +2147,21 @@ class livebox extends eqLogic {
 			$caller->save();
 		} else {
 			// Il est déjà dans la base
-			log::add('livebox','debug','caller already stored');
+			// log::add('livebox','debug','caller already stored');
 			// On prend le premier retourné car priorité aux plus récents.
 			$caller = $responses[0];
 			$favorite = 0;
 			if ($caller->getIsFetched() == 0) {
-				log::add('livebox','debug','but it is not fetched');
+				// log::add('livebox','debug','but it is not fetched');
 				if($usepagesjaunes == 1) {
 					if ($this->_pagesJaunesRequests < self::MAX_PAGESJAUNES && strlen($num) == 10) {
-						log::add('livebox','debug','we fetch the name');
+						// log::add('livebox','debug','we fetch the name');
 						$this->_pagesJaunesRequests++;
 						$callerName = $this->getPjCallerName($normalizedPhone);
-						log::add('livebox','debug','response from pages jaunes '.$callerName);
+						// log::add('livebox','debug','response from pages jaunes '.$callerName);
 						$caller->setCallerName($callerName);
 						$caller->setIsFetched(1);
-						log::add('livebox','debug','and we save it');
+						// log::add('livebox','debug','and we save it');
 						$caller->save();
 					}
 				}
@@ -2236,21 +2235,24 @@ class liveboxCmd extends cmd
 		if (!is_object($eqLogic) || $eqLogic->getIsEnable() != 1) {
 			throw new Exception(__("Equipement désactivé impossible d'exécuter la commande : " . $this->getHumanName(), __FILE__));
 		}
-		log::add('livebox','debug','execute '.$this->getLogicalId());
+		log::add('livebox','debug','execute cmd '.$this->getLogicalId());
 		if ($this->getLogicalId() == 'refresh') {
 			$eqLogic->refresh();
 			return;
 		}
 		if ($eqLogic->getConfiguration('type','') == 'box') {
 		$option = array();
-		if (preg_match("/Livebox (4|Fibre)/i", $this->getConfiguration('productClass',''))) {
+		if (preg_match("/Livebox (4|Fibre)/i", $eqLogic->getConfiguration('productClass',''))) {
+			log::add('livebox','debug','wifi0_bcm wifi0_quan');
 			$mibs0 = 'wifi0_bcm';
 			$mibs1 = 'wifi0_quan';
-		} elseif (preg_match("/Livebox (6|7)", $this->getConfiguration('productClass',''))) {
+		} elseif (preg_match("/Livebox (6|7)", $eqLogic->getConfiguration('productClass',''))) {
+			log::add('livebox','debug','rad2g0 rad5g0 rad6g0');
 			$mibs0 = 'rad2g0';
 			$mibs1 = 'rad5g0';
 			$mibs2 = 'rad6g0';
 		} else {
+			log::add('livebox','debug','wifi0_ath wifi1_ath');
 			$mibs0 = 'wifi0_ath';
 			$mibs1 = 'wifi1_ath';
 		}
@@ -2419,11 +2421,11 @@ class livebox_calls {
 		$values = array(
 			'phone' => $_phonenum,
 		);
-		log::add('livebox','debug','searchbyphone values ' .print_r($values, true));
+		// log::add('livebox','debug','searchbyphone values ' .print_r($values, true));
 		$sql = 'SELECT ' . DB::buildField(__CLASS__) . '
 		FROM livebox_calls
 		WHERE phone=:phone ORDER BY startDate DESC';
-		log::add('livebox','debug','searchbyphone sql ' .$sql);
+		// log::add('livebox','debug','searchbyphone sql ' .$sql);
 		return DB::Prepare($sql, $values, DB::FETCH_TYPE_ALL, PDO::FETCH_CLASS, __CLASS__);
 	}
 
