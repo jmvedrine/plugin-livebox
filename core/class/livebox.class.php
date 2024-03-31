@@ -2457,7 +2457,7 @@ class liveboxCmd extends cmd
 			log::add('livebox','debug','wifi0_bcm wifi0_quan');
 			$mibs0 = 'wifi0_bcm';
 			$mibs1 = 'wifi0_quan';
-		} elseif (preg_match("/Livebox (6|7)", $eqLogic->getConfiguration('productClass',''))) {
+		} elseif (preg_match("/Livebox (6|7)/", $eqLogic->getConfiguration('productClass',''))) {
 			log::add('livebox','debug','rad2g0 rad5g0 rad6g0');
 			$mibs0 = 'rad2g0';
 			$mibs1 = 'rad5g0';
