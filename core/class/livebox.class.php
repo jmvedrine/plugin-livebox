@@ -1831,7 +1831,37 @@ class livebox extends eqLogic {
 			}  elseif ( count($content["status"]) == 3 ) {
 				$content = $this->getPage("wifi");
 				if ( $content !== false ) {
-					// A faire lorsqu'on saura le contenu du getPage wifi pour les livebox 6 et 7.
+					if (isset($content["status"]["wlanvap"]["vap2g0priv0"]["VAPStatus"])) {
+						$this->setConfiguration('wifi24Name', 'vap2g0priv0');
+						$eqLogic_cmd = $this->getCmd(null, 'wifi2.4status');
+						if (is_object($eqLogic_cmd)) {
+							$statusvalue = $content["status"]["wlanvap"]["vap2g0priv0"]["VAPStatus"];
+							log::add('livebox','debug','Maj wifi2.4status ' . $eqLogic_cmd->formatValue($statusvalue));
+							$this->checkAndUpdateCmd('wifi2.4status', $eqLogic_cmd->formatValue($statusvalue));
+						}
+					}
+					if (isset($content["status"]["wlanvap"]["vap5g0priv0"])) {
+						// Livebox 6.
+						$this->setConfiguration('wifi5Name', 'vap5g0priv0');
+						$eqLogic_cmd = $this->getCmd(null, 'wifi5status');
+						if (is_object($eqLogic_cmd)) {
+							$statusvalue = $content["status"]["wlanvap"]["vap5g0priv0"]["VAPStatus"];
+							log::add('livebox','debug','Maj wifi5status ' .$eqLogic_cmd->formatValue($statusvalue));
+							$this->checkAndUpdateCmd('wifi5status', $eqLogic_cmd->formatValue($statusvalue));
+						}
+						
+					}
+					if (isset($content["status"]["wlanvap"]["vap6g0priv0"])) {
+						// Livebox 6.
+						$this->setConfiguration('wifi6Name', 'vap6g0priv0');
+						$eqLogic_cmd = $this->getCmd(null, 'wifi6status');
+						if (is_object($eqLogic_cmd)) {
+							$statusvalue = $content["status"]["wlanvap"]["vap6g0priv0"]["VAPStatus"];
+							log::add('livebox','debug','Maj wifi6status ' .$eqLogic_cmd->formatValue($statusvalue));
+							$this->checkAndUpdateCmd('wifi6status', $eqLogic_cmd->formatValue($statusvalue));
+						}
+						
+					}
 				}
 			}
 		}
