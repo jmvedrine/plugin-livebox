@@ -47,6 +47,12 @@ if (!isConnect()) {
 			</select>
 		  </div>
 		</div>
+		<div class="form-group">
+			<label class="col-sm-4 control-label">{{Vous laisser personnaliser entierement les widget}}</label>
+			<div class="col-sm-2">
+				<input type="checkbox" class="configKey tooltips" data-l1key="widgetCustomization">
+			</div>
+		</div>
 <?php
 	$ignoredClients=config::byKey('ignoredClients','livebox',[],true);
 	if(count($ignoredClients)) :
