@@ -83,3 +83,4 @@ Compatibilité avec PHP 8
 - Ajout de commandes d'activation wifi pour l'ensemble des bandes
 - Ajout d'un paramètre de configuration pour permettre de personnaliser entierement les widgets (sinon à chaque enregistrement une configuration par défaut est réappliquée)
 - Ajout d'une commande softwareVersion (que vous pouvez historiser dans le menu avancé de la commande)
+- Corrige le blocage et deblocage d'un device
