@@ -80,3 +80,6 @@ Compatibilité avec PHP 8
 # Version du 01/04/2024
 
 - Les commandes action et info relatives au WiFi (2.4GHz, 5GHz, 6GHz) ont été corrigées et fonctionnent avec la Livebox 6 (pas encore de retour pour la Livebox 7)
+- Ajout de commandes d'activation wifi pour l'ensemble des bandes
+- Ajout d'un paramètre de configuration pour permettre de personnaliser entierement les widgets (sinon à chaque enregistrement une configuration par défaut est réappliquée)
+- Ajout d'une commande softwareVersion (que vous pouvez historiser dans le menu avancé de la commande)

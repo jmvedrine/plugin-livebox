@@ -48,7 +48,7 @@ if (!isConnect()) {
 		  </div>
 		</div>
 		<div class="form-group">
-			<label class="col-sm-4 control-label">{{Vous laisser personnaliser entierement les widget}}</label>
+			<label class="col-sm-4 control-label">{{Vous laisser personnaliser entierement les widgets}}</label>
 			<div class="col-sm-2">
 				<input type="checkbox" class="configKey tooltips" data-l1key="widgetCustomization">
 			</div>
