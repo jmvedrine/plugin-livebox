@@ -75,22 +75,21 @@ class livebox extends eqLogic {
 				break;
 			}
 		}
-		if(!$found){
+		if(!$found) {
 			$favoris[] =  array(
 				'callerName' => $name,
 				'phone' => $num
 			);
 			config::save('favorites',$favoris,'livebox');
 		}
-
 	}
 
 	public static function nameExists($name, $objectId=null) {
-			$allLivebox = eqLogic::byObjectId($objectId,false);
-			foreach($allLivebox as $u) {
-				if($name == $u->getName()) return true;
-			}
-			return false;
+		$allLivebox = eqLogic::byObjectId($objectId,false);
+		foreach($allLivebox as $u) {
+			if($name == $u->getName()) return true;
+		}
+		return false;
 	}
 
 	public static function createClient($client, $boxId) {
@@ -160,7 +159,6 @@ class livebox extends eqLogic {
 	}
 
 	public static function deleteDisabledEQ($what = 'clients') {
-
 		$ignoredNew=[];
 		if($what == 'all' || $what == 'clients') {
 			$eqLogics = eqLogic::byType('livebox');
@@ -181,7 +179,6 @@ class livebox extends eqLogic {
 				config::save('ignoredClients',$ignoredClients,'livebox');
 			}
 		}
-
 	}
 
 	public static function removeAllClients($boxId) {
@@ -198,8 +195,7 @@ class livebox extends eqLogic {
 	}
 
 	function getCookiesInfo() {
-		if ( ! isset($this->_cookies) )
-		{
+		if ( ! isset($this->_cookies) ) {
 			log::add('livebox','debug','get cookies');
 			$cookiefile =  jeedom::getTmpFolder('livebox') . "/livebox.cookie";
 			if ( ! defined("COOKIE_FILE") ) {
@@ -227,8 +223,7 @@ class livebox extends eqLogic {
 			log::add('livebox','debug','json : '.$json);
 			$httpCode = curl_getinfo($session, CURLINFO_HTTP_CODE);
 
-			if ( $httpCode != 200 )
-			{
+			if ( $httpCode != 200 ) {
 				log::add('livebox','debug','version 4');
 				$this->_version = "4";
 				curl_close($session);
@@ -267,9 +262,7 @@ class livebox extends eqLogic {
 					throw new Exception(__('La Livebox ne répond pas à la demande de cookie.', __FILE__));
 					return false;
 				}
-			}
-			else
-			{
+			} else {
 				log::add('livebox','debug','version 2');
 				$this->_version = "2";
 			}
@@ -283,8 +276,7 @@ class livebox extends eqLogic {
 				return false;
 			}
 			$this->_contextID = $obj->data->contextID;
-			if ( ! file_exists ($cookiefile) )
-			{
+			if ( ! file_exists ($cookiefile) ) {
 				log::add('livebox','error',__('Le compte est incorrect.',__FILE__));
 				if ($statuscmd->execCmd() != 0) {
 					$statuscmd->setCollectDate('');
@@ -392,6 +384,12 @@ class livebox extends eqLogic {
 					$listpage = array("sysbus/NeMo/Intf/lan:setWLANConfig" => '"mibs":{"penable":{"'.$option['mibs'].'":{"PersistentEnable":'.$option['value'].',"Enable":'.$option['value'].'}}}');
 				}
 				break;
+			case "changemainwifi":
+				$listpage = array("sysbus/NMC/Wifi:set" => '"Enable":'.$option['value'].',"Status":"'.$option['value'].'"');
+				break;
+			case "mainwifistate":
+				$listpage = array("sysbus/NMC/Wifi:get" => "");
+				break;
 			case "changeguestwifi":
 				if ($option['value']) {
 					$guestWifiStatus = 'Enabled';
@@ -487,18 +485,14 @@ class livebox extends eqLogic {
 		}
 	}
 
-	public function preUpdate()
-	{
-		if ( $this->getIsEnable() && $this->getConfiguration('type','') == 'box')
-		{
+	public function preUpdate() {
+		if ( $this->getIsEnable() && $this->getConfiguration('type','') == 'box') {
 			return $this->getCookiesInfo();
 		}
 	}
 
-	public function preSave()
-	{
-		if ( $this->getIsEnable() && $this->getConfiguration('type','') == 'box')
-		{
+	public function preSave() {
+		if ( $this->getIsEnable() && $this->getConfiguration('type','') == 'box') {
 			$result = $this->getCookiesInfo();
 			if ($result) {
 				$content = $this->getPage("deviceinfo");
@@ -649,7 +643,7 @@ class livebox extends eqLogic {
 			$content = $this->getPage("wifilist");
 			if ( $content !== false ) {
 				if ( count($content["status"]) == 1 ) {
-					log::add('livebox','debug','Mode Wifi');
+					log::add('livebox','debug','Mode Wifi 2.4');
 					$cmd = $this->getCmd(null, 'wifion');
 					if ( ! is_object($cmd) ) {
 						$cmd = new liveboxCmd();
@@ -673,13 +667,25 @@ class livebox extends eqLogic {
 					}
 
 					$cmd = $this->getCmd(null, 'wifi2.4on');
-					if ( is_object($cmd)) {
-						$cmd->remove();
+					if ( ! is_object($cmd) ) {
+						$cmd = new liveboxCmd();
+						$cmd->setName('Activer wifi 2.4G');
+						$cmd->setEqLogic_id($this->getId());
+						$cmd->setType('action');
+						$cmd->setSubType('other');
+						$cmd->setLogicalId('wifi2.4on');
+						$cmd->save();
 					}
 
 					$cmd = $this->getCmd(null, 'wifi2.4off');
-					if ( is_object($cmd)) {
-						$cmd->remove();
+					if ( ! is_object($cmd) ) {
+						$cmd = new liveboxCmd();
+						$cmd->setName('Désactiver wifi 2.4G');
+						$cmd->setEqLogic_id($this->getId());
+						$cmd->setType('action');
+						$cmd->setSubType('other');
+						$cmd->setLogicalId('wifi2.4off');
+						$cmd->save();
 					}
 
 					$cmd = $this->getCmd(null, 'wifi5on');
@@ -701,95 +707,13 @@ class livebox extends eqLogic {
 					if ( is_object($cmd)) {
 						$cmd->remove();
 					}
+
 					$cmd = $this->getCmd(null, 'wifistatus');
 					if ( ! is_object($cmd)) {
 						$cmd = new liveboxCmd();
 						$cmd->setName('Etat Wifi');
 						$cmd->setEqLogic_id($this->getId());
 						$cmd->setLogicalId('wifistatus');
-						$cmd->setUnite('');
-						$cmd->setType('info');
-						$cmd->setSubType('binary');
-						$cmd->setIsHistorized(0);
-						$cmd->save();
-					}
-
-					$cmd = $this->getCmd(null, 'wifi5status');
-					if ( is_object($cmd)) {
-						$cmd->remove();
-					}
-
-					$cmd = $this->getCmd(null, 'wifi2.4status');
-					if ( is_object($cmd)) {
-						$cmd->remove();
-					}
-
-					$cmd = $this->getCmd(null, 'wifi6status');
-					if ( is_object($cmd)) {
-						$cmd->remove();
-					}
-				} elseif ( count($content["status"]) == 2 ) {
-					log::add('livebox','debug','Mode Wifi 2.4 et 5');
-					$cmd = $this->getCmd(null, 'wifi2.4on');
-					if ( ! is_object($cmd) ) {
-						$cmd = new liveboxCmd();
-						$cmd->setName('Activer wifi 2.4G');
-						$cmd->setEqLogic_id($this->getId());
-						$cmd->setType('action');
-						$cmd->setSubType('other');
-						$cmd->setLogicalId('wifi2.4on');
-						$cmd->save();
-					}
-
-					$cmd = $this->getCmd(null, 'wifi5on');
-					if ( ! is_object($cmd) ) {
-						$cmd = new liveboxCmd();
-						$cmd->setName('Activer wifi 5G');
-						$cmd->setEqLogic_id($this->getId());
-						$cmd->setType('action');
-						$cmd->setSubType('other');
-						$cmd->setLogicalId('wifi5on');
-						$cmd->save();
-					}
-
-					$cmd = $this->getCmd(null, 'wifi2.4off');
-					if ( ! is_object($cmd) ) {
-						$cmd = new liveboxCmd();
-						$cmd->setName('Désactiver wifi 2.4G');
-						$cmd->setEqLogic_id($this->getId());
-						$cmd->setType('action');
-						$cmd->setSubType('other');
-						$cmd->setLogicalId('wifi2.4off');
-						$cmd->save();
-					}
-
-					$cmd = $this->getCmd(null, 'wifi5off');
-					if ( ! is_object($cmd) ) {
-						$cmd = new liveboxCmd();
-						$cmd->setName('Désactiver wifi 5G');
-						$cmd->setEqLogic_id($this->getId());
-						$cmd->setType('action');
-						$cmd->setSubType('other');
-						$cmd->setLogicalId('wifi5off');
-						$cmd->save();
-					}
-
-					$cmd = $this->getCmd(null, 'wifioff');
-					if ( is_object($cmd)) {
-						$cmd->remove();
-					}
-
-					$cmd = $this->getCmd(null, 'wifion');
-					if ( is_object($cmd)) {
-						$cmd->remove();
-					}
-
-					$cmd = $this->getCmd(null, 'wifi5status');
-					if ( ! is_object($cmd)) {
-						$cmd = new liveboxCmd();
-						$cmd->setName('Etat Wifi 5G');
-						$cmd->setEqLogic_id($this->getId());
-						$cmd->setLogicalId('wifi5status');
 						$cmd->setUnite('');
 						$cmd->setType('info');
 						$cmd->setSubType('binary');
@@ -810,12 +734,39 @@ class livebox extends eqLogic {
 						$cmd->save();
 					}
 
-					$cmd = $this->getCmd(null, 'wifistatus');
+					$cmd = $this->getCmd(null, 'wifi5status');
 					if ( is_object($cmd)) {
 						$cmd->remove();
 					}
-				} elseif ( count($content["status"]) == 3 ) {
-					log::add('livebox','debug','Mode Wifi 6');
+
+					$cmd = $this->getCmd(null, 'wifi6status');
+					if ( is_object($cmd)) {
+						$cmd->remove();
+					}
+				} elseif ( count($content["status"]) == 2 ) {
+					log::add('livebox','debug','Mode Wifi 2.4 et 5');
+					$cmd = $this->getCmd(null, 'wifion');
+					if ( ! is_object($cmd) ) {
+						$cmd = new liveboxCmd();
+						$cmd->setName('Activer wifi');
+						$cmd->setEqLogic_id($this->getId());
+						$cmd->setType('action');
+						$cmd->setSubType('other');
+						$cmd->setLogicalId('wifion');
+						$cmd->save();
+					}
+
+					$cmd = $this->getCmd(null, 'wifioff');
+					if ( ! is_object($cmd) ) {
+						$cmd = new liveboxCmd();
+						$cmd->setName('Désactiver wifi');
+						$cmd->setEqLogic_id($this->getId());
+						$cmd->setType('action');
+						$cmd->setSubType('other');
+						$cmd->setLogicalId('wifioff');
+						$cmd->save();
+					}
+
 					$cmd = $this->getCmd(null, 'wifi2.4on');
 					if ( ! is_object($cmd) ) {
 						$cmd = new liveboxCmd();
@@ -827,6 +778,17 @@ class livebox extends eqLogic {
 						$cmd->save();
 					}
 
+					$cmd = $this->getCmd(null, 'wifi2.4off');
+					if ( ! is_object($cmd) ) {
+						$cmd = new liveboxCmd();
+						$cmd->setName('Désactiver wifi 2.4G');
+						$cmd->setEqLogic_id($this->getId());
+						$cmd->setType('action');
+						$cmd->setSubType('other');
+						$cmd->setLogicalId('wifi2.4off');
+						$cmd->save();
+					}
+
 					$cmd = $this->getCmd(null, 'wifi5on');
 					if ( ! is_object($cmd) ) {
 						$cmd = new liveboxCmd();
@@ -835,6 +797,138 @@ class livebox extends eqLogic {
 						$cmd->setType('action');
 						$cmd->setSubType('other');
 						$cmd->setLogicalId('wifi5on');
+						$cmd->save();
+					}
+
+					$cmd = $this->getCmd(null, 'wifi5off');
+					if ( ! is_object($cmd) ) {
+						$cmd = new liveboxCmd();
+						$cmd->setName('Désactiver wifi 5G');
+						$cmd->setEqLogic_id($this->getId());
+						$cmd->setType('action');
+						$cmd->setSubType('other');
+						$cmd->setLogicalId('wifi5off');
+						$cmd->save();
+					}
+
+					$cmd = $this->getCmd(null, 'wifi6on');
+					if ( is_object($cmd)) {
+						$cmd->remove();
+					}
+
+					$cmd = $this->getCmd(null, 'wifi6off');
+					if ( is_object($cmd)) {
+						$cmd->remove();
+					}
+
+					$cmd = $this->getCmd(null, 'wifistatus');
+					if ( ! is_object($cmd)) {
+						$cmd = new liveboxCmd();
+						$cmd->setName('Etat Wifi');
+						$cmd->setEqLogic_id($this->getId());
+						$cmd->setLogicalId('wifistatus');
+						$cmd->setUnite('');
+						$cmd->setType('info');
+						$cmd->setSubType('binary');
+						$cmd->setIsHistorized(0);
+						$cmd->save();
+					}
+
+					$cmd = $this->getCmd(null, 'wifi2.4status');
+					if ( ! is_object($cmd)) {
+						$cmd = new liveboxCmd();
+						$cmd->setName('Etat Wifi 2.4G');
+						$cmd->setEqLogic_id($this->getId());
+						$cmd->setLogicalId('wifi2.4status');
+						$cmd->setUnite('');
+						$cmd->setType('info');
+						$cmd->setSubType('binary');
+						$cmd->setIsHistorized(0);
+						$cmd->save();
+					}
+
+					$cmd = $this->getCmd(null, 'wifi5status');
+					if ( ! is_object($cmd)) {
+						$cmd = new liveboxCmd();
+						$cmd->setName('Etat Wifi 5G');
+						$cmd->setEqLogic_id($this->getId());
+						$cmd->setLogicalId('wifi5status');
+						$cmd->setUnite('');
+						$cmd->setType('info');
+						$cmd->setSubType('binary');
+						$cmd->setIsHistorized(0);
+						$cmd->save();
+					}
+
+					$cmd = $this->getCmd(null, 'wifi6status');
+					if ( is_object($cmd)) {
+						$cmd->remove();
+					}
+				} elseif ( count($content["status"]) == 3 ) {
+					log::add('livebox','debug','Mode Wifi 6');
+					$cmd = $this->getCmd(null, 'wifion');
+					if ( ! is_object($cmd) ) {
+						$cmd = new liveboxCmd();
+						$cmd->setName('Activer wifi');
+						$cmd->setEqLogic_id($this->getId());
+						$cmd->setType('action');
+						$cmd->setSubType('other');
+						$cmd->setLogicalId('wifion');
+						$cmd->save();
+					}
+
+					$cmd = $this->getCmd(null, 'wifioff');
+					if ( ! is_object($cmd) ) {
+						$cmd = new liveboxCmd();
+						$cmd->setName('Désactiver wifi');
+						$cmd->setEqLogic_id($this->getId());
+						$cmd->setType('action');
+						$cmd->setSubType('other');
+						$cmd->setLogicalId('wifioff');
+						$cmd->save();
+					}
+
+					$cmd = $this->getCmd(null, 'wifi2.4on');
+					if ( ! is_object($cmd) ) {
+						$cmd = new liveboxCmd();
+						$cmd->setName('Activer wifi 2.4G');
+						$cmd->setEqLogic_id($this->getId());
+						$cmd->setType('action');
+						$cmd->setSubType('other');
+						$cmd->setLogicalId('wifi2.4on');
+						$cmd->save();
+					}
+
+					$cmd = $this->getCmd(null, 'wifi2.4off');
+					if ( ! is_object($cmd) ) {
+						$cmd = new liveboxCmd();
+						$cmd->setName('Désactiver wifi 2.4G');
+						$cmd->setEqLogic_id($this->getId());
+						$cmd->setType('action');
+						$cmd->setSubType('other');
+						$cmd->setLogicalId('wifi2.4off');
+						$cmd->save();
+					}
+
+					$cmd = $this->getCmd(null, 'wifi5on');
+					if ( ! is_object($cmd) ) {
+						$cmd = new liveboxCmd();
+						$cmd->setName('Activer wifi 5G');
+						$cmd->setEqLogic_id($this->getId());
+						$cmd->setType('action');
+						$cmd->setSubType('other');
+						$cmd->setLogicalId('wifi5on');
+						$cmd->save();
+					}
+
+					$cmd = $this->getCmd(null, 'wifi5off');
+					if ( ! is_object($cmd) ) {
+						$cmd = new liveboxCmd();
+						$cmd->setName('Désactiver wifi 5G');
+						$cmd->setEqLogic_id($this->getId());
+						$cmd->setType('action');
+						$cmd->setSubType('other');
+						$cmd->setLogicalId('wifi5off');
 						$cmd->save();
 					}
 
@@ -849,28 +943,6 @@ class livebox extends eqLogic {
 						$cmd->save();
 					}
 
-					$cmd = $this->getCmd(null, 'wifi2.4off');
-					if ( ! is_object($cmd) ) {
-						$cmd = new liveboxCmd();
-						$cmd->setName('Désactiver wifi 2.4G');
-						$cmd->setEqLogic_id($this->getId());
-						$cmd->setType('action');
-						$cmd->setSubType('other');
-						$cmd->setLogicalId('wifi2.4off');
-						$cmd->save();
-					}
-
-					$cmd = $this->getCmd(null, 'wifi5off');
-					if ( ! is_object($cmd) ) {
-						$cmd = new liveboxCmd();
-						$cmd->setName('Désactiver wifi 5G');
-						$cmd->setEqLogic_id($this->getId());
-						$cmd->setType('action');
-						$cmd->setSubType('other');
-						$cmd->setLogicalId('wifi5off');
-						$cmd->save();
-					}
-
 					$cmd = $this->getCmd(null, 'wifi6off');
 					if ( ! is_object($cmd) ) {
 						$cmd = new liveboxCmd();
@@ -882,22 +954,12 @@ class livebox extends eqLogic {
 						$cmd->save();
 					}
 
-					$cmd = $this->getCmd(null, 'wifioff');
-					if ( is_object($cmd)) {
-						$cmd->remove();
-					}
-
-					$cmd = $this->getCmd(null, 'wifion');
-					if ( is_object($cmd)) {
-						$cmd->remove();
-					}
-
-					$cmd = $this->getCmd(null, 'wifi5status');
+					$cmd = $this->getCmd(null, 'wifistatus');
 					if ( ! is_object($cmd)) {
 						$cmd = new liveboxCmd();
-						$cmd->setName('Etat Wifi 5G');
+						$cmd->setName('Etat Wifi');
 						$cmd->setEqLogic_id($this->getId());
-						$cmd->setLogicalId('wifi5status');
+						$cmd->setLogicalId('wifistatus');
 						$cmd->setUnite('');
 						$cmd->setType('info');
 						$cmd->setSubType('binary');
@@ -911,6 +973,19 @@ class livebox extends eqLogic {
 						$cmd->setName('Etat Wifi 2.4G');
 						$cmd->setEqLogic_id($this->getId());
 						$cmd->setLogicalId('wifi2.4status');
+						$cmd->setUnite('');
+						$cmd->setType('info');
+						$cmd->setSubType('binary');
+						$cmd->setIsHistorized(0);
+						$cmd->save();
+					}
+
+					$cmd = $this->getCmd(null, 'wifi5status');
+					if ( ! is_object($cmd)) {
+						$cmd = new liveboxCmd();
+						$cmd->setName('Etat Wifi 5G');
+						$cmd->setEqLogic_id($this->getId());
+						$cmd->setLogicalId('wifi5status');
 						$cmd->setUnite('');
 						$cmd->setType('info');
 						$cmd->setSubType('binary');
@@ -929,11 +1004,6 @@ class livebox extends eqLogic {
 						$cmd->setSubType('binary');
 						$cmd->setIsHistorized(0);
 						$cmd->save();
-					}
-
-					$cmd = $this->getCmd(null, 'wifistatus');
-					if ( is_object($cmd)) {
-						$cmd->remove();
 					}
 				}
 				$content2 = $this->getPage("deviceinfo");
@@ -1518,7 +1588,7 @@ class livebox extends eqLogic {
 	}
 
 	public function getImage() {
-		if($this->getConfiguration('type') == 'cli'){
+		if($this->getConfiguration('type') == 'cli') {
 			$filename = 'plugins/livebox/core/config/cli/' . $this->getConfiguration('deviceType') .'.png';
 			if(file_exists(__DIR__.'/../../../../'.$filename)){
 				return $filename;
@@ -1672,7 +1742,6 @@ class livebox extends eqLogic {
 					/* A voir ce qu'on peut faire dans ce cas là */
 				}
 			}
-				
 		}
 		$content = $this->getPage("voip");
 		if ( $content !== false ) {
@@ -1680,7 +1749,6 @@ class livebox extends eqLogic {
 				if ( ! isset($voip["signalingProtocol"]) ) {
 					$voip["signalingProtocol"] = strstr($voip["name"], "-", true);
 				}
-
 				$eqLogic_cmd = $this->getCmd(null, 'voipstatus'.$voip["signalingProtocol"]);
 				if (is_object($eqLogic_cmd)) {
 					if (isset($voip["trunk_lines"]["0"]["status"])) {
@@ -1713,10 +1781,12 @@ class livebox extends eqLogic {
 				$content = $this->getPage("wifi");
 				if ( $content !== false ) {
 					if (isset($content["status"]["wlanvap"]["wl0"]["VAPStatus"])) {
-						$eqLogic_cmd = $this->getCmd(null, 'wifistatus');
+						$this->setConfiguration('wifi24Name', 'wl0');
+						$eqLogic_cmd = $this->getCmd(null, 'wifi2.4status');
 						if (is_object($eqLogic_cmd)) {
-							log::add('livebox','debug','Maj wifistatus ' . $eqLogic_cmd->formatValue($content["status"]["wlanvap"]["wl0"]["VAPStatus"]));
-							$this->checkAndUpdateCmd('wifistatus',  $eqLogic_cmd->formatValue($content["status"]["wlanvap"]["wl0"]["VAPStatus"]));
+							$statusvalue = $content["status"]["wlanvap"]["wl0"]["VAPStatus"];
+							log::add('livebox','debug','Maj wifi2.4status ' . $eqLogic_cmd->formatValue($statusvalue));
+							$this->checkAndUpdateCmd('wifi2.4status',  $eqLogic_cmd->formatValue($statusvalue));
 						}
 					}
 				}
@@ -1724,10 +1794,12 @@ class livebox extends eqLogic {
 				$content = $this->getPage("wifi");
 				if ( $content !== false ) {
 					if (isset($content["status"]["wlanvap"]["wl0"]["VAPStatus"])) {
+						$this->setConfiguration('wifi24Name', 'wl0');
 						$eqLogic_cmd = $this->getCmd(null, 'wifi2.4status');
 						if (is_object($eqLogic_cmd)) {
-							log::add('livebox','debug','Maj wifi2.4status ' . $eqLogic_cmd->formatValue($content["status"]["wlanvap"]["wl0"]["VAPStatus"]));
-							$this->checkAndUpdateCmd('wifi2.4status', $eqLogic_cmd->formatValue($content["status"]["wlanvap"]["wl0"]["VAPStatus"]));
+							$statusvalue = $content["status"]["wlanvap"]["wl0"]["VAPStatus"];
+							log::add('livebox','debug','Maj wifi2.4status ' . $eqLogic_cmd->formatValue($statusvalue));
+							$this->checkAndUpdateCmd('wifi2.4status', $eqLogic_cmd->formatValue($statusvalue));
 						}
 					}
 					$eqLogic_cmd = $this->getCmd(null, 'wifi5status');
@@ -1749,7 +1821,7 @@ class livebox extends eqLogic {
 						$this->checkAndUpdateCmd('wifi5status', $eqLogic_cmd->formatValue($statusvalue));
 					}
 				}
-			}  elseif ( count($content["status"]) == 3 ) {
+			} elseif ( count($content["status"]) == 3 ) {
 				$content = $this->getPage("wifi");
 				if ( $content !== false ) {
 					if (isset($content["status"]["wlanvap"]["vap2g0priv0"]["VAPStatus"])) {
@@ -1770,7 +1842,6 @@ class livebox extends eqLogic {
 							log::add('livebox','debug','Maj wifi5status ' .$eqLogic_cmd->formatValue($statusvalue));
 							$this->checkAndUpdateCmd('wifi5status', $eqLogic_cmd->formatValue($statusvalue));
 						}
-						
 					}
 					if (isset($content["status"]["wlanvap"]["vap6g0priv0"])) {
 						// Livebox 6.
@@ -1781,7 +1852,27 @@ class livebox extends eqLogic {
 							log::add('livebox','debug','Maj wifi6status ' .$eqLogic_cmd->formatValue($statusvalue));
 							$this->checkAndUpdateCmd('wifi6status', $eqLogic_cmd->formatValue($statusvalue));
 						}
-						
+					}
+				}
+			}
+		}
+		$content = $this->getPage("mainwifistate");
+		if ( $content !== false ) {
+			if (isset($content["status"]["Status"])) {
+				$eqLogic_cmd = $this->getCmd(null, 'wifistatus');
+				log::add('livebox','debug','Maj wifistatus ' . $eqLogic_cmd->formatValue($content["status"]["Status"]));
+				$this->checkAndUpdateCmd('wifistatus', $eqLogic_cmd->formatValue($content["status"]["Status"]));
+			}
+		}
+		if (preg_match("/Livebox (4|Fibre|6|7)/i", $this->getConfiguration('productClass',''))) {
+			$content = $this->getPage("guestwifistate");
+			if ( $content !== false ) {
+				log::add('livebox','debug', 'Gest Wifi ' . print_r($content, true));
+				$eqLogic_cmd = $this->getCmd(null, 'guestwifistatus');
+				if (is_object($eqLogic_cmd)) {
+					if (isset($content["status"]["Enable"])) {
+						log::add('livebox','debug','Maj wifi invité status ' . $eqLogic_cmd->formatValue($content["status"]["Enable"]));
+						$this->checkAndUpdateCmd('guestwifistatus', $eqLogic_cmd->formatValue($content["status"]["Enable"]));
 					}
 				}
 			}
@@ -1994,19 +2085,6 @@ class livebox extends eqLogic {
 			$devicestring = join(', ', $devicelist);
 			log::add('livebox','debug','Maj devicelist ' . $devicestring);
 			$this->checkAndUpdateCmd('devicelist', $devicestring);
-		}
-		if (preg_match("/Livebox (4|Fibre|6|7)/i", $this->getConfiguration('productClass',''))) {
-			$content = $this->getPage("guestwifistate");
-			if ( $content !== false ) {
-				log::add('livebox','debug', 'Gest Wifi ' . print_r($content, true));
-				$eqLogic_cmd = $this->getCmd(null, 'guestwifistatus');
-				if (is_object($eqLogic_cmd)) {
-					if (isset($content["status"]["Enable"])) {
-						log::add('livebox','debug','Maj wifi invité status ' . $eqLogic_cmd->formatValue($content["status"]["Enable"]));
-						$this->checkAndUpdateCmd('guestwifistatus', $eqLogic_cmd->formatValue($content["status"]["Enable"]));
-					}
-				}
-			}
 		}
 
 		$eqLogic_cmd = $this->getCmd(null, 'updatetime');
@@ -2228,6 +2306,7 @@ class liveboxCmd extends cmd
 				break;
 			case 'wifion':
 				$this->setOrder(21);
+				$this->setDisplay('forceReturnLineBefore', 1);
 				break;
 			case 'wifi2.4on':
 				$this->setOrder(22);
@@ -2243,6 +2322,7 @@ class liveboxCmd extends cmd
 				break;
 			case 'wifioff':
 				$this->setOrder(31);
+				$this->setDisplay('forceReturnLineBefore', 1);
 				break;
 			case 'wifi2.4off':
 				$this->setOrder(32);
@@ -2484,15 +2564,7 @@ class liveboxCmd extends cmd
 				$option = array('mibs' => $mibs0, 'value' => 'true');
 				$page = "changewifi";
 				break;
-			case "wifion":
-				$option = array('mibs' => $mibs0, 'value' => 'true');
-				$page = "changewifi";
-				break;
 			case "wifi2.4off":
-				$option = array('mibs' => $mibs0, 'value' => 'false');
-				$page = "changewifi";
-				break;
-			case "wifioff":
 				$option = array('mibs' => $mibs0, 'value' => 'false');
 				$page = "changewifi";
 				break;
@@ -2511,6 +2583,14 @@ class liveboxCmd extends cmd
 			case "wifi6off":
 				$option = array('mibs' => $mibs2, 'value' => 'false');
 				$page = "changewifi";
+				break;
+			case "wifion":
+				$option = array('value' => 'true');
+				$page = "changemainwifi";
+				break;
+			case "wifioff":
+				$option = array('value' => 'false');
+				$page = "changemainwifi";
 				break;
 			case "guestwifion":
 				$option = array('value' => 'true');
@@ -2534,7 +2614,7 @@ class liveboxCmd extends cmd
 			}
 		} else {
 			throw new Exception(__('Commande non implémentée actuellement', __FILE__));
-			}
+		}
 		} else if ($eqLogic->getConfiguration('type','') == 'cli') {
 			$mac = $eqLogic->getLogicalId();
 			$boxid = $eqLogic->getConfiguration('boxId','');
