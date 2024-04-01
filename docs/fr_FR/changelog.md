@@ -76,3 +76,7 @@ Compatibilité avec PHP 8
 
 - Compatibilité avec Livebox 6 et 7
 - Compatibilité avec core jeedom 4.4 (la version minimum exigée du core jeedom passe de 3.3.28 à 4.1.28)
+
+# Version du 01/04/2024
+
+- Les commandes action et info relatives au WiFi (2.4GHz, 5GHz, 6GHz) ont été corrigées et fonctionnent avec la Livebox 6 (pas encore de retour pour la Livebox 7)
