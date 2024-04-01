@@ -1351,6 +1351,18 @@ class livebox extends eqLogic {
 				$cmd->save();
 			}
 
+			$cmd = $this->getCmd(null, 'softwareVersion');
+			if ( ! is_object($cmd)) {
+				$cmd = new liveboxCmd();
+				$cmd->setName('Version software');
+				$cmd->setEqLogic_id($this->getId());
+				$cmd->setLogicalId('softwareVersion');
+				$cmd->setType('info');
+				$cmd->setSubType('string');
+				$cmd->setIsHistorized(0);
+				$cmd->save();
+			}
+
 			$cmd = $this->getCmd(null, 'linkstate');
 			if ( ! is_object($cmd)) {
 				$cmd = new liveboxCmd();
@@ -1389,7 +1401,6 @@ class livebox extends eqLogic {
 				$cmd->setIsHistorized(0);
 				$cmd->save();
 			}
-
 
 			$cmd = $this->getCmd(null, 'ipwan');
 			if ( ! is_object($cmd)) {
@@ -1660,6 +1671,13 @@ class livebox extends eqLogic {
 			$eqLogic_cmd = $this->getCmd(null, 'uptime');
 			if (is_object($eqLogic_cmd)) {
 			    $this->checkAndUpdateCmd('uptime', $content["status"]["UpTime"]);
+			}
+			$eqLogic_cmd = $this->getCmd(null, 'softwareVersion');
+			if (is_object($eqLogic_cmd)) {
+			    $this->checkAndUpdateCmd('softwareVersion', $content["status"]["SoftwareVersion"]);
+			}
+			if (isset($content['status']['SoftwareVersion'])) {
+				$this->setConfiguration('softwareVersion', $content['status']['SoftwareVersion']);
 			}
 		}
 		$wifionly ? $content = false : $content = $this->getPage("internet");
@@ -2461,8 +2479,11 @@ class liveboxCmd extends cmd
 					$this->setDisplay('forceReturnLineAfter', 1);
 				}
 				break;
-			case 'updatetime':
+			case 'softwareVersion':
 				$this->setOrder(89);
+				break;
+			case 'updatetime':
+				$this->setOrder(99);
 				if (version_compare(jeedom::version(), "4.4", ">")) {
 					$this->setDisplay('forceReturnLineBefore', 1);
 					$this->setDisplay('forceReturnLineAfter', 1);
