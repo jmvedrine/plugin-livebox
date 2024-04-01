@@ -1678,6 +1678,7 @@ class livebox extends eqLogic {
 			}
 			if (isset($content['status']['SoftwareVersion'])) {
 				$this->setConfiguration('softwareVersion', $content['status']['SoftwareVersion']);
+				$this->save(true);
 			}
 		}
 		$wifionly ? $content = false : $content = $this->getPage("internet");
@@ -2481,6 +2482,10 @@ class liveboxCmd extends cmd
 				break;
 			case 'softwareVersion':
 				$this->setOrder(89);
+				if (version_compare(jeedom::version(), "4.4", ">")) {
+					$this->setDisplay('forceReturnLineBefore', 1);
+					$this->setDisplay('forceReturnLineAfter', 1);
+				}
 				break;
 			case 'updatetime':
 				$this->setOrder(99);
