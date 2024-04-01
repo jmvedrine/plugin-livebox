@@ -420,14 +420,18 @@ class livebox extends eqLogic {
 				log::add('livebox','debug', 'in setschedule result of request = ' . $content);
 				if ( $content !== false) {
 					$json = json_decode($content, true);
-					if ( $json["status"] == true) {
-						log::add('livebox','debug', 'in setschedule status ok');
+					if ( $json["status"] == false) {
+						log::add('livebox','debug', 'in setschedule status false - schedule not found - creating schedule');
+						$schedule = '{"base":"Weekly","def":"Enable","ID":"'.$option['mac'].'","schedule":[],"enable":true,"override":"'.$option['override'].'"}';
+						log::add('livebox','debug', 'in setschedule schedule = ' . $schedule);
+						$listpage = array("sysbus/Scheduler:addSchedule" => '"type":"ToD","info":' . $schedule);
+					} elseif ( $json["status"] == true) {
+						log::add('livebox','debug', 'in setschedule status true - schedule found - updating schedule');
 						$schedule = $json["data"]["scheduleInfo"];
 						log::add('livebox','debug', 'in setschedule schedule = ' . print_r($schedule, true));
 						$schedule["override"] = $option['override'];
 						log::add('livebox','debug', 'in setschedule schedule after modif = ' . print_r($schedule, true));
 						$listpage = array("sysbus/Scheduler:addSchedule" => '"type":"ToD","info":' . json_encode($schedule));
-						log::add('livebox','debug', 'in setschedule test = ' . print_r($test, true));
 					}
 				}
 				break;
@@ -1665,8 +1669,8 @@ class livebox extends eqLogic {
 		}
 	}
 
-	function refreshInfo($wifionly=false) {
-		$wifionly ? $content = false : $content = $this->getPage('deviceinfo');
+	function refreshInfo($refreshonly='all') {
+		$refreshonly != 'all' ? $content = false : $content = $this->getPage('deviceinfo');
 		if ( $content !== false ) {
 			$eqLogic_cmd = $this->getCmd(null, 'uptime');
 			if (is_object($eqLogic_cmd)) {
@@ -1681,7 +1685,7 @@ class livebox extends eqLogic {
 				$this->save(true);
 			}
 		}
-		$wifionly ? $content = false : $content = $this->getPage("internet");
+		$refreshonly != 'all'  ? $content = false : $content = $this->getPage("internet");
 		if ( $content !== false ) {
 			if (isset($content["data"]["LinkState"])) {
 				$eqLogic_cmd = $this->getCmd(null, 'linkstate');
@@ -1758,7 +1762,7 @@ class livebox extends eqLogic {
 				}
 			}
 		}
-		$wifionly ? $content = false : $content = $this->getPage("voip");
+		$refreshonly != 'all' ? $content = false : $content = $this->getPage("voip");
 		if ( $content !== false ) {
 			foreach ( $content["status"] as $voip ) {
 				if ( ! isset($voip["signalingProtocol"]) ) {
@@ -1780,7 +1784,7 @@ class livebox extends eqLogic {
 				}
 			}
 		}
-		$wifionly ? $content = false : $content = $this->getPage("tv");
+		$refreshonly != 'all' ? $content = false : $content = $this->getPage("tv");
 		if ( $content !== false ) {
 			if (isset($content["data"]["IPTVStatus"])) {
 				$eqLogic_cmd = $this->getCmd(null, 'tvstatus');
@@ -1790,7 +1794,7 @@ class livebox extends eqLogic {
 				}
 			}
 		}
-		$content = $this->getPage("wifilist");
+		($refreshonly != 'all' && $refreshonly != 'wifi') ? $content = false : $content = $this->getPage("wifilist");
 		if ( $content !== false ) {
 			if ( count($content["status"]) == 1 ) {
 				$content = $this->getPage("wifi");
@@ -1871,7 +1875,7 @@ class livebox extends eqLogic {
 				}
 			}
 		}
-		$content = $this->getPage("mainwifistate");
+		($refreshonly != 'all' && $refreshonly != 'wifi') ? $content = false : $content = $this->getPage("mainwifistate");
 		if ( $content !== false ) {
 			if (isset($content["status"]["Status"])) {
 				$eqLogic_cmd = $this->getCmd(null, 'wifistatus');
@@ -1880,7 +1884,7 @@ class livebox extends eqLogic {
 			}
 		}
 		if (preg_match("/Livebox (4|Fibre|6|7)/i", $this->getConfiguration('productClass',''))) {
-			$content = $this->getPage("guestwifistate");
+			($refreshonly != 'all' && $refreshonly != 'wifi') ? $content = false : $content = $this->getPage("guestwifistate");
 			if ( $content !== false ) {
 				log::add('livebox','debug', 'Gest Wifi ' . print_r($content, true));
 				$eqLogic_cmd = $this->getCmd(null, 'guestwifistatus');
@@ -1892,7 +1896,7 @@ class livebox extends eqLogic {
 				}
 			}
 		}
-		$wifionly ? $content = false : $content = $this->getPage("listcalls");
+		$refreshonly != 'all' ? $content = false : $content = $this->getPage("listcalls");
 		if ( $content !== false ) {
 			$callsTable = '';
 			$outCallsTable = '';
@@ -2057,7 +2061,7 @@ class livebox extends eqLogic {
 			$this->checkAndUpdateCmd('missedcallstable', $missedCallsTable);
 		}
 
-		$wifionly ? $content = false : $content = $this->getPage("devicelist");
+		($refreshonly != 'all' && $refreshonly != 'devicelist') ? $content = false : $content = $this->getPage("devicelist");
 		if ( $content !== false ) {
 			$eqLogic_cmd = $this->getCmd(null, 'devicelist');
 			$devicelist = array();
@@ -2639,7 +2643,7 @@ class liveboxCmd extends cmd
 			$content = $eqLogic->getPage($page, $option);
 			if ( $this->getLogicalId() != "reboot" && $this->getLogicalId() != "ring" ) {
 				sleep(5);
-				$eqLogic->refreshInfo($wifionly=true);
+				$eqLogic->refreshInfo($refreshonly='wifi');
 				$eqLogic->logOut();
 			}
 		} else {
@@ -2670,7 +2674,7 @@ class liveboxCmd extends cmd
 				if ( $page != null ) {
 					$boxEqLogic->getCookiesInfo();
 					$content = $boxEqLogic->getPage($page, $option);
-					$boxEqLogic->refreshInfo();
+					$boxEqLogic->refreshInfo($refreshonly='devicelist');
 					$boxEqLogic->logOut();
 				} else {
 					throw new Exception(__('Commande non implémentée actuellement', __FILE__));
