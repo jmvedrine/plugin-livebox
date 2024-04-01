@@ -1658,15 +1658,15 @@ class livebox extends eqLogic {
 		}
 	}
 
-	function refreshInfo() {
-		$content = $this->getPage('deviceinfo');
+	function refreshInfo($wifionly=false) {
+		$wifionly ? $content = false : $content = $this->getPage('deviceinfo');
 		if ( $content !== false ) {
 			$eqLogic_cmd = $this->getCmd(null, 'uptime');
 			if (is_object($eqLogic_cmd)) {
 			    $this->checkAndUpdateCmd('uptime', $content["status"]["UpTime"]);
 			}
 		}
-		$content = $this->getPage("internet");
+		$wifionly ? $content = false : $content = $this->getPage("internet");
 		if ( $content !== false ) {
 			if (isset($content["data"]["LinkState"])) {
 				$eqLogic_cmd = $this->getCmd(null, 'linkstate');
@@ -1743,7 +1743,7 @@ class livebox extends eqLogic {
 				}
 			}
 		}
-		$content = $this->getPage("voip");
+		$wifionly ? $content = false : $content = $this->getPage("voip");
 		if ( $content !== false ) {
 			foreach ( $content["status"] as $voip ) {
 				if ( ! isset($voip["signalingProtocol"]) ) {
@@ -1765,7 +1765,7 @@ class livebox extends eqLogic {
 				}
 			}
 		}
-		$content = $this->getPage("tv");
+		$wifionly ? $content = false : $content = $this->getPage("tv");
 		if ( $content !== false ) {
 			if (isset($content["data"]["IPTVStatus"])) {
 				$eqLogic_cmd = $this->getCmd(null, 'tvstatus');
@@ -1877,7 +1877,7 @@ class livebox extends eqLogic {
 				}
 			}
 		}
-		$content = $this->getPage("listcalls");
+		$wifionly ? $content = false : $content = $this->getPage("listcalls");
 		if ( $content !== false ) {
 			$callsTable = '';
 			$outCallsTable = '';
@@ -2032,17 +2032,17 @@ class livebox extends eqLogic {
 				}
 				$inCallsTable .= "</table>";
 			}
+
+			$this->checkAndUpdateCmd('callstable', $callsTable);
+			// log::add('livebox','debug','Appels entrants'.$inCallsTable);
+			$this->checkAndUpdateCmd('incallstable', $inCallsTable);
+			// log::add('livebox','debug','Appels sortants'.$outCallsTable);
+			$this->checkAndUpdateCmd('outcallstable', $outCallsTable);
+			// log::add('livebox','debug','Appels manqués'.$missedCallsTable);
+			$this->checkAndUpdateCmd('missedcallstable', $missedCallsTable);
 		}
 
-		$this->checkAndUpdateCmd('callstable', $callsTable);
-		// log::add('livebox','debug','Appels entrants'.$inCallsTable);
-		$this->checkAndUpdateCmd('incallstable', $inCallsTable);
-		// log::add('livebox','debug','Appels sortants'.$outCallsTable);
-		$this->checkAndUpdateCmd('outcallstable', $outCallsTable);
-		// log::add('livebox','debug','Appels manqués'.$missedCallsTable);
-		$this->checkAndUpdateCmd('missedcallstable', $missedCallsTable);
-
-		$content = $this->getPage("devicelist");
+		$wifionly ? $content = false : $content = $this->getPage("devicelist");
 		if ( $content !== false ) {
 			$eqLogic_cmd = $this->getCmd(null, 'devicelist');
 			$devicelist = array();
@@ -2604,12 +2604,9 @@ class liveboxCmd extends cmd
 		if ( $page != null ) {
 			$eqLogic->getCookiesInfo();
 			$content = $eqLogic->getPage($page, $option);
-			if ( $this->getLogicalId() != "reboot" ) {
-				$eqLogic->refreshInfo();
-				$eqLogic->logOut();
-			}
-			if ( $this->getLogicalId() != "ring" ) {
-				$eqLogic->refreshInfo();
+			if ( $this->getLogicalId() != "reboot" && $this->getLogicalId() != "ring" ) {
+				sleep(5);
+				$eqLogic->refreshInfo($wifionly=true);
 				$eqLogic->logOut();
 			}
 		} else {
