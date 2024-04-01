@@ -1129,7 +1129,6 @@ class livebox extends eqLogic {
 					$cmd->setType('info');
 					$cmd->setSubType('numeric');
 					$cmd->setIsHistorized(0);
-					$cmd->setTemplate('dashboard', 'line');
 					$cmd->save();
 				}
 
@@ -1143,7 +1142,6 @@ class livebox extends eqLogic {
 					$cmd->setType('info');
 					$cmd->setSubType('numeric');
 					$cmd->setIsHistorized(0);
-					$cmd->setTemplate('dashboard', 'line');
 					$cmd->save();
 				}
 
@@ -1157,7 +1155,6 @@ class livebox extends eqLogic {
 					$cmd->setType('info');
 					$cmd->setSubType('numeric');
 					$cmd->setIsHistorized(0);
-					$cmd->setTemplate('dashboard', 'line');
 					$cmd->save();
 				}
 
@@ -1172,7 +1169,6 @@ class livebox extends eqLogic {
 					$cmd->setSubType('numeric');
 					$cmd->setIsHistorized(0);
 					$cmd->setIsVisible(0);
-					$cmd->setTemplate('dashboard', 'line');
 					$cmd->save();
 				}
 
@@ -2338,6 +2334,8 @@ class liveboxCmd extends cmd
 				break;
 			case 'missedcallsnumber':
 				$this->setOrder(41);
+				$this->setTemplate('dashboard', 'line');
+				$this->setTemplate('mobile', 'line');
 				if (version_compare(jeedom::version(), "4.4", ">")) {
 					$this->setDisplay('forceReturnLineBefore', 1);
 					$this->setDisplay('forceReturnLineAfter', 1);
@@ -2345,6 +2343,8 @@ class liveboxCmd extends cmd
 				break;
 			case 'incallsnumber':
 				$this->setOrder(42);
+				$this->setTemplate('dashboard', 'line');
+				$this->setTemplate('mobile', 'line');
 				if (version_compare(jeedom::version(), "4.4", ">")) {
 					$this->setDisplay('forceReturnLineBefore', 1);
 					$this->setDisplay('forceReturnLineAfter', 1);
@@ -2352,6 +2352,8 @@ class liveboxCmd extends cmd
 				break;
 			case 'outcallsnumber':
 				$this->setOrder(43);
+				$this->setTemplate('dashboard', 'line');
+				$this->setTemplate('mobile', 'line');
 				if (version_compare(jeedom::version(), "4.4", ">")) {
 					$this->setDisplay('forceReturnLineBefore', 1);
 					$this->setDisplay('forceReturnLineAfter', 1);
@@ -2359,6 +2361,8 @@ class liveboxCmd extends cmd
 				break;
 			case 'totalcallsnumber':
 				$this->setOrder(44);
+				$this->setTemplate('dashboard', 'line');
+				$this->setTemplate('mobile', 'line');
 				if (version_compare(jeedom::version(), "4.4", ">")) {
 					$this->setDisplay('forceReturnLineBefore', 1);
 					$this->setDisplay('forceReturnLineAfter', 1);
@@ -2406,19 +2410,22 @@ class liveboxCmd extends cmd
 				break;
 			case 'debitmontant':
 				$this->setOrder(71);
+				$this->setTemplate('mobile', 'line');
 				break;
 			case 'debitdescendant':
 				$this->setOrder(72);
+				$this->setTemplate('mobile', 'line');
 				break;
 			case 'margebruitmontant':
 				$this->setOrder(73);
+				$this->setTemplate('mobile', 'line');
 				break;
 			case 'margebruitdescendant':
 				$this->setOrder(74);
+				$this->setTemplate('mobile', 'line');
 				break;
 			case 'lastchange':
 				$this->setOrder(75);
-
 				if (version_compare(jeedom::version(), "4.4", ">")) {
 					$this->setDisplay('forceReturnLineBefore', 1);
 					$this->setDisplay('forceReturnLineAfter', 1);
