@@ -22,35 +22,6 @@ function livebox_install() {
 	config::save('nominconnu', 'Oups', 'livebox');
 	$sql = file_get_contents(dirname(__FILE__) . '/install.sql');
 	DB::Prepare($sql, array(), DB::FETCH_TYPE_ROW);
-	$cron = cron::byClassAndFunction('livebox', 'pull');
-	if ( ! is_object($cron)) {
-		$cron = new cron();
-		$cron->setClass('livebox');
-		$cron->setFunction('pull');
-		$cron->setEnable(1);
-		$cron->setDeamon(0);
-		$cron->setSchedule('* * * * *');
-		$cron->save();
-	}
-	if ( version_compare(jeedom::version(), "4", "<")) {
-		// Copie des templates dans le répertoire du plugin widget pour pouvoir éditer les commandes sans perte de la template associée.
-		$srcDir	 = __DIR__ . '/../core/template/dashboard';
-		$resuDir = __DIR__ . '/../../widget/core/template/dashboard';
-		if (file_exists($resuDir)) { // plugin widget déjà installé
-			$file = '/cmd.info.numeric.dureev3.html';
-			shell_exec("cp $srcDir$file $resuDir");
-			$file = '/cmd.info.string.deroulantv3.html';
-			shell_exec("cp $srcDir$file $resuDir");
-		}
-		$srcDir	 = __DIR__ . '/../core/template/mobile';
-		$resuDir = __DIR__ . '/../../widget/core/template/mobile';
-		if (file_exists($resuDir)) { // plugin widget déjà installé
-			$file = '/cmd.info.numeric.dureev3.html';
-			shell_exec("cp $srcDir$file $resuDir");
-			$file = '/cmd.info.string.deroulantv3.html';
-			shell_exec("cp $srcDir$file $resuDir");
-		}
-	}
 }
 
 function livebox_update() {
@@ -61,55 +32,21 @@ function livebox_update() {
 	$sql = file_get_contents(dirname(__FILE__) . '/install.sql');
 	DB::Prepare($sql, array(), DB::FETCH_TYPE_ROW);
 	$cron = cron::byClassAndFunction('livebox', 'pull');
-	if ( ! is_object($cron)) {
-		$cron = new cron();
+	if ( is_object($cron)) {
+		$cron->stop();
+		$cron->remove();
 	}
-	$cron->setClass('livebox');
-	$cron->setFunction('pull');
-	$cron->setEnable(1);
-	$cron->setDeamon(0);
-	$cron->setSchedule('* * * * *');
-	$cron->save();
-	if ( version_compare(jeedom::version(), "4", "<")) {
-		// Copie des templates dans le répertoire du plugin widget pour pouvoir éditer les commandes sans perte de la template associée.
-		$srcDir	 = __DIR__ . '/../core/template/dashboard';
-		$resuDir = __DIR__ . '/../../widget/core/template/dashboard';
-		if (file_exists($resuDir)) { // plugin widget déjà installé
-			$file = '/cmd.info.numeric.dureev3.html';
-			shell_exec("cp $srcDir$file $resuDir");
-			$file = '/cmd.info.string.deroulantv3.html';
-			shell_exec("cp $srcDir$file $resuDir");
-		}
-		$srcDir	 = __DIR__ . '/../core/template/mobile';
-		$resuDir = __DIR__ . '/../../widget/core/template/mobile';
-		if (file_exists($resuDir)) { // plugin widget déjà installé
-			$file = '/cmd.info.numeric.dureev3.html';
-			shell_exec("cp $srcDir$file $resuDir");
-			$file = '/cmd.info.string.deroulantv3.html';
-			shell_exec("cp $srcDir$file $resuDir");
-		}
-	}
+
 	foreach (eqLogic::byType('livebox') as $eqLogic) {
-		if ($eqLogic->getConfiguration('type') == '') {
-			$eqLogic->setConfiguration('type', 'box');
-		}
 		if ($eqLogic->getConfiguration('type') == 'box') {
-		// Suppression du Wifi invité pour les anciennes LB
-		if ($eqLogic->getConfiguration('productClass','') !== 'Livebox 4' && $eqLogic->getConfiguration('productClass','') !== 'Livebox Fibre') {
-			$cmd = $eqLogic->getCmd(null, 'guestwifion');
-			if (is_object($cmd)) {
-				$cmd->remove();
-			}
-			$cmd = $eqLogic->getCmd(null, 'guestwifioff');
-			if (is_object($cmd)) {
-				$cmd->remove();
-			}
-			$cmd = $eqLogic->getCmd(null, 'guestwifistatus');
-			if (is_object($cmd)) {
-				$cmd->remove();
-			}
-		} else {
-			// Correction des commandes manquantes avec Livebox 5
+		// Migration du cron sur la LB
+		$autorefresh = $eqLogic->getConfiguration('autorefresh');
+		if ($autorefresh == '') {
+			$eqLogic->setConfiguration('autorefresh', '* * * * *');
+		}
+
+			if (preg_match("/Livebox (4|Fibre|6|7)/i", $eqLogic->getConfiguration('productClass',''))) {
+				// Correction des commandes manquantes avec Livebox 4 5 6 et 7
 			$cmd = $eqLogic->getCmd(null, 'guestwifion');
 			if ( ! is_object($cmd) ) {
 				$cmd = new liveboxCmd();
@@ -142,14 +79,20 @@ function livebox_update() {
 				$cmd->setIsHistorized(0);
 				$cmd->save();
 			}
+			} else {
+				// Suppression du Wifi invité pour les anciennes LB.
+				$cmd = $eqLogic->getCmd(null, 'guestwifion');
+				if (is_object($cmd)) {
+					$cmd->remove();
 		}
-		$cmd = $eqLogic->getCmd(null, 'reset');
-		if ( is_object($cmd) ) {
+				$cmd = $eqLogic->getCmd(null, 'guestwifioff');
+				if (is_object($cmd)) {
 			$cmd->remove();
 		}
-		$cmd = $eqLogic->getCmd(null, 'voipstatus');
-		if ( is_object($cmd)) {
+				$cmd = $eqLogic->getCmd(null, 'guestwifistatus');
+				if (is_object($cmd)) {
 			$cmd->remove();
+				}
 			}
 		}
 		$eqLogic->save();

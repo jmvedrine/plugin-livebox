@@ -28,9 +28,24 @@ class livebox extends eqLogic {
 	const MAX_PAGESJAUNES = 5;		   // Nombre maximum de requêtes à Pages Jaunes
 	/* * ***********************Methode static*************************** */
 
-	public static function pull() {
-		foreach (self::byType('livebox') as $eqLogic) {
-			$eqLogic->scan();
+	public static function cron() {
+		log::add('livebox', 'debug','cron');
+		foreach (eqLogic::byType('livebox', true) as $eqLogic) {
+			$autorefresh = $eqLogic->getConfiguration('autorefresh');
+			if ($autorefresh != '') {
+				try {
+					$c = new Cron\CronExpression(checkAndFixCron($autorefresh), new Cron\FieldFactory);
+					if ($c->isDue()) {
+						try {
+							$eqLogic->refresh();
+						} catch (Exception $exc) {
+							log::add('livebox', 'error', __('Error in ', __FILE__) . $eqLogic->getHumanName() . ' : ' . $exc->getMessage());
+						}
+					}
+				} catch (Exception $exc) {
+					log::add('livebox', 'error', __('Expression cron non valide pour ', __FILE__) . $eqLogic->getHumanName() . ' : ' . $autorefresh);
+				}
+			}
 		}
 	}
 
@@ -60,22 +75,21 @@ class livebox extends eqLogic {
 				break;
 			}
 		}
-		if(!$found){
+		if(!$found) {
 			$favoris[] =  array(
 				'callerName' => $name,
 				'phone' => $num
 			);
 			config::save('favorites',$favoris,'livebox');
 		}
-
 	}
 
-	public static function nameExists($name) {
-			$allLivebox=eqLogic::byType('livebox');
-			foreach($allLivebox as $u) {
-				if($name == $u->getName()) return true;
-			}
-			return false;
+	public static function nameExists($name, $objectId=null) {
+		$allLivebox = eqLogic::byObjectId($objectId,false);
+		foreach($allLivebox as $u) {
+			if($name == $u->getName()) return true;
+		}
+		return false;
 	}
 
 	public static function createClient($client, $boxId) {
@@ -83,9 +97,17 @@ class livebox extends eqLogic {
 		$mac = $client['Key'];
 		$defaultRoom = intval(config::byKey('defaultParentObject','livebox','',true));
 		$name= (isset($client["Name"]) && $client["Name"]) ? $client["Name"] : $mac;
-		if(self::nameExists($name)) {
-			log::add('livebox', 'debug', "Nom en double ".$name." renommé en ".$name.'_'.$mac);
-			$name = $name.'_'.$mac;
+		if($defaultRoom) {
+			if(self::nameExists($name, $defaultRoom)) {
+				log::add('livebox', 'debug', "Nom en double dans la même pièce ".$name." renommé en LB_".$name.'_'.$mac);
+				$name = 'LB_'.$name.'_'.$mac;
+			}
+			$eqLogicClient->setObject_id($defaultRoom);
+		} else {
+			if(self::nameExists($name)) {
+				log::add('livebox', 'debug', "Nom en double ".$name." renommé en LB_".$name.'_'.$mac);
+				$name = 'LB_'.$name.'_'.$mac;
+			}
 		}
 		log::add('livebox', 'info', "Trouvé Client ".$name."(".$mac."):".json_encode($client));
 		$eqLogicClient->setName($name);
@@ -93,7 +115,6 @@ class livebox extends eqLogic {
 		$eqLogicClient->setIsVisible(0);
 		$eqLogicClient->setLogicalId($mac);
 		$eqLogicClient->setEqType_name('livebox');
-		if($defaultRoom) $eqLogicClient->setObject_id($defaultRoom);
 		$eqLogicClient->setConfiguration('type', 'cli');
 		$eqLogicClient->setConfiguration('boxId', $boxId);
 		$eqLogicClient->setConfiguration('macAddress',$mac);
@@ -138,8 +159,6 @@ class livebox extends eqLogic {
 	}
 
 	public static function deleteDisabledEQ($what = 'clients') {
-		log::add('livebox', 'info', "deleteDisabledEQ");
-
 		$ignoredNew=[];
 		if($what == 'all' || $what == 'clients') {
 			$eqLogics = eqLogic::byType('livebox');
@@ -160,7 +179,6 @@ class livebox extends eqLogic {
 				config::save('ignoredClients',$ignoredClients,'livebox');
 			}
 		}
-
 	}
 
 	public static function removeAllClients($boxId) {
@@ -177,8 +195,7 @@ class livebox extends eqLogic {
 	}
 
 	function getCookiesInfo() {
-		if ( ! isset($this->_cookies) )
-		{
+		if ( ! isset($this->_cookies) ) {
 			log::add('livebox','debug','get cookies');
 			$cookiefile =  jeedom::getTmpFolder('livebox') . "/livebox.cookie";
 			if ( ! defined("COOKIE_FILE") ) {
@@ -206,8 +223,7 @@ class livebox extends eqLogic {
 			log::add('livebox','debug','json : '.$json);
 			$httpCode = curl_getinfo($session, CURLINFO_HTTP_CODE);
 
-			if ( $httpCode != 200 )
-			{
+			if ( $httpCode != 200 ) {
 				log::add('livebox','debug','version 4');
 				$this->_version = "4";
 				curl_close($session);
@@ -246,9 +262,7 @@ class livebox extends eqLogic {
 					throw new Exception(__('La Livebox ne répond pas à la demande de cookie.', __FILE__));
 					return false;
 				}
-			}
-			else
-			{
+			} else {
 				log::add('livebox','debug','version 2');
 				$this->_version = "2";
 			}
@@ -262,8 +276,7 @@ class livebox extends eqLogic {
 				return false;
 			}
 			$this->_contextID = $obj->data->contextID;
-			if ( ! file_exists ($cookiefile) )
-			{
+			if ( ! file_exists ($cookiefile) ) {
 				log::add('livebox','error',__('Le compte est incorrect.',__FILE__));
 				if ($statuscmd->execCmd() != 0) {
 					$statuscmd->setCollectDate('');
@@ -365,11 +378,17 @@ class livebox extends eqLogic {
 				$listpage = array("sysbus/VoiceService/VoiceApplication:ring" => "");
 				break;
 			case "changewifi":
-				if ($this->getConfiguration('productClass','') == 'Livebox 4' || $this->getConfiguration('productClass','') == 'Livebox Fibre') {
+				if (preg_match("/Livebox (4|Fibre|6|7)/i", $this->getConfiguration('productClass',''))) {
 					$listpage = array("sysbus/NeMo/Intf/lan:setWLANConfig" => '"mibs":{"penable":{"'.$option['mibs'].'":{"PersistentEnable":'.$option['value'].',"Enable":'.$option['value'].'}}}');
 				} else {
 					$listpage = array("sysbus/NeMo/Intf/lan:setWLANConfig" => '"mibs":{"penable":{"'.$option['mibs'].'":{"PersistentEnable":'.$option['value'].',"Enable":'.$option['value'].'}}}');
 				}
+				break;
+			case "changemainwifi":
+				$listpage = array("sysbus/NMC/Wifi:set" => '"Enable":'.$option['value'].',"Status":"'.$option['value'].'"');
+				break;
+			case "mainwifistate":
+				$listpage = array("sysbus/NMC/Wifi:get" => "");
 				break;
 			case "changeguestwifi":
 				if ($option['value']) {
@@ -401,14 +420,18 @@ class livebox extends eqLogic {
 				log::add('livebox','debug', 'in setschedule result of request = ' . $content);
 				if ( $content !== false) {
 					$json = json_decode($content, true);
-					if ( $json["status"] == true) {
-						log::add('livebox','debug', 'in setschedule status ok');
+					if ( $json["status"] == false) {
+						log::add('livebox','debug', 'in setschedule status false - schedule not found - creating schedule');
+						$schedule = '{"base":"Weekly","def":"Enable","ID":"'.$option['mac'].'","schedule":[],"enable":true,"override":"'.$option['override'].'"}';
+						log::add('livebox','debug', 'in setschedule schedule = ' . $schedule);
+						$listpage = array("sysbus/Scheduler:addSchedule" => '"type":"ToD","info":' . $schedule);
+					} elseif ( $json["status"] == true) {
+						log::add('livebox','debug', 'in setschedule status true - schedule found - updating schedule');
 						$schedule = $json["data"]["scheduleInfo"];
 						log::add('livebox','debug', 'in setschedule schedule = ' . print_r($schedule, true));
 						$schedule["override"] = $option['override'];
 						log::add('livebox','debug', 'in setschedule schedule after modif = ' . print_r($schedule, true));
 						$listpage = array("sysbus/Scheduler:addSchedule" => '"type":"ToD","info":' . json_encode($schedule));
-						log::add('livebox','debug', 'in setschedule test = ' . print_r($test, true));
 					}
 				}
 				break;
@@ -466,18 +489,14 @@ class livebox extends eqLogic {
 		}
 	}
 
-	public function preUpdate()
-	{
-		if ( $this->getIsEnable() && $this->getConfiguration('type','') == 'box')
-		{
+	public function preUpdate() {
+		if ( $this->getIsEnable() && $this->getConfiguration('type','') == 'box') {
 			return $this->getCookiesInfo();
 		}
 	}
 
-	public function preSave()
-	{
-		if ( $this->getIsEnable() && $this->getConfiguration('type','') == 'box')
-		{
+	public function preSave() {
+		if ( $this->getIsEnable() && $this->getConfiguration('type','') == 'box') {
 			$result = $this->getCookiesInfo();
 			if ($result) {
 				$content = $this->getPage("deviceinfo");
@@ -511,6 +530,18 @@ class livebox extends eqLogic {
 
 	public function postSave() {
 		if ($this->getConfiguration('type','') == 'box') {
+		$refresh = $this->getCmd(null, 'refresh');
+		if (!is_object($refresh)) {
+			$refresh = new liveboxCmd();
+			$refresh->setLogicalId('refresh');
+			$refresh->setIsVisible(1);
+			$refresh->setName(__('Rafraichir', __FILE__));
+		}
+		$refresh->setType('action');
+		$refresh->setSubType('other');
+		$refresh->setEqLogic_id($this->getId());
+		$refresh->save();
+
 		if ( $this->getIsEnable() ) {
 			$content = $this->getPage("internet");
 			if ( $content !== false ) {
@@ -519,7 +550,7 @@ class livebox extends eqLogic {
 					$cmd = $this->getCmd(null, 'debitmontant');
 					if ( ! is_object($cmd)) {
 						$cmd = new liveboxCmd();
-							$cmd->setName(__('Debit montant', __FILE__));
+						$cmd->setName(__('Debit montant', __FILE__));
 						$cmd->setEqLogic_id($this->getId());
 						$cmd->setLogicalId('debitmontant');
 						$cmd->setUnite('Kb/s');
@@ -532,7 +563,7 @@ class livebox extends eqLogic {
 					$cmd = $this->getCmd(null, 'debitdescendant');
 					if ( ! is_object($cmd)) {
 						$cmd = new liveboxCmd();
-							$cmd->setName(__('Debit descendant', __FILE__));
+						$cmd->setName(__('Debit descendant', __FILE__));
 						$cmd->setEqLogic_id($this->getId());
 						$cmd->setLogicalId('debitdescendant');
 						$cmd->setUnite('Kb/s');
@@ -541,23 +572,24 @@ class livebox extends eqLogic {
 						$cmd->setIsHistorized(0);
 						$cmd->save();
 					}
+
 					$cmd = $this->getCmd(null, 'margebruitmontant');
 					if ( ! is_object($cmd)) {
 						$cmd = new liveboxCmd();
-							$cmd->setName(__('Marge de bruit montant', __FILE__));
+						$cmd->setName(__('Marge de bruit montant', __FILE__));
 						$cmd->setEqLogic_id($this->getId());
 						$cmd->setLogicalId('margebruitmontant');
 						$cmd->setUnite('dB');
 						$cmd->setType('info');
 						$cmd->setSubType('numeric');
-						$cmd->setIsHistorized(1);
+						$cmd->setIsHistorized(0);
 						$cmd->save();
 					}
 
 					$cmd = $this->getCmd(null, 'margebruitdescendant');
 					if ( ! is_object($cmd)) {
 						$cmd = new liveboxCmd();
-							$cmd->setName(__('Marge de bruit descendant', __FILE__));
+						$cmd->setName(__('Marge de bruit descendant', __FILE__));
 						$cmd->setEqLogic_id($this->getId());
 						$cmd->setLogicalId('margebruitdescendant');
 						$cmd->setUnite('dB');
@@ -566,6 +598,7 @@ class livebox extends eqLogic {
 						$cmd->setIsHistorized(0);
 						$cmd->save();
 					}
+
 					$cmd = $this->getCmd(null, 'lastchange');
 					if ( ! is_object($cmd)) {
 						$cmd = new liveboxCmd();
@@ -576,10 +609,7 @@ class livebox extends eqLogic {
 						$cmd->setType('info');
 						$cmd->setSubType('numeric');
 						$cmd->setIsHistorized(1);
-						if ( version_compare(jeedom::version(), "4", "<")) {
-							$cmd->setTemplate('dashboard', 'dureev3');
-							$cmd->setTemplate('mobile', 'dureev3');
-						} else {
+						if (version_compare(jeedom::version(), "4.4", "<")) {
 							$cmd->setTemplate('dashboard', 'livebox::duree');
 							$cmd->setTemplate('mobile', 'livebox::duree');
 						}
@@ -617,7 +647,7 @@ class livebox extends eqLogic {
 			$content = $this->getPage("wifilist");
 			if ( $content !== false ) {
 				if ( count($content["status"]) == 1 ) {
-					log::add('livebox','debug','Mode Wifi');
+					log::add('livebox','debug','Mode Wifi 2.4');
 					$cmd = $this->getCmd(null, 'wifion');
 					if ( ! is_object($cmd) ) {
 						$cmd = new liveboxCmd();
@@ -628,6 +658,7 @@ class livebox extends eqLogic {
 						$cmd->setLogicalId('wifion');
 						$cmd->save();
 					}
+
 					$cmd = $this->getCmd(null, 'wifioff');
 					if ( ! is_object($cmd) ) {
 						$cmd = new liveboxCmd();
@@ -638,47 +669,7 @@ class livebox extends eqLogic {
 						$cmd->setLogicalId('wifioff');
 						$cmd->save();
 					}
-					$cmd = $this->getCmd(null, 'wifi2.4on');
-					if ( is_object($cmd)) {
-						$cmd->remove();
-					}
 
-					$cmd = $this->getCmd(null, 'wifi2.4off');
-					if ( is_object($cmd)) {
-						$cmd->remove();
-					}
-					$cmd = $this->getCmd(null, 'wifi5on');
-					if ( is_object($cmd)) {
-						$cmd->remove();
-					}
-
-					$cmd = $this->getCmd(null, 'wifi5off');
-					if ( is_object($cmd)) {
-						$cmd->remove();
-					}
-					$cmd = $this->getCmd(null, 'wifistatus');
-					if ( ! is_object($cmd)) {
-						$cmd = new liveboxCmd();
-						$cmd->setName('Etat Wifi');
-						$cmd->setEqLogic_id($this->getId());
-						$cmd->setLogicalId('wifistatus');
-						$cmd->setUnite('');
-						$cmd->setType('info');
-						$cmd->setSubType('binary');
-						$cmd->setIsHistorized(0);
-						$cmd->save();
-					}
-					$cmd = $this->getCmd(null, 'wifi5status');
-					if ( is_object($cmd)) {
-						$cmd->remove();
-					}
-
-					$cmd = $this->getCmd(null, 'wifi2.4status');
-					if ( is_object($cmd)) {
-						$cmd->remove();
-					}
-				} elseif ( count($content["status"]) == 2 ) {
-					log::add('livebox','debug','Mode Wifi 2.4 et 5');
 					$cmd = $this->getCmd(null, 'wifi2.4on');
 					if ( ! is_object($cmd) ) {
 						$cmd = new liveboxCmd();
@@ -689,16 +680,7 @@ class livebox extends eqLogic {
 						$cmd->setLogicalId('wifi2.4on');
 						$cmd->save();
 					}
-					$cmd = $this->getCmd(null, 'wifi5on');
-					if ( ! is_object($cmd) ) {
-						$cmd = new liveboxCmd();
-						$cmd->setName('Activer wifi 5G');
-						$cmd->setEqLogic_id($this->getId());
-						$cmd->setType('action');
-						$cmd->setSubType('other');
-						$cmd->setLogicalId('wifi5on');
-						$cmd->save();
-					}
+
 					$cmd = $this->getCmd(null, 'wifi2.4off');
 					if ( ! is_object($cmd) ) {
 						$cmd = new liveboxCmd();
@@ -709,31 +691,33 @@ class livebox extends eqLogic {
 						$cmd->setLogicalId('wifi2.4off');
 						$cmd->save();
 					}
-					$cmd = $this->getCmd(null, 'wifi5off');
-					if ( ! is_object($cmd) ) {
-						$cmd = new liveboxCmd();
-						$cmd->setName('Désactiver wifi 5G');
-						$cmd->setEqLogic_id($this->getId());
-						$cmd->setType('action');
-						$cmd->setSubType('other');
-						$cmd->setLogicalId('wifi5off');
-						$cmd->save();
-					}
-					$cmd = $this->getCmd(null, 'wifioff');
+
+					$cmd = $this->getCmd(null, 'wifi5on');
 					if ( is_object($cmd)) {
 						$cmd->remove();
 					}
 
-					$cmd = $this->getCmd(null, 'wifion');
+					$cmd = $this->getCmd(null, 'wifi5off');
 					if ( is_object($cmd)) {
 						$cmd->remove();
 					}
-					$cmd = $this->getCmd(null, 'wifi5status');
+
+					$cmd = $this->getCmd(null, 'wifi6on');
+					if ( is_object($cmd)) {
+						$cmd->remove();
+					}
+
+					$cmd = $this->getCmd(null, 'wifi6off');
+					if ( is_object($cmd)) {
+						$cmd->remove();
+					}
+
+					$cmd = $this->getCmd(null, 'wifistatus');
 					if ( ! is_object($cmd)) {
 						$cmd = new liveboxCmd();
-						$cmd->setName('Etat Wifi 5G');
+						$cmd->setName('Etat Wifi');
 						$cmd->setEqLogic_id($this->getId());
-						$cmd->setLogicalId('wifi5status');
+						$cmd->setLogicalId('wifistatus');
 						$cmd->setUnite('');
 						$cmd->setType('info');
 						$cmd->setSubType('binary');
@@ -753,14 +737,282 @@ class livebox extends eqLogic {
 						$cmd->setIsHistorized(0);
 						$cmd->save();
 					}
-					$cmd = $this->getCmd(null, 'wifistatus');
+
+					$cmd = $this->getCmd(null, 'wifi5status');
 					if ( is_object($cmd)) {
 						$cmd->remove();
+					}
+
+					$cmd = $this->getCmd(null, 'wifi6status');
+					if ( is_object($cmd)) {
+						$cmd->remove();
+					}
+				} elseif ( count($content["status"]) == 2 ) {
+					log::add('livebox','debug','Mode Wifi 2.4 et 5');
+					$cmd = $this->getCmd(null, 'wifion');
+					if ( ! is_object($cmd) ) {
+						$cmd = new liveboxCmd();
+						$cmd->setName('Activer wifi');
+						$cmd->setEqLogic_id($this->getId());
+						$cmd->setType('action');
+						$cmd->setSubType('other');
+						$cmd->setLogicalId('wifion');
+						$cmd->save();
+					}
+
+					$cmd = $this->getCmd(null, 'wifioff');
+					if ( ! is_object($cmd) ) {
+						$cmd = new liveboxCmd();
+						$cmd->setName('Désactiver wifi');
+						$cmd->setEqLogic_id($this->getId());
+						$cmd->setType('action');
+						$cmd->setSubType('other');
+						$cmd->setLogicalId('wifioff');
+						$cmd->save();
+					}
+
+					$cmd = $this->getCmd(null, 'wifi2.4on');
+					if ( ! is_object($cmd) ) {
+						$cmd = new liveboxCmd();
+						$cmd->setName('Activer wifi 2.4G');
+						$cmd->setEqLogic_id($this->getId());
+						$cmd->setType('action');
+						$cmd->setSubType('other');
+						$cmd->setLogicalId('wifi2.4on');
+						$cmd->save();
+					}
+
+					$cmd = $this->getCmd(null, 'wifi2.4off');
+					if ( ! is_object($cmd) ) {
+						$cmd = new liveboxCmd();
+						$cmd->setName('Désactiver wifi 2.4G');
+						$cmd->setEqLogic_id($this->getId());
+						$cmd->setType('action');
+						$cmd->setSubType('other');
+						$cmd->setLogicalId('wifi2.4off');
+						$cmd->save();
+					}
+
+					$cmd = $this->getCmd(null, 'wifi5on');
+					if ( ! is_object($cmd) ) {
+						$cmd = new liveboxCmd();
+						$cmd->setName('Activer wifi 5G');
+						$cmd->setEqLogic_id($this->getId());
+						$cmd->setType('action');
+						$cmd->setSubType('other');
+						$cmd->setLogicalId('wifi5on');
+						$cmd->save();
+					}
+
+					$cmd = $this->getCmd(null, 'wifi5off');
+					if ( ! is_object($cmd) ) {
+						$cmd = new liveboxCmd();
+						$cmd->setName('Désactiver wifi 5G');
+						$cmd->setEqLogic_id($this->getId());
+						$cmd->setType('action');
+						$cmd->setSubType('other');
+						$cmd->setLogicalId('wifi5off');
+						$cmd->save();
+					}
+
+					$cmd = $this->getCmd(null, 'wifi6on');
+					if ( is_object($cmd)) {
+						$cmd->remove();
+					}
+
+					$cmd = $this->getCmd(null, 'wifi6off');
+					if ( is_object($cmd)) {
+						$cmd->remove();
+					}
+
+					$cmd = $this->getCmd(null, 'wifistatus');
+					if ( ! is_object($cmd)) {
+						$cmd = new liveboxCmd();
+						$cmd->setName('Etat Wifi');
+						$cmd->setEqLogic_id($this->getId());
+						$cmd->setLogicalId('wifistatus');
+						$cmd->setUnite('');
+						$cmd->setType('info');
+						$cmd->setSubType('binary');
+						$cmd->setIsHistorized(0);
+						$cmd->save();
+					}
+
+					$cmd = $this->getCmd(null, 'wifi2.4status');
+					if ( ! is_object($cmd)) {
+						$cmd = new liveboxCmd();
+						$cmd->setName('Etat Wifi 2.4G');
+						$cmd->setEqLogic_id($this->getId());
+						$cmd->setLogicalId('wifi2.4status');
+						$cmd->setUnite('');
+						$cmd->setType('info');
+						$cmd->setSubType('binary');
+						$cmd->setIsHistorized(0);
+						$cmd->save();
+					}
+
+					$cmd = $this->getCmd(null, 'wifi5status');
+					if ( ! is_object($cmd)) {
+						$cmd = new liveboxCmd();
+						$cmd->setName('Etat Wifi 5G');
+						$cmd->setEqLogic_id($this->getId());
+						$cmd->setLogicalId('wifi5status');
+						$cmd->setUnite('');
+						$cmd->setType('info');
+						$cmd->setSubType('binary');
+						$cmd->setIsHistorized(0);
+						$cmd->save();
+					}
+
+					$cmd = $this->getCmd(null, 'wifi6status');
+					if ( is_object($cmd)) {
+						$cmd->remove();
+					}
+				} elseif ( count($content["status"]) == 3 ) {
+					log::add('livebox','debug','Mode Wifi 6');
+					$cmd = $this->getCmd(null, 'wifion');
+					if ( ! is_object($cmd) ) {
+						$cmd = new liveboxCmd();
+						$cmd->setName('Activer wifi');
+						$cmd->setEqLogic_id($this->getId());
+						$cmd->setType('action');
+						$cmd->setSubType('other');
+						$cmd->setLogicalId('wifion');
+						$cmd->save();
+					}
+
+					$cmd = $this->getCmd(null, 'wifioff');
+					if ( ! is_object($cmd) ) {
+						$cmd = new liveboxCmd();
+						$cmd->setName('Désactiver wifi');
+						$cmd->setEqLogic_id($this->getId());
+						$cmd->setType('action');
+						$cmd->setSubType('other');
+						$cmd->setLogicalId('wifioff');
+						$cmd->save();
+					}
+
+					$cmd = $this->getCmd(null, 'wifi2.4on');
+					if ( ! is_object($cmd) ) {
+						$cmd = new liveboxCmd();
+						$cmd->setName('Activer wifi 2.4G');
+						$cmd->setEqLogic_id($this->getId());
+						$cmd->setType('action');
+						$cmd->setSubType('other');
+						$cmd->setLogicalId('wifi2.4on');
+						$cmd->save();
+					}
+
+					$cmd = $this->getCmd(null, 'wifi2.4off');
+					if ( ! is_object($cmd) ) {
+						$cmd = new liveboxCmd();
+						$cmd->setName('Désactiver wifi 2.4G');
+						$cmd->setEqLogic_id($this->getId());
+						$cmd->setType('action');
+						$cmd->setSubType('other');
+						$cmd->setLogicalId('wifi2.4off');
+						$cmd->save();
+					}
+
+					$cmd = $this->getCmd(null, 'wifi5on');
+					if ( ! is_object($cmd) ) {
+						$cmd = new liveboxCmd();
+						$cmd->setName('Activer wifi 5G');
+						$cmd->setEqLogic_id($this->getId());
+						$cmd->setType('action');
+						$cmd->setSubType('other');
+						$cmd->setLogicalId('wifi5on');
+						$cmd->save();
+					}
+
+					$cmd = $this->getCmd(null, 'wifi5off');
+					if ( ! is_object($cmd) ) {
+						$cmd = new liveboxCmd();
+						$cmd->setName('Désactiver wifi 5G');
+						$cmd->setEqLogic_id($this->getId());
+						$cmd->setType('action');
+						$cmd->setSubType('other');
+						$cmd->setLogicalId('wifi5off');
+						$cmd->save();
+					}
+
+					$cmd = $this->getCmd(null, 'wifi6on');
+					if ( ! is_object($cmd) ) {
+						$cmd = new liveboxCmd();
+						$cmd->setName('Activer wifi 6');
+						$cmd->setEqLogic_id($this->getId());
+						$cmd->setType('action');
+						$cmd->setSubType('other');
+						$cmd->setLogicalId('wifi6on');
+						$cmd->save();
+					}
+
+					$cmd = $this->getCmd(null, 'wifi6off');
+					if ( ! is_object($cmd) ) {
+						$cmd = new liveboxCmd();
+						$cmd->setName('Désactiver wifi 6');
+						$cmd->setEqLogic_id($this->getId());
+						$cmd->setType('action');
+						$cmd->setSubType('other');
+						$cmd->setLogicalId('wifi6off');
+						$cmd->save();
+					}
+
+					$cmd = $this->getCmd(null, 'wifistatus');
+					if ( ! is_object($cmd)) {
+						$cmd = new liveboxCmd();
+						$cmd->setName('Etat Wifi');
+						$cmd->setEqLogic_id($this->getId());
+						$cmd->setLogicalId('wifistatus');
+						$cmd->setUnite('');
+						$cmd->setType('info');
+						$cmd->setSubType('binary');
+						$cmd->setIsHistorized(0);
+						$cmd->save();
+					}
+
+					$cmd = $this->getCmd(null, 'wifi2.4status');
+					if ( ! is_object($cmd)) {
+						$cmd = new liveboxCmd();
+						$cmd->setName('Etat Wifi 2.4G');
+						$cmd->setEqLogic_id($this->getId());
+						$cmd->setLogicalId('wifi2.4status');
+						$cmd->setUnite('');
+						$cmd->setType('info');
+						$cmd->setSubType('binary');
+						$cmd->setIsHistorized(0);
+						$cmd->save();
+					}
+
+					$cmd = $this->getCmd(null, 'wifi5status');
+					if ( ! is_object($cmd)) {
+						$cmd = new liveboxCmd();
+						$cmd->setName('Etat Wifi 5G');
+						$cmd->setEqLogic_id($this->getId());
+						$cmd->setLogicalId('wifi5status');
+						$cmd->setUnite('');
+						$cmd->setType('info');
+						$cmd->setSubType('binary');
+						$cmd->setIsHistorized(0);
+						$cmd->save();
+					}
+
+					$cmd = $this->getCmd(null, 'wifi6status');
+					if ( ! is_object($cmd)) {
+						$cmd = new liveboxCmd();
+						$cmd->setName('Etat Wifi 6');
+						$cmd->setEqLogic_id($this->getId());
+						$cmd->setLogicalId('wifi6status');
+						$cmd->setUnite('');
+						$cmd->setType('info');
+						$cmd->setSubType('binary');
+						$cmd->setIsHistorized(0);
+						$cmd->save();
 					}
 				}
 				$content2 = $this->getPage("deviceinfo");
 				if ( $content2 !== false ) {
-					if ($content2['status']['ProductClass'] == 'Livebox 4' || $content2['status']['ProductClass'] == 'Livebox Fibre') {
+					if (preg_match("/Livebox (4|Fibre|6|7)/i", $content2['status']['ProductClass'])) {
 						$cmd = $this->getCmd(null, 'guestwifion');
 						if ( ! is_object($cmd) ) {
 							$cmd = new liveboxCmd();
@@ -771,6 +1023,7 @@ class livebox extends eqLogic {
 							$cmd->setLogicalId('guestwifion');
 							$cmd->save();
 						}
+
 						$cmd = $this->getCmd(null, 'guestwifioff');
 						if ( ! is_object($cmd) ) {
 							$cmd = new liveboxCmd();
@@ -781,6 +1034,7 @@ class livebox extends eqLogic {
 							$cmd->setLogicalId('guestwifioff');
 							$cmd->save();
 						}
+
 						$cmd = $this->getCmd(null, 'guestwifistatus');
 						if ( ! is_object($cmd)) {
 							$cmd = new liveboxCmd();
@@ -793,6 +1047,7 @@ class livebox extends eqLogic {
 							$cmd->setIsHistorized(0);
 							$cmd->save();
 						}
+
 					} else {
 						$cmd = $this->getCmd(null, 'guestwifion');
 						if ( is_object($cmd) ) {
@@ -809,7 +1064,6 @@ class livebox extends eqLogic {
 					}
 				}
 			}
-
 
 			$cmd = $this->getCmd(null, 'numerotelephone');
 			if ( is_object($cmd)) {
@@ -839,6 +1093,7 @@ class livebox extends eqLogic {
 								$cmd->setIsVisible(1);
 								$cmd->save();
 							}
+
 							$cmd = $this->getCmd(null, 'numerotelephone'.$voip["signalingProtocol"]);
 							if ( ! is_object($cmd)) {
 								$cmd = new liveboxCmd();
@@ -852,6 +1107,7 @@ class livebox extends eqLogic {
 								$cmd->setIsVisible(1);
 								$cmd->save();
 							}
+
 						} else {
 							log::add('livebox','debug','Mode VOIP '.$voip["signalingProtocol"].' inactif');
 							$cmd = $this->getCmd(null, 'voipstatus'.$voip["signalingProtocol"]);
@@ -877,9 +1133,9 @@ class livebox extends eqLogic {
 					$cmd->setType('info');
 					$cmd->setSubType('numeric');
 					$cmd->setIsHistorized(0);
-					$cmd->setTemplate('dashboard', 'line');
 					$cmd->save();
 				}
+
 				$cmd = $this->getCmd(null, 'incallsnumber');
 				if ( ! is_object($cmd)) {
 					$cmd = new liveboxCmd();
@@ -890,9 +1146,9 @@ class livebox extends eqLogic {
 					$cmd->setType('info');
 					$cmd->setSubType('numeric');
 					$cmd->setIsHistorized(0);
-					$cmd->setTemplate('dashboard', 'line');
 					$cmd->save();
 				}
+
 				$cmd = $this->getCmd(null, 'outcallsnumber');
 				if ( ! is_object($cmd)) {
 					$cmd = new liveboxCmd();
@@ -903,9 +1159,9 @@ class livebox extends eqLogic {
 					$cmd->setType('info');
 					$cmd->setSubType('numeric');
 					$cmd->setIsHistorized(0);
-					$cmd->setTemplate('dashboard', 'line');
 					$cmd->save();
 				}
+
 				$cmd = $this->getCmd(null, 'totalcallsnumber');
 				if ( ! is_object($cmd)) {
 					$cmd = new liveboxCmd();
@@ -917,9 +1173,9 @@ class livebox extends eqLogic {
 					$cmd->setSubType('numeric');
 					$cmd->setIsHistorized(0);
 					$cmd->setIsVisible(0);
-					$cmd->setTemplate('dashboard', 'line');
 					$cmd->save();
 				}
+
 				$cmd = $this->getCmd(null, 'outcallstable');
 				if ( ! is_object($cmd)) {
 					$cmd = new liveboxCmd();
@@ -931,15 +1187,11 @@ class livebox extends eqLogic {
 					$cmd->setSubType('string');
 					$cmd->setIsVisible(0);
 					$cmd->setIsHistorized(0);
-					if ( version_compare(jeedom::version(), "4", "<")) {
-						$cmd->setTemplate('dashboard', 'deroulantv3');
-						$cmd->setTemplate('mobile', 'deroulantv3');
-					} else {
-						$cmd->setTemplate('dashboard', 'livebox::deroulant');
-						$cmd->setTemplate('mobile', 'livebox::deroulant');
-					}
+					$cmd->setTemplate('dashboard', 'livebox::deroulant');
+					$cmd->setTemplate('mobile', 'livebox::deroulant');
 					$cmd->save();
 				}
+
 				$cmd = $this->getCmd(null, 'incallstable');
 				if ( ! is_object($cmd)) {
 					$cmd = new liveboxCmd();
@@ -951,15 +1203,11 @@ class livebox extends eqLogic {
 					$cmd->setSubType('string');
 					$cmd->setIsVisible(0);
 					$cmd->setIsHistorized(0);
-					if ( version_compare(jeedom::version(), "4", "<")) {
-						$cmd->setTemplate('dashboard', 'deroulantv3');
-						$cmd->setTemplate('mobile', 'deroulantv3');
-					} else {
-						$cmd->setTemplate('dashboard', 'livebox::deroulant');
-						$cmd->setTemplate('mobile', 'livebox::deroulant');
-					}
+					$cmd->setTemplate('dashboard', 'livebox::deroulant');
+					$cmd->setTemplate('mobile', 'livebox::deroulant');
 					$cmd->save();
 				}
+
 				$cmd = $this->getCmd(null, 'missedcallstable');
 				if ( ! is_object($cmd)) {
 					$cmd = new liveboxCmd();
@@ -971,15 +1219,11 @@ class livebox extends eqLogic {
 					$cmd->setSubType('string');
 					$cmd->setIsVisible(0);
 					$cmd->setIsHistorized(0);
-					if ( version_compare(jeedom::version(), "4", "<")) {
-						$cmd->setTemplate('dashboard', 'deroulantv3');
-						$cmd->setTemplate('mobile', 'deroulantv3');
-					} else {
-						$cmd->setTemplate('dashboard', 'livebox::deroulant');
-						$cmd->setTemplate('mobile', 'livebox::deroulant');
-					}
+					$cmd->setTemplate('dashboard', 'livebox::deroulant');
+					$cmd->setTemplate('mobile', 'livebox::deroulant');
 					$cmd->save();
 				}
+
 				$cmd = $this->getCmd(null, 'callstable');
 				if ( ! is_object($cmd)) {
 					$cmd = new liveboxCmd();
@@ -990,15 +1234,11 @@ class livebox extends eqLogic {
 					$cmd->setType('info');
 					$cmd->setSubType('string');
 					$cmd->setIsHistorized(0);
-					if ( version_compare(jeedom::version(), "4", "<")) {
-						$cmd->setTemplate('dashboard', 'deroulantv3');
-						$cmd->setTemplate('mobile', 'deroulantv3');
-					} else {
-						$cmd->setTemplate('dashboard', 'livebox::deroulant');
-						$cmd->setTemplate('mobile', 'livebox::deroulant');
-					}
+					$cmd->setTemplate('dashboard', 'livebox::deroulant');
+					$cmd->setTemplate('mobile', 'livebox::deroulant');
 					$cmd->save();
 				}
+
 				$cmd = $this->getCmd(null, 'lastmissedcall');
 				if ( ! is_object($cmd)) {
 					$cmd = new liveboxCmd();
@@ -1011,6 +1251,7 @@ class livebox extends eqLogic {
 					$cmd->setIsHistorized(0);
 					$cmd->save();
 				}
+
 				$cmd = $this->getCmd(null, 'lastincomingcall');
 				if ( ! is_object($cmd)) {
 					$cmd = new liveboxCmd();
@@ -1023,6 +1264,7 @@ class livebox extends eqLogic {
 					$cmd->setIsHistorized(0);
 					$cmd->save();
 				}
+
 				$cmd = $this->getCmd(null, 'lastoutgoingcall');
 				if ( ! is_object($cmd)) {
 					$cmd = new liveboxCmd();
@@ -1049,6 +1291,7 @@ class livebox extends eqLogic {
 				$cmd->setIsHistorized(0);
 				$cmd->save();
 			}
+
 			$cmd = $this->getCmd(null, 'reboot');
 			if ( ! is_object($cmd) ) {
 				$cmd = new liveboxCmd();
@@ -1059,6 +1302,7 @@ class livebox extends eqLogic {
 				$cmd->setLogicalId('reboot');
 				$cmd->save();
 			}
+
 			$cmd = $this->getCmd(null, 'ring');
 			if ( ! is_object($cmd) ) {
 				$cmd = new liveboxCmd();
@@ -1093,6 +1337,7 @@ class livebox extends eqLogic {
 				$cmd->setIsHistorized(0);
 				$cmd->save();
 			}
+
 			$cmd = $this->getCmd(null, 'uptime');
 			if ( ! is_object($cmd)) {
 				$cmd = new liveboxCmd();
@@ -1102,16 +1347,26 @@ class livebox extends eqLogic {
 				$cmd->setUnite('s');
 				$cmd->setType('info');
 				$cmd->setSubType('numeric');
-				if ( version_compare(jeedom::version(), "4", "<")) {
-					$cmd->setTemplate('dashboard', 'dureev3');
-					$cmd->setTemplate('mobile', 'dureev3');
-				} else {
+				if (version_compare(jeedom::version(), "4.4", "<")) {
 					$cmd->setTemplate('dashboard', 'livebox::duree');
 					$cmd->setTemplate('mobile', 'livebox::duree');
 				}
 				$cmd->setIsHistorized(0);
 				$cmd->save();
 			}
+
+			$cmd = $this->getCmd(null, 'softwareVersion');
+			if ( ! is_object($cmd)) {
+				$cmd = new liveboxCmd();
+				$cmd->setName('Version software');
+				$cmd->setEqLogic_id($this->getId());
+				$cmd->setLogicalId('softwareVersion');
+				$cmd->setType('info');
+				$cmd->setSubType('string');
+				$cmd->setIsHistorized(0);
+				$cmd->save();
+			}
+
 			$cmd = $this->getCmd(null, 'linkstate');
 			if ( ! is_object($cmd)) {
 				$cmd = new liveboxCmd();
@@ -1189,6 +1444,7 @@ class livebox extends eqLogic {
 				$cmd->setIsHistorized(0);
 				$cmd->save();
 			}
+
 			$this->refreshInfo();
 			$this->logOut();
 		}
@@ -1206,6 +1462,7 @@ class livebox extends eqLogic {
 				$cmd->setIsHistorized(0);
 				$cmd->save();
 			}
+
 			$cmd = $this->getCmd(null, 'firstseen');
 			if ( ! is_object($cmd)) {
 				$cmd = new liveboxCmd();
@@ -1219,6 +1476,7 @@ class livebox extends eqLogic {
 				$cmd->setIsHistorized(0);
 				$cmd->save();
 			}
+
 			$cmd = $this->getCmd(null, 'lastchanged');
 			if ( ! is_object($cmd)) {
 				$cmd = new liveboxCmd();
@@ -1232,6 +1490,7 @@ class livebox extends eqLogic {
 				$cmd->setIsHistorized(0);
 				$cmd->save();
 			}
+
 			$cmd = $this->getCmd(null, 'present');
 			if ( ! is_object($cmd)) {
 				$cmd = new liveboxCmd();
@@ -1245,6 +1504,7 @@ class livebox extends eqLogic {
 				$cmd->setIsHistorized(1);
 				$cmd->save();
 			}
+
 			$cmd = $this->getCmd(null, 'ip');
 			if ( ! is_object($cmd)) {
 				$cmd = new liveboxCmd();
@@ -1258,6 +1518,7 @@ class livebox extends eqLogic {
 				$cmd->setIsHistorized(0);
 				$cmd->save();
 			}
+
 			$cmd = $this->getCmd(null, 'macaddress');
 			if ( ! is_object($cmd)) {
 				$cmd = new liveboxCmd();
@@ -1271,6 +1532,7 @@ class livebox extends eqLogic {
 				$cmd->setIsHistorized(0);
 				$cmd->save();
 			}
+
 			$cmd = $this->getCmd(null, 'access');
 			if ( ! is_object($cmd)) {
 				$cmd = new liveboxCmd();
@@ -1284,6 +1546,7 @@ class livebox extends eqLogic {
 				$cmd->setIsHistorized(1);
 				$cmd->save();
 			}
+
 			$cmdId = $cmd->getId();
 			$cmd = $this->getCmd(null, 'block');
 			if ( ! is_object($cmd)) {
@@ -1298,6 +1561,7 @@ class livebox extends eqLogic {
 				$cmd->setIsVisible(1);
 				$cmd->save();
 			}
+
 			$cmd = $this->getCmd(null, 'authorize');
 			if ( ! is_object($cmd)) {
 				$cmd = new liveboxCmd();
@@ -1306,11 +1570,12 @@ class livebox extends eqLogic {
 				$cmd->setLogicalId('authorize');
 				$cmd->setType('action');
 				$cmd->setSubType('other');
-				 $cmd->setGeneric_type( 'SWITCH_OFF');
+				$cmd->setGeneric_type( 'SWITCH_OFF');
 				$cmd->setValue($cmdId);
 				$cmd->setIsVisible(1);
 				$cmd->save();
 			}
+
 			$cmd = $this->getCmd(null, 'schedule');
 			if ( ! is_object($cmd)) {
 				$cmd = new liveboxCmd();
@@ -1319,7 +1584,7 @@ class livebox extends eqLogic {
 				$cmd->setLogicalId('schedule');
 				$cmd->setType('action');
 				$cmd->setSubType('other');
-				 $cmd->setGeneric_type( 'SWITCH_OFF');
+				$cmd->setGeneric_type( 'SWITCH_OFF');
 				$cmd->setValue($cmdId);
 				$cmd->setIsVisible(1);
 				$cmd->save();
@@ -1334,7 +1599,7 @@ class livebox extends eqLogic {
 	}
 
 	public function getImage() {
-		if($this->getConfiguration('type') == 'cli'){
+		if($this->getConfiguration('type') == 'cli') {
 			$filename = 'plugins/livebox/core/config/cli/' . $this->getConfiguration('deviceType') .'.png';
 			if(file_exists(__DIR__.'/../../../../'.$filename)){
 				return $filename;
@@ -1344,7 +1609,7 @@ class livebox extends eqLogic {
 		return 'plugins/livebox/plugin_info/livebox_icon.png';
 	}
 
-	public function scan() {
+	public function refresh() {
 		if ( $this->getIsEnable() && $this->getConfiguration('type') == 'box') {
 			if ( $this->getCookiesInfo() ) {
 				$this->refreshInfo();
@@ -1404,15 +1669,23 @@ class livebox extends eqLogic {
 		}
 	}
 
-	function refreshInfo() {
-		$content = $this->getPage('deviceinfo');
+	function refreshInfo($refreshonly='all') {
+		$refreshonly != 'all' ? $content = false : $content = $this->getPage('deviceinfo');
 		if ( $content !== false ) {
 			$eqLogic_cmd = $this->getCmd(null, 'uptime');
 			if (is_object($eqLogic_cmd)) {
 			    $this->checkAndUpdateCmd('uptime', $content["status"]["UpTime"]);
 			}
+			$eqLogic_cmd = $this->getCmd(null, 'softwareVersion');
+			if (is_object($eqLogic_cmd)) {
+			    $this->checkAndUpdateCmd('softwareVersion', $content["status"]["SoftwareVersion"]);
+			}
+			if (isset($content['status']['SoftwareVersion'])) {
+				$this->setConfiguration('softwareVersion', $content['status']['SoftwareVersion']);
+				$this->save(true);
+			}
 		}
-		$content = $this->getPage("internet");
+		$refreshonly != 'all'  ? $content = false : $content = $this->getPage("internet");
 		if ( $content !== false ) {
 			if (isset($content["data"]["LinkState"])) {
 				$eqLogic_cmd = $this->getCmd(null, 'linkstate');
@@ -1488,15 +1761,13 @@ class livebox extends eqLogic {
 					/* A voir ce qu'on peut faire dans ce cas là */
 				}
 			}
-				
 		}
-		$content = $this->getPage("voip");
+		$refreshonly != 'all' ? $content = false : $content = $this->getPage("voip");
 		if ( $content !== false ) {
 			foreach ( $content["status"] as $voip ) {
 				if ( ! isset($voip["signalingProtocol"]) ) {
 					$voip["signalingProtocol"] = strstr($voip["name"], "-", true);
 				}
-
 				$eqLogic_cmd = $this->getCmd(null, 'voipstatus'.$voip["signalingProtocol"]);
 				if (is_object($eqLogic_cmd)) {
 					if (isset($voip["trunk_lines"]["0"]["status"])) {
@@ -1513,7 +1784,7 @@ class livebox extends eqLogic {
 				}
 			}
 		}
-		$content = $this->getPage("tv");
+		$refreshonly != 'all' ? $content = false : $content = $this->getPage("tv");
 		if ( $content !== false ) {
 			if (isset($content["data"]["IPTVStatus"])) {
 				$eqLogic_cmd = $this->getCmd(null, 'tvstatus');
@@ -1523,16 +1794,18 @@ class livebox extends eqLogic {
 				}
 			}
 		}
-		$content = $this->getPage("wifilist");
+		($refreshonly != 'all' && $refreshonly != 'wifi') ? $content = false : $content = $this->getPage("wifilist");
 		if ( $content !== false ) {
 			if ( count($content["status"]) == 1 ) {
 				$content = $this->getPage("wifi");
 				if ( $content !== false ) {
 					if (isset($content["status"]["wlanvap"]["wl0"]["VAPStatus"])) {
-						$eqLogic_cmd = $this->getCmd(null, 'wifistatus');
+						$this->setConfiguration('wifi24Name', 'wl0');
+						$eqLogic_cmd = $this->getCmd(null, 'wifi2.4status');
 						if (is_object($eqLogic_cmd)) {
-							log::add('livebox','debug','Maj wifistatus ' . $eqLogic_cmd->formatValue($content["status"]["wlanvap"]["wl0"]["VAPStatus"]));
-							$this->checkAndUpdateCmd('wifistatus',  $eqLogic_cmd->formatValue($content["status"]["wlanvap"]["wl0"]["VAPStatus"]));
+							$statusvalue = $content["status"]["wlanvap"]["wl0"]["VAPStatus"];
+							log::add('livebox','debug','Maj wifi2.4status ' . $eqLogic_cmd->formatValue($statusvalue));
+							$this->checkAndUpdateCmd('wifi2.4status',  $eqLogic_cmd->formatValue($statusvalue));
 						}
 					}
 				}
@@ -1540,10 +1813,12 @@ class livebox extends eqLogic {
 				$content = $this->getPage("wifi");
 				if ( $content !== false ) {
 					if (isset($content["status"]["wlanvap"]["wl0"]["VAPStatus"])) {
+						$this->setConfiguration('wifi24Name', 'wl0');
 						$eqLogic_cmd = $this->getCmd(null, 'wifi2.4status');
 						if (is_object($eqLogic_cmd)) {
-							log::add('livebox','debug','Maj wifi2.4status ' . $eqLogic_cmd->formatValue($content["status"]["wlanvap"]["wl0"]["VAPStatus"]));
-							$this->checkAndUpdateCmd('wifi2.4status', $eqLogic_cmd->formatValue($content["status"]["wlanvap"]["wl0"]["VAPStatus"]));
+							$statusvalue = $content["status"]["wlanvap"]["wl0"]["VAPStatus"];
+							log::add('livebox','debug','Maj wifi2.4status ' . $eqLogic_cmd->formatValue($statusvalue));
+							$this->checkAndUpdateCmd('wifi2.4status', $eqLogic_cmd->formatValue($statusvalue));
 						}
 					}
 					$eqLogic_cmd = $this->getCmd(null, 'wifi5status');
@@ -1565,9 +1840,63 @@ class livebox extends eqLogic {
 						$this->checkAndUpdateCmd('wifi5status', $eqLogic_cmd->formatValue($statusvalue));
 					}
 				}
+			} elseif ( count($content["status"]) == 3 ) {
+				$content = $this->getPage("wifi");
+				if ( $content !== false ) {
+					if (isset($content["status"]["wlanvap"]["vap2g0priv0"]["VAPStatus"])) {
+						$this->setConfiguration('wifi24Name', 'vap2g0priv0');
+						$eqLogic_cmd = $this->getCmd(null, 'wifi2.4status');
+						if (is_object($eqLogic_cmd)) {
+							$statusvalue = $content["status"]["wlanvap"]["vap2g0priv0"]["VAPStatus"];
+							log::add('livebox','debug','Maj wifi2.4status ' . $eqLogic_cmd->formatValue($statusvalue));
+							$this->checkAndUpdateCmd('wifi2.4status', $eqLogic_cmd->formatValue($statusvalue));
+						}
+					}
+					if (isset($content["status"]["wlanvap"]["vap5g0priv0"])) {
+						// Livebox 6.
+						$this->setConfiguration('wifi5Name', 'vap5g0priv0');
+						$eqLogic_cmd = $this->getCmd(null, 'wifi5status');
+						if (is_object($eqLogic_cmd)) {
+							$statusvalue = $content["status"]["wlanvap"]["vap5g0priv0"]["VAPStatus"];
+							log::add('livebox','debug','Maj wifi5status ' .$eqLogic_cmd->formatValue($statusvalue));
+							$this->checkAndUpdateCmd('wifi5status', $eqLogic_cmd->formatValue($statusvalue));
+						}
+					}
+					if (isset($content["status"]["wlanvap"]["vap6g0priv0"])) {
+						// Livebox 6.
+						$this->setConfiguration('wifi6Name', 'vap6g0priv0');
+						$eqLogic_cmd = $this->getCmd(null, 'wifi6status');
+						if (is_object($eqLogic_cmd)) {
+							$statusvalue = $content["status"]["wlanvap"]["vap6g0priv0"]["VAPStatus"];
+							log::add('livebox','debug','Maj wifi6status ' .$eqLogic_cmd->formatValue($statusvalue));
+							$this->checkAndUpdateCmd('wifi6status', $eqLogic_cmd->formatValue($statusvalue));
+						}
+					}
+				}
 			}
 		}
-		$content = $this->getPage("listcalls");
+		($refreshonly != 'all' && $refreshonly != 'wifi') ? $content = false : $content = $this->getPage("mainwifistate");
+		if ( $content !== false ) {
+			if (isset($content["status"]["Status"])) {
+				$eqLogic_cmd = $this->getCmd(null, 'wifistatus');
+				log::add('livebox','debug','Maj wifistatus ' . $eqLogic_cmd->formatValue($content["status"]["Status"]));
+				$this->checkAndUpdateCmd('wifistatus', $eqLogic_cmd->formatValue($content["status"]["Status"]));
+			}
+		}
+		if (preg_match("/Livebox (4|Fibre|6|7)/i", $this->getConfiguration('productClass',''))) {
+			($refreshonly != 'all' && $refreshonly != 'wifi') ? $content = false : $content = $this->getPage("guestwifistate");
+			if ( $content !== false ) {
+				log::add('livebox','debug', 'Gest Wifi ' . print_r($content, true));
+				$eqLogic_cmd = $this->getCmd(null, 'guestwifistatus');
+				if (is_object($eqLogic_cmd)) {
+					if (isset($content["status"]["Enable"])) {
+						log::add('livebox','debug','Maj wifi invité status ' . $eqLogic_cmd->formatValue($content["status"]["Enable"]));
+						$this->checkAndUpdateCmd('guestwifistatus', $eqLogic_cmd->formatValue($content["status"]["Enable"]));
+					}
+				}
+			}
+		}
+		$refreshonly != 'all' ? $content = false : $content = $this->getPage("listcalls");
 		if ( $content !== false ) {
 			$callsTable = '';
 			$outCallsTable = '';
@@ -1617,14 +1946,14 @@ class livebox extends eqLogic {
 				}
 			}
 
-			log::add('livebox','debug','Appels '.print_r($calls, true));
-			log::add('livebox','debug','Nombre appels manqués '.$missedCallsNumber);
+			// log::add('livebox','debug','Appels '.print_r($calls, true));
+			// log::add('livebox','debug','Nombre appels manqués '.$missedCallsNumber);
 			$this->checkAndUpdateCmd('missedcallsnumber', $missedCallsNumber);
-			log::add('livebox','debug','Nombre appels entrants '.$inCallsNumber);
+			// log::add('livebox','debug','Nombre appels entrants '.$inCallsNumber);
 			$this->checkAndUpdateCmd('incallsnumber', $inCallsNumber);
-			log::add('livebox','debug','Nombre appels sortants '.$outCallsNumber);
+			// log::add('livebox','debug','Nombre appels sortants '.$outCallsNumber);
 			$this->checkAndUpdateCmd('outcallsnumber', $outCallsNumber);
-			log::add('livebox','debug','Nombre total appels '.$totalCallsNumber);
+			// log::add('livebox','debug','Nombre total appels '.$totalCallsNumber);
 			$this->checkAndUpdateCmd('totalcallsnumber', $totalCallsNumber);
 
 			$tabstyle = "<style> .thLboxC { text-align:center;padding : 2px !important; } .tdLboxR { text-align:right;padding : 2px !important; } .tdLboxL { text-align:left;padding : 2px !important; } </style>";
@@ -1722,17 +2051,17 @@ class livebox extends eqLogic {
 				}
 				$inCallsTable .= "</table>";
 			}
+
+			$this->checkAndUpdateCmd('callstable', $callsTable);
+			// log::add('livebox','debug','Appels entrants'.$inCallsTable);
+			$this->checkAndUpdateCmd('incallstable', $inCallsTable);
+			// log::add('livebox','debug','Appels sortants'.$outCallsTable);
+			$this->checkAndUpdateCmd('outcallstable', $outCallsTable);
+			// log::add('livebox','debug','Appels manqués'.$missedCallsTable);
+			$this->checkAndUpdateCmd('missedcallstable', $missedCallsTable);
 		}
 
-		$this->checkAndUpdateCmd('callstable', $callsTable);
-		log::add('livebox','debug','Appels entrants'.$inCallsTable);
-		$this->checkAndUpdateCmd('incallstable', $inCallsTable);
-		log::add('livebox','debug','Appels sortants'.$outCallsTable);
-		$this->checkAndUpdateCmd('outcallstable', $outCallsTable);
-		log::add('livebox','debug','Appels manqués'.$missedCallsTable);
-		$this->checkAndUpdateCmd('missedcallstable', $missedCallsTable);
-
-		$content = $this->getPage("devicelist");
+		($refreshonly != 'all' && $refreshonly != 'devicelist') ? $content = false : $content = $this->getPage("devicelist");
 		if ( $content !== false ) {
 			$eqLogic_cmd = $this->getCmd(null, 'devicelist');
 			$devicelist = array();
@@ -1775,19 +2104,6 @@ class livebox extends eqLogic {
 			$devicestring = join(', ', $devicelist);
 			log::add('livebox','debug','Maj devicelist ' . $devicestring);
 			$this->checkAndUpdateCmd('devicelist', $devicestring);
-		}
-		if ($this->getConfiguration('productClass','') == 'Livebox 4' || $this->getConfiguration('productClass','') == 'Livebox Fibre') {
-			$content = $this->getPage("guestwifistate");
-			if ( $content !== false ) {
-				log::add('livebox','debug', 'Gest Wifi ' . print_r($content, true));
-				$eqLogic_cmd = $this->getCmd(null, 'guestwifistatus');
-				if (is_object($eqLogic_cmd)) {
-					if (isset($content["status"]["Enable"])) {
-						log::add('livebox','debug','Maj wifi invité status ' . $eqLogic_cmd->formatValue($content["status"]["Enable"]));
-						$this->checkAndUpdateCmd('guestwifistatus', $eqLogic_cmd->formatValue($content["status"]["Enable"]));
-					}
-				}
-			}
 		}
 
 		$eqLogic_cmd = $this->getCmd(null, 'updatetime');
@@ -1854,7 +2170,7 @@ class livebox extends eqLogic {
 		$usepagesjaunes = config::byKey('pagesjaunes','livebox', false);
 		$responses = livebox_calls::searchByPhone($normalizedPhone);
 		if (!is_array($responses) || count($responses) ===0) {
-			log::add('livebox','debug','caller not stored');
+			// log::add('livebox','debug','caller not stored');
 			// Il n'est pas dans la base, nouveau caller.
 			$caller = new livebox_calls;
 			$caller->setStartDate(date('Y-m-d H:i:s'));
@@ -1862,13 +2178,13 @@ class livebox extends eqLogic {
 			$favorite = 0;
 			if($usepagesjaunes == 1) {
 				if ($this->_pagesJaunesRequests < self::MAX_PAGESJAUNES && strlen($num) == 10) {
-					log::add('livebox','debug','we fetch the name');
+					// log::add('livebox','debug','we fetch the name');
 					$this->_pagesJaunesRequests++;
 					$callerName = $this->getPjCallerName($normalizedPhone);
 					$caller->setCallerName($callerName);
 					$caller->setIsFetched(1);
 				} else {
-					log::add('livebox','debug','store it but not fetched');
+					// log::add('livebox','debug','store it but not fetched');
 					$caller->setCallerName('');
 					$caller->setIsFetched(0);
 				}
@@ -1879,21 +2195,21 @@ class livebox extends eqLogic {
 			$caller->save();
 		} else {
 			// Il est déjà dans la base
-			log::add('livebox','debug','caller already stored');
+			// log::add('livebox','debug','caller already stored');
 			// On prend le premier retourné car priorité aux plus récents.
 			$caller = $responses[0];
 			$favorite = 0;
 			if ($caller->getIsFetched() == 0) {
-				log::add('livebox','debug','but it is not fetched');
+				// log::add('livebox','debug','but it is not fetched');
 				if($usepagesjaunes == 1) {
 					if ($this->_pagesJaunesRequests < self::MAX_PAGESJAUNES && strlen($num) == 10) {
-						log::add('livebox','debug','we fetch the name');
+						// log::add('livebox','debug','we fetch the name');
 						$this->_pagesJaunesRequests++;
 						$callerName = $this->getPjCallerName($normalizedPhone);
-						log::add('livebox','debug','response from pages jaunes '.$callerName);
+						// log::add('livebox','debug','response from pages jaunes '.$callerName);
 						$caller->setCallerName($callerName);
 						$caller->setIsFetched(1);
-						log::add('livebox','debug','and we save it');
+						// log::add('livebox','debug','and we save it');
 						$caller->save();
 					}
 				}
@@ -1954,18 +2270,317 @@ class liveboxCmd extends cmd
 	/*	   * *********************Methode d'instance************************* */
 
 	/*	   * **********************Getteur Setteur*************************** */
+
+	public function dontRemoveCmd() {
+		if ($this->getLogicalId() == 'refresh') {
+			return true;
+		}
+		return false;
+	}
+
+	public function preSave() {
+		//log::add('livebox','debug',$this->getLogicalId());
+		if (config::byKey('widgetCustomization','livebox', false)) return;
+		switch($this->getLogicalId()) {
+			// box
+			case 'refresh':
+				$this->setOrder(0);
+				break;
+			case 'state':
+				$this->setOrder(10);
+				break;
+			case 'linkstate':
+				$this->setOrder(11);
+				break;
+			case 'connectionstate':
+				$this->setOrder(12);
+				break;
+			case 'tvstatus':
+				$this->setOrder(13);
+				break;
+			case (preg_match('/voipstatus*/',$this->getLogicalId()) ? true : false):
+				$this->setOrder(14);
+				break;
+			case 'wifistatus':
+				$this->setOrder(15);
+				break;
+			case 'wifi2.4status':
+				$this->setOrder(16);
+				break;
+			case 'wifi5status':
+				$this->setOrder(17);
+				break;
+			case 'wifi6status':
+				$this->setOrder(18);
+				break;
+			case 'guestwifistatus':
+				$this->setOrder(19);
+				break;
+			case 'devicelist':
+				$this->setOrder(20);
+				if (version_compare(jeedom::version(), "4.4", ">")) {
+					$this->setDisplay('forceReturnLineBefore', 1);
+					$this->setDisplay('forceReturnLineAfter', 1);
+				}
+				break;
+			case 'wifion':
+				$this->setOrder(21);
+				$this->setDisplay('forceReturnLineBefore', 1);
+				break;
+			case 'wifi2.4on':
+				$this->setOrder(22);
+				break;
+			case 'wifi5on':
+				$this->setOrder(23);
+				break;
+			case 'wifi6on':
+				$this->setOrder(24);
+				break;
+			case 'guestwifion':
+				$this->setOrder(25);
+				break;
+			case 'wifioff':
+				$this->setOrder(31);
+				$this->setDisplay('forceReturnLineBefore', 1);
+				break;
+			case 'wifi2.4off':
+				$this->setOrder(32);
+				break;
+			case 'wifi5off':
+				$this->setOrder(33);
+				break;
+			case 'wifi6off':
+				$this->setOrder(34);
+				break;
+			case 'guestwifioff':
+				$this->setOrder(35);
+				break;
+			case 'missedcallsnumber':
+				$this->setOrder(41);
+				$this->setTemplate('dashboard', 'line');
+				$this->setTemplate('mobile', 'line');
+				if (version_compare(jeedom::version(), "4.4", ">")) {
+					$this->setDisplay('forceReturnLineBefore', 1);
+					$this->setDisplay('forceReturnLineAfter', 1);
+				}
+				break;
+			case 'incallsnumber':
+				$this->setOrder(42);
+				$this->setTemplate('dashboard', 'line');
+				$this->setTemplate('mobile', 'line');
+				if (version_compare(jeedom::version(), "4.4", ">")) {
+					$this->setDisplay('forceReturnLineBefore', 1);
+					$this->setDisplay('forceReturnLineAfter', 1);
+				}
+				break;
+			case 'outcallsnumber':
+				$this->setOrder(43);
+				$this->setTemplate('dashboard', 'line');
+				$this->setTemplate('mobile', 'line');
+				if (version_compare(jeedom::version(), "4.4", ">")) {
+					$this->setDisplay('forceReturnLineBefore', 1);
+					$this->setDisplay('forceReturnLineAfter', 1);
+				}
+				break;
+			case 'totalcallsnumber':
+				$this->setOrder(44);
+				$this->setTemplate('dashboard', 'line');
+				$this->setTemplate('mobile', 'line');
+				if (version_compare(jeedom::version(), "4.4", ">")) {
+					$this->setDisplay('forceReturnLineBefore', 1);
+					$this->setDisplay('forceReturnLineAfter', 1);
+				}
+				break;
+			case 'lastmissedcall':
+				$this->setOrder(51);
+				if (version_compare(jeedom::version(), "4.4", ">")) {
+					$this->setDisplay('forceReturnLineBefore', 1);
+					$this->setDisplay('forceReturnLineAfter', 1);
+				}
+				break;
+			case 'lastincomingcall':
+				$this->setOrder(52);
+				if (version_compare(jeedom::version(), "4.4", ">")) {
+					$this->setDisplay('forceReturnLineBefore', 1);
+					$this->setDisplay('forceReturnLineAfter', 1);
+				}
+				break;
+			case 'lastoutgoingcall':
+				$this->setOrder(53);
+				if (version_compare(jeedom::version(), "4.4", ">")) {
+					$this->setDisplay('forceReturnLineBefore', 1);
+					$this->setDisplay('forceReturnLineAfter', 1);
+				}
+				break;
+			case 'missedcallstable':
+				$this->setOrder(61);
+				break;
+			case 'incallstable':
+				$this->setOrder(62);
+				break;
+			case 'outcallstable':
+				$this->setOrder(63);
+				break;
+			case 'callstable':
+				$this->setOrder(64);
+				break;
+			case (preg_match('/numerotelephone*/',$this->getLogicalId()) ? true : false):
+				$this->setOrder(65);
+				if (version_compare(jeedom::version(), "4.4", ">")) {
+					$this->setDisplay('forceReturnLineBefore', 1);
+					$this->setDisplay('forceReturnLineAfter', 1);
+				}
+				break;
+			case 'debitmontant':
+				$this->setOrder(71);
+				$this->setTemplate('mobile', 'line');
+				break;
+			case 'debitdescendant':
+				$this->setOrder(72);
+				$this->setTemplate('mobile', 'line');
+				break;
+			case 'margebruitmontant':
+				$this->setOrder(73);
+				$this->setTemplate('mobile', 'line');
+				break;
+			case 'margebruitdescendant':
+				$this->setOrder(74);
+				$this->setTemplate('mobile', 'line');
+				break;
+			case 'lastchange':
+				$this->setOrder(75);
+				if (version_compare(jeedom::version(), "4.4", ">")) {
+					$this->setDisplay('forceReturnLineBefore', 1);
+					$this->setDisplay('forceReturnLineAfter', 1);
+				}
+				break;
+			case 'ipwan':
+				$this->setOrder(81);
+				if (version_compare(jeedom::version(), "4.4", ">")) {
+					$this->setDisplay('forceReturnLineBefore', 1);
+					$this->setDisplay('forceReturnLineAfter', 1);
+				}
+				break;
+			case 'ipv6wan':
+				$this->setOrder(82);
+				if (version_compare(jeedom::version(), "4.4", ">")) {
+					$this->setDisplay('forceReturnLineBefore', 1);
+					$this->setDisplay('forceReturnLineAfter', 1);
+				}
+				break;
+			case 'reboot':
+				$this->setOrder(84);
+				break;
+			case 'ring':
+				$this->setOrder(85);
+				break;
+			case 'wpspushbutton':
+				$this->setOrder(86);
+				break;
+			case 'uptime':
+				$this->setOrder(88);
+				if (version_compare(jeedom::version(), "4.4", ">")) {
+					$this->setDisplay('forceReturnLineBefore', 1);
+					$this->setDisplay('forceReturnLineAfter', 1);
+				}
+				break;
+			case 'softwareVersion':
+				$this->setOrder(89);
+				if (version_compare(jeedom::version(), "4.4", ">")) {
+					$this->setDisplay('forceReturnLineBefore', 1);
+					$this->setDisplay('forceReturnLineAfter', 1);
+				}
+				break;
+			case 'updatetime':
+				$this->setOrder(99);
+				if (version_compare(jeedom::version(), "4.4", ">")) {
+					$this->setDisplay('forceReturnLineBefore', 1);
+					$this->setDisplay('forceReturnLineAfter', 1);
+				}
+				break;
+
+			// cli
+			case 'present':
+				$this->setOrder(1);
+				break;
+			case 'macaddress':
+				$this->setOrder(2);
+				if (version_compare(jeedom::version(), "4.4", ">")) {
+					$this->setDisplay('forceReturnLineBefore', 1);
+					$this->setDisplay('forceReturnLineAfter', 1);
+				}
+				break;
+			case 'ip':
+				$this->setOrder(3);
+				if (version_compare(jeedom::version(), "4.4", ">")) {
+					$this->setDisplay('forceReturnLineBefore', 1);
+					$this->setDisplay('forceReturnLineAfter', 1);
+				}
+				break;
+			case 'firstseen':
+				$this->setOrder(4);
+				if (version_compare(jeedom::version(), "4.4", ">")) {
+					$this->setDisplay('forceReturnLineBefore', 1);
+					$this->setDisplay('forceReturnLineAfter', 1);
+				}
+				break;
+			case 'lastlogin':
+				$this->setOrder(5);
+				if (version_compare(jeedom::version(), "4.4", ">")) {
+					$this->setDisplay('forceReturnLineBefore', 1);
+					$this->setDisplay('forceReturnLineAfter', 1);
+				}
+				break;
+			case 'lastchanged':
+				$this->setOrder(6);
+				if (version_compare(jeedom::version(), "4.4", ">")) {
+					$this->setDisplay('forceReturnLineBefore', 1);
+					$this->setDisplay('forceReturnLineAfter', 1);
+				}
+				break;
+			case 'access':
+				$this->setOrder(7);
+				if (version_compare(jeedom::version(), "4.4", ">")) {
+					$this->setDisplay('forceReturnLineBefore', 1);
+					$this->setDisplay('forceReturnLineAfter', 1);
+				}
+				break;
+			case 'authorize':
+				$this->setOrder(8);
+				break;
+			case 'block':
+				$this->setOrder(9);
+				break;
+			case 'schedule':
+				$this->setOrder(10);
+				break;
+		}
+		//log::add('livebox','debug',$this->getOrder());
+	}
+
 	public function execute($_options = null) {
 		$eqLogic = $this->getEqLogic();
 		if (!is_object($eqLogic) || $eqLogic->getIsEnable() != 1) {
 			throw new Exception(__("Equipement désactivé impossible d'exécuter la commande : " . $this->getHumanName(), __FILE__));
 		}
-		log::add('livebox','debug','execute '.$this->getLogicalId());
+		log::add('livebox','debug','execute cmd '.$this->getLogicalId());
+		if ($this->getLogicalId() == 'refresh') {
+			$eqLogic->refresh();
+			return;
+		}
 		if ($eqLogic->getConfiguration('type','') == 'box') {
 		$option = array();
-		if ($eqLogic->getConfiguration('productClass','') == 'Livebox 4' || $eqLogic->getConfiguration('productClass','') == 'Livebox Fibre') {
+		if (preg_match("/Livebox (4|Fibre)/i", $eqLogic->getConfiguration('productClass',''))) {
+			log::add('livebox','debug','wifi0_bcm wifi0_quan');
 			$mibs0 = 'wifi0_bcm';
 			$mibs1 = 'wifi0_quan';
+		} elseif (preg_match("/Livebox (6|7)/", $eqLogic->getConfiguration('productClass',''))) {
+			log::add('livebox','debug','rad2g0 rad5g0 rad6g0');
+			$mibs0 = 'rad2g0';
+			$mibs1 = 'rad5g0';
+			$mibs2 = 'rad6g0';
 		} else {
+			log::add('livebox','debug','wifi0_ath wifi1_ath');
 			$mibs0 = 'wifi0_ath';
 			$mibs1 = 'wifi1_ath';
 		}
@@ -1986,15 +2601,7 @@ class liveboxCmd extends cmd
 				$option = array('mibs' => $mibs0, 'value' => 'true');
 				$page = "changewifi";
 				break;
-			case "wifion":
-				$option = array('mibs' => $mibs0, 'value' => 'true');
-				$page = "changewifi";
-				break;
 			case "wifi2.4off":
-				$option = array('mibs' => $mibs0, 'value' => 'false');
-				$page = "changewifi";
-				break;
-			case "wifioff":
 				$option = array('mibs' => $mibs0, 'value' => 'false');
 				$page = "changewifi";
 				break;
@@ -2005,6 +2612,22 @@ class liveboxCmd extends cmd
 			case "wifi5off":
 				$option = array('mibs' => $mibs1, 'value' => 'false');
 				$page = "changewifi";
+				break;
+			case "wifi6on":
+				$option = array('mibs' => $mibs2, 'value' => 'true');
+				$page = "changewifi";
+				break;
+			case "wifi6off":
+				$option = array('mibs' => $mibs2, 'value' => 'false');
+				$page = "changewifi";
+				break;
+			case "wifion":
+				$option = array('value' => 'true');
+				$page = "changemainwifi";
+				break;
+			case "wifioff":
+				$option = array('value' => 'false');
+				$page = "changemainwifi";
 				break;
 			case "guestwifion":
 				$option = array('value' => 'true');
@@ -2018,17 +2641,14 @@ class liveboxCmd extends cmd
 		if ( $page != null ) {
 			$eqLogic->getCookiesInfo();
 			$content = $eqLogic->getPage($page, $option);
-			if ( $this->getLogicalId() != "reboot" ) {
-				$eqLogic->refreshInfo();
-				$eqLogic->logOut();
-			}
-			if ( $this->getLogicalId() != "ring" ) {
-				$eqLogic->refreshInfo();
+			if ( $this->getLogicalId() != "reboot" && $this->getLogicalId() != "ring" ) {
+				sleep(5);
+				$eqLogic->refreshInfo($refreshonly='wifi');
 				$eqLogic->logOut();
 			}
 		} else {
 			throw new Exception(__('Commande non implémentée actuellement', __FILE__));
-			}
+		}
 		} else if ($eqLogic->getConfiguration('type','') == 'cli') {
 			$mac = $eqLogic->getLogicalId();
 			$boxid = $eqLogic->getConfiguration('boxId','');
@@ -2054,7 +2674,7 @@ class liveboxCmd extends cmd
 				if ( $page != null ) {
 					$boxEqLogic->getCookiesInfo();
 					$content = $boxEqLogic->getPage($page, $option);
-					$boxEqLogic->refreshInfo();
+					$boxEqLogic->refreshInfo($refreshonly='devicelist');
 					$boxEqLogic->logOut();
 				} else {
 					throw new Exception(__('Commande non implémentée actuellement', __FILE__));
@@ -2126,11 +2746,11 @@ class livebox_calls {
 		$values = array(
 			'phone' => $_phonenum,
 		);
-		log::add('livebox','debug','searchbyphone values ' .print_r($values, true));
+		// log::add('livebox','debug','searchbyphone values ' .print_r($values, true));
 		$sql = 'SELECT ' . DB::buildField(__CLASS__) . '
 		FROM livebox_calls
 		WHERE phone=:phone ORDER BY startDate DESC';
-		log::add('livebox','debug','searchbyphone sql ' .$sql);
+		// log::add('livebox','debug','searchbyphone sql ' .$sql);
 		return DB::Prepare($sql, $values, DB::FETCH_TYPE_ALL, PDO::FETCH_CLASS, __CLASS__);
 	}
 

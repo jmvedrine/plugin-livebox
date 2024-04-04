@@ -64,3 +64,23 @@ Ajout de styles spécifiques à ce plugin pour les listes d'appels. Auparavant l
 # Version du 23/03/2024
 
 Compatibilité avec PHP 8
+
+# Version du 25/03/2024
+
+- Ajout de la configuration de la fréquence d'actualisation (cron) sur l'équipement livebox
+- Ajout d'un bouton pour forcer le rafraichissement des informations
+- Ajout d'un bouton permettant l'affichage du mot de password de la livebox
+- Ajout d'un panneau sur le bureau (à configurer dans le plugin)
+
+# Version du 28/03/2024
+
+- Compatibilité avec Livebox 6 et 7
+- Compatibilité avec core jeedom 4.4 (la version minimum exigée du core jeedom passe de 3.3.28 à 4.1.28)
+
+# Version du 01/04/2024
+
+- Les commandes action et info relatives au WiFi (2.4GHz, 5GHz, 6GHz) ont été corrigées et fonctionnent avec la Livebox 6 (pas encore de retour pour la Livebox 7)
+- Ajout de commandes d'activation wifi pour l'ensemble des bandes
+- Ajout d'un paramètre de configuration pour permettre de personnaliser entierement les widgets (sinon à chaque enregistrement une configuration par défaut est réappliquée)
+- Ajout d'une commande softwareVersion (que vous pouvez historiser dans le menu avancé de la commande)
+- Corrige le blocage et deblocage d'un device
