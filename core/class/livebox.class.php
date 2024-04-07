@@ -23,7 +23,7 @@ class livebox extends eqLogic {
 	/* * *************************Attributs****************************** */
 	public $_cookies;
 	public $_contextID;
-	public $_version = "2";
+	public $_version = 2;
 	public $_pagesJaunesRequests = 0;  // Nombre de fois où on a interrogé Pages jaunes
 	const MAX_PAGESJAUNES = 5;		   // Nombre maximum de requêtes à Pages Jaunes
 	/* * ***********************Methode static*************************** */
@@ -225,7 +225,7 @@ class livebox extends eqLogic {
 
 			if ( $httpCode != 200 ) {
 				log::add('livebox','debug','version 4');
-				$this->_version = "4";
+				$this->_version = 4;
 				curl_close($session);
 				unset($session);
 				$session = curl_init();
@@ -264,7 +264,7 @@ class livebox extends eqLogic {
 				}
 			} else {
 				log::add('livebox','debug','version 2');
-				$this->_version = "2";
+				$this->_version = 2;
 			}
 			$info = curl_getinfo($session);
 			curl_close($session);
@@ -439,7 +439,7 @@ class livebox extends eqLogic {
 		$statuscmd = $this->getCmd(null, 'state');
 		foreach ($listpage as $pageuri => $param) {
 			$this->_version = 4;
-			if ( $this->_version == '4' ) {
+			if ( $this->_version == 4 ) {
 				$param = str_replace('/', '.', preg_replace('!sysbus/(.*):(.*)!i', '{"service":"$1", "method":"$2", "parameters": {'.$param.'}}', $pageuri));
 				$pageuri = 'ws';
 			} else {
@@ -449,7 +449,7 @@ class livebox extends eqLogic {
 			log::add('livebox','debug','getPage '.$page.' => param '.$param);
 			$content = @file_get_contents('http://'.$this->getConfiguration('ip').'/'.$pageuri, false, $this->getContext($param));
 			if ( $content === false ) {
-				log::add('livebox','debug',$page.' => second attempt get http://'.$this->getConfiguration('ip').'/'.$pageuri);
+				log::add('livebox','debug','getPage '.$page.' => second attempt');
 				$content = @file_get_contents('http://'.$this->getConfiguration('ip').'/'.$pageuri, false, $this->getContext($param));
 			}
 			if ( is_object($statuscmd) ) {
@@ -461,7 +461,7 @@ class livebox extends eqLogic {
 					log::add('livebox','error',__('La Livebox ne répond pas.',__FILE__)." ".$this->getName());
 					return false;
 				}
-				log::add('livebox','debug','getPage content '.$content);
+				log::add('livebox','debug','getPage '.$page.' => content '.$content);
 				if (is_object($statuscmd) && $statuscmd->execCmd() != 1) {
 					$statuscmd->setCollectDate('');
 					$statuscmd->event(1);
@@ -474,8 +474,8 @@ class livebox extends eqLogic {
 			return false;
 		} else {
 			$json = json_decode($content, true);
-			if ( $json["status"] == "" && $page !== 'tv' && $page !== 'changewifi' ) {
-				log::add('livebox','debug','Demande non traitée par la Livebox. Param: ' .print_r($param,true));
+			if ( $json["status"] == "" && $page !== 'tv' && $page !== 'changewifi' && $page !== 'changeguestwifi' ) {
+				log::add('livebox','debug','getPage '.$page.' => Demande non traitée par la Livebox. Param: ' .print_r($param,true));
 				return false;
 			}
 			return $json;
@@ -1877,7 +1877,7 @@ class livebox extends eqLogic {
 				$eqLogic_cmd = $this->getCmd(null, 'guestwifistatus');
 				if (is_object($eqLogic_cmd)) {
 					if (isset($content["status"]["Enable"])) {
-						log::add('livebox','debug','Maj wifi invité status ' . $eqLogic_cmd->formatValue($content["status"]["Enable"]));
+						log::add('livebox','debug','Maj guestwifistatus ' . $eqLogic_cmd->formatValue($content["status"]["Enable"]));
 						$this->checkAndUpdateCmd('guestwifistatus', $eqLogic_cmd->formatValue($content["status"]["Enable"]));
 					}
 				}
