@@ -16,7 +16,7 @@
 			if (s) txt += s + 's ';
 			var cmd = $('.cmd[data-cmd_id=#id#]')
 			cmd.attr('title','Date de valeur : '+_options.valueDate+'<br/>Date de collecte : '+_options.collectDate)
-			cmd.find('.state').empty().append(txt +' (' + _options.display_value +'#unite#)');
+			cmd.find('.state').empty().append(txt +' (' + _options.display_value +' s)');
 			if(_options.alertLevel){
 				if(_options.alertLevel == 'warning'){
 					cmd.find('.content-xs').addClass('label label-warning')
@@ -30,6 +30,6 @@
 				}
 			}
 		}
-		jeedom.cmd.update['#id#']({display_value:'#state#',valueDate:'#valueDate#',collectDate:'#collectDate#',alertLevel:'#alertLevel#'});
+		jeedom.cmd.update['#id#']({display_value:'#value#',valueDate:'#valueDate#',collectDate:'#collectDate#',alertLevel:'#alertLevel#'});
 	</script>
 </div>
