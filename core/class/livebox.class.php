@@ -1002,57 +1002,54 @@ class livebox extends eqLogic {
 						$cmd->save();
 					}
 				}
-				$content2 = $this->getPage("deviceinfo");
-				if ( $content2 !== false ) {
-					if (preg_match("/Livebox (4|Fibre|6|7)/i", $content2['status']['ProductClass'])) {
-						$cmd = $this->getCmd(null, 'guestwifion');
-						if ( ! is_object($cmd) ) {
-							$cmd = new liveboxCmd();
-							$cmd->setName('Activer wifi invité');
-							$cmd->setEqLogic_id($this->getId());
-							$cmd->setType('action');
-							$cmd->setSubType('other');
-							$cmd->setLogicalId('guestwifion');
-							$cmd->save();
-						}
+				if (preg_match("/Livebox (4|Fibre|6|7)/i", $this->getConfiguration('productClass',''))) {
+					$cmd = $this->getCmd(null, 'guestwifion');
+					if ( ! is_object($cmd) ) {
+						$cmd = new liveboxCmd();
+						$cmd->setName('Activer wifi invité');
+						$cmd->setEqLogic_id($this->getId());
+						$cmd->setType('action');
+						$cmd->setSubType('other');
+						$cmd->setLogicalId('guestwifion');
+						$cmd->save();
+					}
 
-						$cmd = $this->getCmd(null, 'guestwifioff');
-						if ( ! is_object($cmd) ) {
-							$cmd = new liveboxCmd();
-							$cmd->setName('Désactiver wifi invité');
-							$cmd->setEqLogic_id($this->getId());
-							$cmd->setType('action');
-							$cmd->setSubType('other');
-							$cmd->setLogicalId('guestwifioff');
-							$cmd->save();
-						}
+					$cmd = $this->getCmd(null, 'guestwifioff');
+					if ( ! is_object($cmd) ) {
+						$cmd = new liveboxCmd();
+						$cmd->setName('Désactiver wifi invité');
+						$cmd->setEqLogic_id($this->getId());
+						$cmd->setType('action');
+						$cmd->setSubType('other');
+						$cmd->setLogicalId('guestwifioff');
+						$cmd->save();
+					}
 
-						$cmd = $this->getCmd(null, 'guestwifistatus');
-						if ( ! is_object($cmd)) {
-							$cmd = new liveboxCmd();
-							$cmd->setName('Etat Wifi Invité');
-							$cmd->setEqLogic_id($this->getId());
-							$cmd->setLogicalId('guestwifistatus');
-							$cmd->setUnite('');
-							$cmd->setType('info');
-							$cmd->setSubType('binary');
-							$cmd->setIsHistorized(0);
-							$cmd->save();
-						}
+					$cmd = $this->getCmd(null, 'guestwifistatus');
+					if ( ! is_object($cmd)) {
+						$cmd = new liveboxCmd();
+						$cmd->setName('Etat Wifi Invité');
+						$cmd->setEqLogic_id($this->getId());
+						$cmd->setLogicalId('guestwifistatus');
+						$cmd->setUnite('');
+						$cmd->setType('info');
+						$cmd->setSubType('binary');
+						$cmd->setIsHistorized(0);
+						$cmd->save();
+					}
 
-					} else {
-						$cmd = $this->getCmd(null, 'guestwifion');
-						if ( is_object($cmd) ) {
-							$cmd->remove();
-						}
-						$cmd = $this->getCmd(null, 'guestwifioff');
-						if ( is_object($cmd) ) {
-							$cmd->remove();
-						}
-						$cmd = $this->getCmd(null, 'guestwifistatus');
-						if ( is_object($cmd) ) {
-							$cmd->remove();
-						}
+				} else {
+					$cmd = $this->getCmd(null, 'guestwifion');
+					if ( is_object($cmd) ) {
+						$cmd->remove();
+					}
+					$cmd = $this->getCmd(null, 'guestwifioff');
+					if ( is_object($cmd) ) {
+						$cmd->remove();
+					}
+					$cmd = $this->getCmd(null, 'guestwifistatus');
+					if ( is_object($cmd) ) {
+						$cmd->remove();
 					}
 				}
 			}
