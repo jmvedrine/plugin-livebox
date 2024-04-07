@@ -1663,17 +1663,23 @@ class livebox extends eqLogic {
 	function refreshInfo($refreshonly='all') {
 		$refreshonly != 'all' ? $content = false : $content = $this->getPage('deviceinfo');
 		if ( $content !== false ) {
-			$eqLogic_cmd = $this->getCmd(null, 'uptime');
-			if (is_object($eqLogic_cmd)) {
-			    $this->checkAndUpdateCmd('uptime', $content["status"]["UpTime"]);
+			if (isset($content["status"]["UpTime"])) {
+				$eqLogic_cmd = $this->getCmd(null, 'uptime');
+				if (is_object($eqLogic_cmd)) {
+					log::add('livebox','debug','Maj uptime ' . $eqLogic_cmd->formatValue($content["status"]["UpTime"]));
+					$this->checkAndUpdateCmd('uptime', $eqLogic_cmd->formatValue($content["status"]["UpTime"]));
+				}
 			}
-			$eqLogic_cmd = $this->getCmd(null, 'softwareVersion');
-			if (is_object($eqLogic_cmd)) {
-			    $this->checkAndUpdateCmd('softwareVersion', $content["status"]["SoftwareVersion"]);
-			}
-			if (isset($content['status']['SoftwareVersion'])) {
-				$this->setConfiguration('softwareVersion', $content['status']['SoftwareVersion']);
-				$this->save(true);
+			if (isset($content["status"]["SoftwareVersion"])) {
+				$eqLogic_cmd = $this->getCmd(null, 'softwareVersion');
+				if (is_object($eqLogic_cmd)) {
+					log::add('livebox','debug','Maj softwareVersion ' . $eqLogic_cmd->formatValue($content["status"]["SoftwareVersion"]));
+					$this->checkAndUpdateCmd('softwareVersion', $eqLogic_cmd->formatValue($content["status"]["SoftwareVersion"]));
+				}
+				if ($this->getConfiguration('softwareVersion','') != $content['status']['SoftwareVersion']) {
+					$this->setConfiguration('softwareVersion', $content['status']['SoftwareVersion']);
+					$this->save(true);
+				}
 			}
 		}
 		$refreshonly != 'all'  ? $content = false : $content = $this->getPage("internet");
