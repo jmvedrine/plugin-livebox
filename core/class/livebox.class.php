@@ -537,6 +537,12 @@ class livebox extends eqLogic {
 
 			$content = $this->getPage("internet");
 			if ( $content !== false ) {
+				if (isset($content['data']['MACAddress'])) {
+					if ($this->getConfiguration('BaseMAC','') == '') {
+						$this->setConfiguration('BaseMAC', $content['data']['MACAddress']);
+						$this->save(true);
+					}
+				}
 				if ( $content["data"]["LinkType"] == "dsl" || $content["data"]["LinkType"] == "vdsl" ) {
 					log::add('livebox','debug','Connexion mode dsl ou vdsl');
 					$cmd = $this->getCmd(null, 'debitmontant');
