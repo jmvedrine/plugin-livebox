@@ -201,47 +201,63 @@ class livebox extends eqLogic {
 			if ( ! defined("COOKIE_FILE") ) {
 				define("COOKIE_FILE", $cookiefile);
 			}
+			log::add('livebox','debug','trying authentification version 2...');
 			$session = curl_init();
+
+			//$fp = fopen(log::getPathToLog('livebox_curl'), 'a');
+			//curl_setopt($session, CURLOPT_VERBOSE, 1);
+			//curl_setopt($session, CURLOPT_STDERR, $fp);
 
 			curl_setopt($session, CURLOPT_HTTPHEADER, array(
 			   'Content-type: application/x-www-form-urlencoded',
 			   'User-Agent: Orange 8.0',
-			   'Host: '.$this->getConfiguration('ip'),
+			   'Host: '.$this->getConfiguration('ip').':'.$this->getConfiguration('port','80'),
 			   'Accept: */*',
 			   'Content-Length: 0'
 			   )
 			);
 			$statuscmd = $this->getCmd(null, 'state');
-			curl_setopt($session, CURLOPT_URL, 'http://'.$this->getConfiguration('ip').'/authenticate?username='.$this->getConfiguration('username').'&password='.$this->getConfiguration('password'));
+			curl_setopt($session, CURLOPT_URL, $this->getConfiguration('protocol','http').'://'.$this->getConfiguration('ip').':'.$this->getConfiguration('port','80').'/authenticate?username='.$this->getConfiguration('username').'&password='.urlencode($this->getConfiguration('password')));
 			curl_setopt($session, CURLOPT_RETURNTRANSFER, true);
 			curl_setopt($session, CURLOPT_COOKIESESSION, true);
 			curl_setopt($session, CURLOPT_COOKIEJAR, COOKIE_FILE);
 			curl_setopt($session, CURLOPT_COOKIEFILE, COOKIE_FILE);
 			curl_setopt($session, CURLOPT_POST, true);
+			curl_setopt($session, CURLOPT_SSL_VERIFYPEER, false);
+			curl_setopt($session, CURLOPT_SSL_VERIFYHOST, false);
 
 			$json = curl_exec ($session);
 			log::add('livebox','debug','json : '.$json);
 			$httpCode = curl_getinfo($session, CURLINFO_HTTP_CODE);
 
 			if ( $httpCode != 200 ) {
-				log::add('livebox','debug','version 4');
+				log::add('livebox','debug','http_code:'.$httpCode);
+				log::add('livebox','debug','curl_error:'.curl_error($session));
+				log::add('livebox','debug','authentication version 2 not working');
+				log::add('livebox','debug','trying authentication version 4...');
 				$this->_version = 4;
 				curl_close($session);
 				unset($session);
+				//fclose($fp);
+
 				$session = curl_init();
+
+				//$fp = fopen(log::getPathToLog('livebox_curl'), 'a');
+				//curl_setopt($session, CURLOPT_VERBOSE, 1);
+				//curl_setopt($session, CURLOPT_STDERR, $fp);
 
 				$paramInternet = '{"service":"sah.Device.Information","method":"createContext","parameters":{"applicationName":"so_sdkut","username":"'.$this->getConfiguration('username').'","password":"'.$this->getConfiguration('password').'"}}';
 				curl_setopt($session, CURLOPT_HTTPHEADER, array(
 				   'Content-type: application/x-sah-ws-4-call+json; charset=UTF-8',
 				   'User-Agent: Orange 8.0',
-				   'Host: '.$this->getConfiguration('ip'),
+				   'Host: '.$this->getConfiguration('ip').':'.$this->getConfiguration('port','80'),
 				   'Accept: */*',
 				   'Authorization: X-Sah-Login',
 				   'Content-Length: '.strlen($paramInternet)
 				   )
 				);
 				curl_setopt($session, CURLOPT_POSTFIELDS, $paramInternet);
-				curl_setopt($session, CURLOPT_URL, 'http://'.$this->getConfiguration('ip').'/ws');
+				curl_setopt($session, CURLOPT_URL, $this->getConfiguration('protocol','http').'://'.$this->getConfiguration('ip').':'.$this->getConfiguration('port','80').'/ws');
 				curl_setopt($session, CURLOPT_RETURNTRANSFER, true);
 				curl_setopt($session, CURLOPT_COOKIESESSION, true);
 				curl_setopt($session, CURLOPT_COOKIEJAR, COOKIE_FILE);
@@ -249,7 +265,19 @@ class livebox extends eqLogic {
 				curl_setopt($session, CURLOPT_POST, true);
 				curl_setopt($session, CURLOPT_SSL_VERIFYPEER, false);
 				curl_setopt($session, CURLOPT_SSL_VERIFYHOST, false);
+
 				$json = curl_exec ($session);
+				log::add('livebox','debug','json : '.$json);
+				$httpCode = curl_getinfo($session, CURLINFO_HTTP_CODE);
+
+				if ( $httpCode != 200 ) {
+					log::add('livebox','debug','http_code:'.$httpCode);
+					log::add('livebox','debug','curl_error:'.curl_error($session));
+					log::add('livebox','debug','authentication version 4 not working');
+				} else {
+					log::add('livebox','debug','authentication version 4 working');
+					$this->_version = 4;
+				}
 				if ( $json === false ) {
 					if ( is_object($statuscmd) ) {
 						if ($statuscmd->execCmd() != 0) {
@@ -263,12 +291,14 @@ class livebox extends eqLogic {
 					return false;
 				}
 			} else {
-				log::add('livebox','debug','version 2');
+				log::add('livebox','debug','authentication version 2 working');
 				$this->_version = 2;
 			}
 			$info = curl_getinfo($session);
 			curl_close($session);
 			unset($session);
+			//fclose($fp);
+
 			$obj = json_decode($json);
 			if ( ! isset($obj->data->contextID) ) {
 				log::add('livebox','debug','unable to get contextID');
@@ -278,9 +308,11 @@ class livebox extends eqLogic {
 			$this->_contextID = $obj->data->contextID;
 			if ( ! file_exists ($cookiefile) ) {
 				log::add('livebox','error',__('Le compte est incorrect.',__FILE__));
-				if ($statuscmd->execCmd() != 0) {
-					$statuscmd->setCollectDate('');
-					$statuscmd->event(0);
+				if ( is_object($statuscmd) ) {
+					if ($statuscmd->execCmd() != 0) {
+						$statuscmd->setCollectDate('');
+						$statuscmd->event(0);
+					}
 				}
 				throw new Exception(__('Le compte est incorrect.', __FILE__));
 				return false;
@@ -306,31 +338,45 @@ class livebox extends eqLogic {
 		return true;
 	}
 
-	function getContext($paramInternet) {
-		$httpInternet = array('http' =>
-			array(
-			 'method' => 'POST',
-			 'header' =>	"Host: ".$this->getConfiguration('ip')."\r\n" .
-							"Connection: keep-alive\r\n" .
-							"Content-Length: ".(strlen($paramInternet))."\r\n" .
-							"X-Context: ".$this->_contextID."\r\n" .
-							"Authorization: X-Sah ".$this->_contextID."\r\n" .
-							"Origin: http://".$this->getConfiguration('ip')."\r\n" .
-							"User-Agent: Jeedom plugin\r\n" .
-							"Content-type: application/x-sah-ws-4-call+json\r\n" .
-							"Accept: */*\r\n" .
-							"Accept-Encoding: gzip, deflate, br\r\n" .
-							"Accept-Language: fr-FR,fr;q=0.8,en-US;q=0.6,en;q=0.4\r\n" .
-							"Cookie: ".$this->_cookies."; ; sah/contextId=".$this->_contextID,
-			 'content' => $paramInternet,
-			 'protocol_version' => '1.0'
+	function file_get_contents_curl($url,$paramInternet,$methodPOST=true) {
+		//log::add('livebox','debug','use curl method :'.($methodPOST?'POST':'GET'));
+		$session = curl_init();
+
+		//$fp = fopen(log::getPathToLog('livebox_curl'), 'a');
+		//curl_setopt($session, CURLOPT_VERBOSE, 1);
+		//curl_setopt($session, CURLOPT_STDERR, $fp);
+
+		curl_setopt($session, CURLOPT_HTTPHEADER, array(
+			'User-Agent: Orange 8.0',
+			'X-Context: '.$this->_contextID,
+			'Authorization: X-Sah '.$this->_contextID,
+			'Cookie: '.$this->_cookies.'; ; sah/contextId='.$this->_contextID,
+			'Host: '.$this->getConfiguration('ip').':'.$this->getConfiguration('port','80'),
+			'Content-type: application/x-sah-ws-4-call+json; charset=UTF-8',
+			'Accept: */*'
 			)
 		);
-		return stream_context_create($httpInternet);
+		if ($methodPOST) curl_setopt($session, CURLOPT_POSTFIELDS, $paramInternet);
+		curl_setopt($session, CURLOPT_URL, $url);
+		curl_setopt($session, CURLOPT_RETURNTRANSFER, true);
+		if ($methodPOST) curl_setopt($session, CURLOPT_POST, true);
+		curl_setopt($session, CURLOPT_SSL_VERIFYPEER, false);
+		curl_setopt($session, CURLOPT_SSL_VERIFYHOST, false);
+
+		$json = curl_exec ($session);
+		$httpCode = curl_getinfo($session, CURLINFO_HTTP_CODE);
+		if ( $httpCode != 200 ) {
+			log::add('livebox','debug','http_code:'.$httpCode);
+			log::add('livebox','debug','curl_error:'.curl_error($session));
+		}
+		curl_close($session);
+		unset($session);
+		//fclose($fp);
+		return $json;
 	}
 
 	function logOut() {
-		@file_get_contents ('http://'.$this->getConfiguration('ip').'/logout');
+		@file_get_contents ($this->getConfiguration('protocol','http').'://'.$this->getConfiguration('ip').':'.$this->getConfiguration('port','80').'/logout');
 	}
 
 	function getPage($page, $option = array()) {
@@ -413,26 +459,27 @@ class livebox extends eqLogic {
 			case "setschedule":
 				$listpage = array();
 				// First we get the schedule.
+				log::add('livebox','debug','getPage '.$page.' => get existing schedule');
 				$param = '{"service":"Scheduler", "method":"getSchedule", "parameters": {"type":"ToD","ID":"'.$option['mac'].'"}}';
-				log::add('livebox','debug', 'in setschedule param = ' . $param);
-				$content = @file_get_contents('http://'.$this->getConfiguration('ip').'/ws', false, $this->getContext($param));
-				// $listpage = array("sysbus/Scheduler:addSchedule" => '"type":"ToD","ID":"'.$option['mac'].'"');
-				log::add('livebox','debug', 'in setschedule result of request = ' . $content);
+				$pageuri = 'ws';
+				$pageurl = $this->getConfiguration('protocol','http').'://'.$this->getConfiguration('ip').':'.$this->getConfiguration('port','80').'/'.$pageuri;
+				log::add('livebox','debug','getPage '.$page.' => get '.$pageurl);
+				log::add('livebox','debug','getPage '.$page.' => param '.$param);
+				$content = @$this->file_get_contents_curl($pageurl,$param); // POST
 				if ( $content !== false) {
 					$json = json_decode($content, true);
 					if ( $json["status"] == false) {
-						log::add('livebox','debug', 'in setschedule status false - schedule not found - creating schedule');
+						log::add('livebox','debug','getPage '.$page.' => schedule not found - creating schedule');
 						$schedule = '{"base":"Weekly","def":"Enable","ID":"'.$option['mac'].'","schedule":[],"enable":true,"override":"'.$option['override'].'"}';
-						log::add('livebox','debug', 'in setschedule schedule = ' . $schedule);
-						$listpage = array("sysbus/Scheduler:addSchedule" => '"type":"ToD","info":' . $schedule);
 					} elseif ( $json["status"] == true) {
-						log::add('livebox','debug', 'in setschedule status true - schedule found - updating schedule');
+						log::add('livebox','debug','getPage '.$page.' => schedule found - updating schedule');
 						$schedule = $json["data"]["scheduleInfo"];
-						log::add('livebox','debug', 'in setschedule schedule = ' . print_r($schedule, true));
+						log::add('livebox','debug','getPage '.$page.' => old schedule : ' . json_encode($schedule));
 						$schedule["override"] = $option['override'];
-						log::add('livebox','debug', 'in setschedule schedule after modif = ' . print_r($schedule, true));
-						$listpage = array("sysbus/Scheduler:addSchedule" => '"type":"ToD","info":' . json_encode($schedule));
+						$schedule = json_encode($schedule);
 					}
+					log::add('livebox','debug','getPage '.$page.' => new schedule : ' . $schedule);
+					$listpage = array("sysbus/Scheduler:addSchedule" => '"type":"ToD","info":' . $schedule);
 				}
 				break;
 		}
@@ -445,12 +492,14 @@ class livebox extends eqLogic {
 			} else {
 				$param = '{"parameters":{'.$param.'}}';
 			}
-			log::add('livebox','debug','getPage '.$page.' => get http://'.$this->getConfiguration('ip').'/'.$pageuri);
+			$pageurl = $this->getConfiguration('protocol','http').'://'.$this->getConfiguration('ip').':'.$this->getConfiguration('port','80').'/'.$pageuri;
+			log::add('livebox','debug','getPage '.$page.' => get '.$pageurl);
 			log::add('livebox','debug','getPage '.$page.' => param '.$param);
-			$content = @file_get_contents('http://'.$this->getConfiguration('ip').'/'.$pageuri, false, $this->getContext($param));
+			$content = @$this->file_get_contents_curl($pageurl,$param); // POST
+			//log::add('livebox','debug','content:'.print_r($content,true));
 			if ( $content === false ) {
 				log::add('livebox','debug','getPage '.$page.' => second attempt');
-				$content = @file_get_contents('http://'.$this->getConfiguration('ip').'/'.$pageuri, false, $this->getContext($param));
+				$content = @$this->file_get_contents_curl($pageurl,$param); // POST
 			}
 			if ( is_object($statuscmd) ) {
 				if ( $content === false ) {
@@ -474,8 +523,8 @@ class livebox extends eqLogic {
 			return false;
 		} else {
 			$json = json_decode($content, true);
-			if ( $json["status"] == "" && $page !== 'tv' && $page !== 'changewifi' && $page !== 'changeguestwifi' ) {
-				log::add('livebox','debug','getPage '.$page.' => Demande non traitée par la Livebox. Param: ' .print_r($param,true));
+			if ( $json["status"] == "" && $page !== 'tv' && $page !== 'changewifi' && $page !== 'changeguestwifi' && $page !== 'getschedule' ) {
+				log::add('livebox','debug','getPage '.$page.' => Demande non traitée par la Livebox.');
 				return false;
 			}
 			return $json;
@@ -1618,7 +1667,7 @@ class livebox extends eqLogic {
 		//Schedule
 		$scheduleclient = $this->getPage("getschedule", array('mac' => $lbcli->getConfiguration('macAddress')));
 		if ( $scheduleclient !== false ) {
-			log::add('livebox', 'debug', "Client ". $lbcli->getName() . " get schedule ".print_r($scheduleclient, true));
+			//log::add('livebox', 'debug', "Client ". $lbcli->getName() . " get schedule ".print_r($scheduleclient, true));
 			if (isset($scheduleclient["data"]["scheduleInfo"]["override"])) {
 				log::add('livebox', 'debug', "Client ". $lbcli->getName() . " schedule override ".$scheduleclient["data"]["scheduleInfo"]["override"]);
 				$value = __('Inconnu', __FILE__);

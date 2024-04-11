@@ -30,13 +30,17 @@ $('.eqLogicAttr[data-l1key=configuration][data-l2key=type]').on('change',functio
 	if ($(this).value() == 'box') {
 		$('#div_cron').show();
 		$('#div_goCarte').show();
+		$('#div_protocolBox').show();
 		$('#div_ipBox').show();
+		$('#div_portBox').show();
 		$('#div_adminBox').show();
 		$('#div_passBox').show();
 	} else {
 		$('#div_cron').hide();
 		$('#div_goCarte').hide();
+		$('#div_protocolBox').hide();
 		$('#div_ipBox').hide();
+		$('#div_portBox').hide();
 		$('#div_adminBox').hide();
 		$('#div_passBox').hide();
 	}
@@ -68,7 +72,9 @@ function printEqLogic(_eqLogic) {
 		printEqLogicHelper("{{Adresse MAC}}","BaseMAC",_eqLogic);
 		$('#div_cron').show();
 		$('#div_goCarte').show();
+		$('#div_protocolBox').show();
 		$('#div_ipBox').show();
+		$('#div_portBox').show();
 		$('#div_adminBox').show();
 		$('#div_passBox').show();
 	}
@@ -77,7 +83,9 @@ function printEqLogic(_eqLogic) {
 		printEqLogicHelper("{{Adresse MAC}}","macAddress",_eqLogic);
 		$('#div_cron').hide();
 		$('#div_goCarte').hide();
+		$('#div_protocolBox').hide();
 		$('#div_ipBox').hide();
+		$('#div_portBox').hide();
 		$('#div_adminBox').hide();
 		$('#div_passBox').hide();
 	}
@@ -241,7 +249,7 @@ $('#bt_cronGenerator').on('click', function(){
 
 $('#bt_goCarte').on('click', function() {
     $('#md_modal').dialog({title: "{{Accèder à l'interface de la livebox}}"});
-	window.open('http://'+$('.eqLogicAttr[data-l2key=ip]').value()+'/');
+	window.open($('.eqLogicAttr[data-l2key=protocol]').value()+'://'+$('.eqLogicAttr[data-l2key=ip]').value()+':'+$('.eqLogicAttr[data-l2key=port]').value()+'/');
 });
 
 $('#bt_showPassword').on('click', function() {
