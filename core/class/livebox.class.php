@@ -379,6 +379,25 @@ class livebox extends eqLogic {
 		@file_get_contents ($this->getConfiguration('protocol','http').'://'.$this->getConfiguration('ip').':'.$this->getConfiguration('port','80').'/logout');
 	}
 
+	public static function decodeContent($content) {
+		if ( $content !== false ) {
+			$json = json_decode($content, true);
+			if ( isset($json["parameters"]) ) {
+				$parameters = $json["parameters"];
+				$json = array ();
+				foreach ($parameters as $parameter) {
+					//log::add('livebox','debug',$parameter["name"].':'.$parameter["value"]);
+					$json[$parameter["name"]] = $parameter["value"];
+				}
+				$content = '{"status":' . json_encode($json) . '}';
+				//log::add('livebox','debug',$content);
+			} else {
+				$content = false;
+			}
+		}
+		return $content;
+	}
+
 	function getPage($page, $option = array()) {
 		switch ($page) {
 			case "deviceinfo":
@@ -448,10 +467,18 @@ class livebox extends eqLogic {
 				$listpage = array("sysbus/NMC/Guest:get" => "");
 				break;
 			case "devicelist":
-				$listpage = array("sysbus/Devices:get" => "");
+				if (preg_match("/Livebox (FTTH v2)/i", $this->getConfiguration('productClass',''))) {
+					$listpage = array("sysbus/Hosts:getDevices" => "");
+				} else {
+					$listpage = array("sysbus/Devices:get" => "");
+				}
 				break;
 			case "listcalls":
-				$listpage = array("sysbus/VoiceService.VoiceApplication:getCallList" => "");
+				if (preg_match("/Livebox (FTTH v2)/i", $this->getConfiguration('productClass',''))) {
+					$listpage = array();
+				} else {
+					$listpage = array("sysbus/VoiceService.VoiceApplication:getCallList" => "");
+				}
 				break;
 			case "getschedule":
 				$listpage = array("sysbus/Scheduler:getSchedule" => '"type":"ToD","ID":"'.$option['mac'].'"');
@@ -485,6 +512,7 @@ class livebox extends eqLogic {
 		}
 		$statuscmd = $this->getCmd(null, 'state');
 		foreach ($listpage as $pageuri => $param) {
+			/*
 			$this->_version = 4;
 			if ( $this->_version == 4 ) {
 				$param = str_replace('/', '.', preg_replace('!sysbus/(.*):(.*)!i', '{"service":"$1", "method":"$2", "parameters": {'.$param.'}}', $pageuri));
@@ -492,15 +520,32 @@ class livebox extends eqLogic {
 			} else {
 				$param = '{"parameters":{'.$param.'}}';
 			}
-			$pageurl = $this->getConfiguration('protocol','http').'://'.$this->getConfiguration('ip').':'.$this->getConfiguration('port','80').'/'.$pageuri;
-			log::add('livebox','debug','getPage '.$page.' => get '.$pageurl);
-			log::add('livebox','debug','getPage '.$page.' => param '.$param);
-			$content = @$this->file_get_contents_curl($pageurl,$param); // POST
-			//log::add('livebox','debug','content:'.print_r($content,true));
-			if ( $content === false ) {
-				log::add('livebox','debug','getPage '.$page.' => second attempt');
+			*/
+			if ($page == 'deviceinfo' && $this->_version == 2 ) {
+				$pageuri = 'sysbus/DeviceInfo?_restDepth=-1';
+				$pageurl = $this->getConfiguration('protocol','http').'://'.$this->getConfiguration('ip').':'.$this->getConfiguration('port','80').'/'.$pageuri;
+				log::add('livebox','debug','getPage '.$page.' => get '.$pageurl);
+				$content = @$this->file_get_contents_curl($pageurl,'',false); // GET
+				//log::add('livebox','debug','content:'.print_r($content,true));
+				if ( $content === false ) {
+					log::add('livebox','debug','getPage '.$page.' => second attempt');
+					$content = @$this->file_get_contents_curl($pageurl,'',false); // GET
+				}
+				$content = self::decodeContent($content);
+			} else {
+				$param = str_replace('/', '.', preg_replace('!sysbus/(.*):(.*)!i', '{"service":"$1", "method":"$2", "parameters": {'.$param.'}}', $pageuri));
+				$pageuri = 'ws';
+				$pageurl = $this->getConfiguration('protocol','http').'://'.$this->getConfiguration('ip').':'.$this->getConfiguration('port','80').'/'.$pageuri;
+				log::add('livebox','debug','getPage '.$page.' => get '.$pageurl);
+				log::add('livebox','debug','getPage '.$page.' => param '.$param);
 				$content = @$this->file_get_contents_curl($pageurl,$param); // POST
+				//log::add('livebox','debug','content:'.print_r($content,true));
+				if ( $content === false ) {
+					log::add('livebox','debug','getPage '.$page.' => second attempt');
+					$content = @$this->file_get_contents_curl($pageurl,$param); // POST
+				}
 			}
+			/*
 			if ( is_object($statuscmd) ) {
 				if ( $content === false ) {
 					if ($statuscmd->execCmd() != 0) {
@@ -517,6 +562,24 @@ class livebox extends eqLogic {
 				}
 			} else {
 				break;
+			}
+			*/
+			if ( $content === false ) {
+				log::add('livebox','error',__('La Livebox ne répond pas.',__FILE__)." ".$this->getName());
+				if ( is_object($statuscmd) ) {
+					if ($statuscmd->execCmd() != 0) {
+						$statuscmd->setCollectDate('');
+						$statuscmd->event(0);
+					}
+				} else {
+					break;
+				}
+				return false;
+			}
+			log::add('livebox','debug','getPage '.$page.' => content '.$content);
+			if (is_object($statuscmd) && $statuscmd->execCmd() != 1) {
+				$statuscmd->setCollectDate('');
+				$statuscmd->event(1);
 			}
 		}
 		if ( $content === false ) {
@@ -2127,7 +2190,7 @@ class livebox extends eqLogic {
 					}
 				}
 				foreach (self::byType('livebox') as $eqLogicClient) {
-					if ($eqLogicClient->getConfiguration('type')=='cli') {
+					if ($eqLogicClient->getConfiguration('type') == 'cli' && $eqLogicClient->getConfiguration('boxId') == $this->getId()) {
 						$clicmd = $eqLogicClient->getCmd(null, 'present');
 						if (is_object($clicmd)) {
 							if (isset($activeclients[$eqLogicClient->getLogicalId()]) && $activeclients[$eqLogicClient->getLogicalId()] == true) {
