@@ -25,6 +25,7 @@ $eqLogics = livebox::byType('livebox');
 	<thead>
 		<tr>
 			<th>{{Module}}</th>
+			<th>{{Livebox}}</th>
 			<th>{{Adresse MAC}}</th>
 			<th>{{IP}}</th>
 			<th>{{Type}}</th>
@@ -38,7 +39,13 @@ $eqLogics = livebox::byType('livebox');
 	 <?php
 foreach ($eqLogics as $eqLogic) {
 	echo '<tr><td><a href="' . $eqLogic->getLinkToConfiguration() . '" style="text-decoration: none;">' . $eqLogic->getHumanName(true) . '</a></td>';
-
+	if ($eqLogic->getConfiguration('type')=='cli') {
+		$boxid = $eqLogic->getConfiguration('boxId','');
+		$boxEqLogic = livebox::byId($boxid);
+		echo '<td><a href="' . $boxEqLogic->getLinkToConfiguration() . '" style="text-decoration: none;">' . $boxEqLogic->getHumanName(true) . '</a></td>';
+	} else {
+		echo '<td></td>';
+	}
 	if ($eqLogic->getConfiguration('type')=='box') {
 		echo '<td><span class="label label-info" style="font-size : 1em;">' . $eqLogic->getConfiguration('BaseMAC') . '</span></td>';
 		echo '<td><span class="label label-info" style="font-size : 1em;">' . $eqLogic->getConfiguration('ip') . '</span></td>';
