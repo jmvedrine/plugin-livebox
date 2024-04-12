@@ -38,6 +38,7 @@ $eqLogics = livebox::byType('livebox');
 	<tbody>
 	 <?php
 foreach ($eqLogics as $eqLogic) {
+	if (!$eqLogic->getIsEnable()) continue;
 	echo '<tr><td><a href="' . $eqLogic->getLinkToConfiguration() . '" style="text-decoration: none;">' . $eqLogic->getHumanName(true) . '</a></td>';
 	if ($eqLogic->getConfiguration('type')=='cli') {
 		$boxid = $eqLogic->getConfiguration('boxId','');
