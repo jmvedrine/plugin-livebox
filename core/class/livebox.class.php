@@ -2360,6 +2360,20 @@ class livebox extends eqLogic {
 		}
 		return($num);
 	}
+
+	public function getIsEnable($_default = 0) {
+		if ($this->getConfiguration('type') == 'cli') {
+			$boxid = $this->getConfiguration('boxId','');
+			$boxEqLogic = livebox::byId($boxid);
+			if (!$boxEqLogic->getIsEnable()) {
+				return $_default;
+			}
+		}
+		if ($this->isEnable == '' || !is_numeric($this->isEnable)) {
+			return $_default;
+		}
+		return $this->isEnable;
+	}
 }
 
 class liveboxCmd extends cmd
