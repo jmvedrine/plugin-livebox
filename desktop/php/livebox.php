@@ -191,10 +191,25 @@ foreach ($eqLogics as $eqLogic) {
                         <a class="btn btn-default" id="bt_goCarte" title='{{Accéder à la Livebox}}'><i class="fas fa-cogs"></i></a>
                     </div>
                 </div>
+                <div class="form-group" id="div_protocolBox" style="display: none;">
+                    <label class="col-lg-2 control-label">{{Protocole de la Livebox}}<sup><i class="fas fa-question-circle tooltips" title="{{Sélectionner le protocole : HTTPS pour un accès distant, HTTP sinon}}"></i></sup></label>
+                    <div class="col-lg-3">
+                        <select class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="protocol">
+                            <option value="http" selected>HTTP</option>
+                            <option value="https">HTTPS</option>
+                        </select>
+                    </div>
+                </div>
                 <div class="form-group" id="div_ipBox" style="display: none;">
-                    <label class="col-lg-2 control-label">{{IP de la Livebox}}</label>
+                    <label class="col-lg-2 control-label">{{IP de la Livebox}}<sup><i class="fas fa-question-circle tooltips" title="{{Indiquer le nom de domaine pour un accès distant, l'adresse IP sinon}}"></i></sup></label>
                     <div class="col-lg-3">
                         <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="ip"/>
+                    </div>
+                </div>
+                <div class="form-group" id="div_portBox" style="display: none;">
+                    <label class="col-lg-2 control-label">{{Port de la Livebox}}<sup><i class="fas fa-question-circle tooltips" title="{{Indiquer le port personnalisé pour un accès distant, le port 80 sinon}}"></i></sup></label>
+                    <div class="col-lg-3">
+                        <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="port" placeholder="{{80}}"/>
                     </div>
                 </div>
                 <div class="form-group" id="div_adminBox" style="display: none;">
