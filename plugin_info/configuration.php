@@ -53,6 +53,12 @@ if (!isConnect()) {
 				<input type="checkbox" class="configKey tooltips" data-l1key="widgetCustomization">
 			</div>
 		</div>
+		<div class="form-group">
+			<label class="col-sm-4 control-label">{{Activer le debug avancé}}<sup><i class="fas fa-question-circle tooltips" title="{{Vous devez également être en niveau de log debug}}"></i></sup></label>
+			<div class="col-sm-2">
+				<input type="checkbox" class="configKey tooltips" data-l1key="advancedDebug">
+			</div>
+		</div>
 <?php
 	$ignoredClients=config::byKey('ignoredClients','livebox',[],true);
 	if(count($ignoredClients)) :
@@ -73,14 +79,12 @@ if (!isConnect()) {
 			<div class="col-sm-2">
 				<input type="checkbox" class="configKey tooltips" data-l1key="pagesjaunes">
 			</div>
-
 		</div>
 		<div class="form-group">
 			<label class="col-sm-4 control-label">{{Nom par défaut pour les inconnus}}</label>
 			<div class="col-sm-2">
 				<input id="unknowndefault" class="configKey form-control" data-l1key="nominconnu" placeholder="{{Oups}}"/>
 			</div>
-
 		</div>
 		<div class="form-group">
 			<label class="col-sm-4 control-label">{{Durée min appel entrant (s)}}</label>
@@ -111,7 +115,6 @@ if (!isConnect()) {
 		</tr>
 	  </thead>
 	  <tbody>
-
 	  </tbody>
 	</table>
 	</div>
