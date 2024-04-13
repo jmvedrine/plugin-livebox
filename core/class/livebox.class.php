@@ -204,9 +204,11 @@ class livebox extends eqLogic {
 			log::add('livebox','debug','trying authentification version 2...');
 			$session = curl_init();
 
-			//$fp = fopen(log::getPathToLog('livebox_curl'), 'a');
-			//curl_setopt($session, CURLOPT_VERBOSE, 1);
-			//curl_setopt($session, CURLOPT_STDERR, $fp);
+			if ( config::byKey('advancedDebug','livebox',false) && log::convertLogLevel(log::getLogLevel('livebox')) == 'debug' ) {
+				$fp = fopen(log::getPathToLog('livebox'), 'a');
+				curl_setopt($session, CURLOPT_VERBOSE, true);
+				curl_setopt($session, CURLOPT_STDERR, $fp);
+			}
 
 			curl_setopt($session, CURLOPT_HTTPHEADER, array(
 			   'Content-type: application/x-www-form-urlencoded',
@@ -238,13 +240,15 @@ class livebox extends eqLogic {
 				$this->_version = 4;
 				curl_close($session);
 				unset($session);
-				//fclose($fp);
+				if ( config::byKey('advancedDebug','livebox',false) && log::convertLogLevel(log::getLogLevel('livebox')) == 'debug' ) fclose($fp);
 
 				$session = curl_init();
 
-				//$fp = fopen(log::getPathToLog('livebox_curl'), 'a');
-				//curl_setopt($session, CURLOPT_VERBOSE, 1);
-				//curl_setopt($session, CURLOPT_STDERR, $fp);
+				if ( config::byKey('advancedDebug','livebox',false) && log::convertLogLevel(log::getLogLevel('livebox')) == 'debug' ) {
+					$fp = fopen(log::getPathToLog('livebox'), 'a');
+					curl_setopt($session, CURLOPT_VERBOSE, true);
+					curl_setopt($session, CURLOPT_STDERR, $fp);
+				}
 
 				$paramInternet = '{"service":"sah.Device.Information","method":"createContext","parameters":{"applicationName":"so_sdkut","username":"'.$this->getConfiguration('username').'","password":"'.$this->getConfiguration('password').'"}}';
 				curl_setopt($session, CURLOPT_HTTPHEADER, array(
@@ -297,7 +301,7 @@ class livebox extends eqLogic {
 			$info = curl_getinfo($session);
 			curl_close($session);
 			unset($session);
-			//fclose($fp);
+			if ( config::byKey('advancedDebug','livebox',false) && log::convertLogLevel(log::getLogLevel('livebox')) == 'debug' ) fclose($fp);
 
 			$obj = json_decode($json);
 			if ( ! isset($obj->data->contextID) ) {
@@ -342,9 +346,11 @@ class livebox extends eqLogic {
 		//log::add('livebox','debug','use curl method :'.($methodPOST?'POST':'GET'));
 		$session = curl_init();
 
-		//$fp = fopen(log::getPathToLog('livebox_curl'), 'a');
-		//curl_setopt($session, CURLOPT_VERBOSE, 1);
-		//curl_setopt($session, CURLOPT_STDERR, $fp);
+		if ( config::byKey('advancedDebug','livebox',false) && log::convertLogLevel(log::getLogLevel('livebox')) == 'debug' ) {
+			$fp = fopen(log::getPathToLog('livebox'), 'a');
+			curl_setopt($session, CURLOPT_VERBOSE, true);
+			curl_setopt($session, CURLOPT_STDERR, $fp);
+		}
 
 		curl_setopt($session, CURLOPT_HTTPHEADER, array(
 			'User-Agent: Orange 8.0',
@@ -371,7 +377,8 @@ class livebox extends eqLogic {
 		}
 		curl_close($session);
 		unset($session);
-		//fclose($fp);
+		if ( config::byKey('advancedDebug','livebox',false) && log::convertLogLevel(log::getLogLevel('livebox')) == 'debug' ) fclose($fp);
+
 		return $json;
 	}
 
