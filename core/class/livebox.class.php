@@ -2369,10 +2369,7 @@ class livebox extends eqLogic {
 				return $_default;
 			}
 		}
-		if ($this->isEnable == '' || !is_numeric($this->isEnable)) {
-			return $_default;
-		}
-		return $this->isEnable;
+		return parent::getIsEnable($_default);
 	}
 }
 
