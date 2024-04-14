@@ -53,6 +53,25 @@ function printEqLogicHelper(label,name,_eqLogic){
 	$('#table_infoseqlogic tbody tr:last').setValues(_eqLogic, '.eqLogicAttr');
 }
 
+function printEqLogicHelperBox(label,name,_eqLogic){
+	var trm = '<tr><td class="col-sm-3"><span style="font-size : 1em;">'+label+'</span></td><td><span class="label label-default" style="font-size : 1em;"> <a id=boxName href=index.php?v=d&p=livebox&m=livebox&id='+_eqLogic.configuration.boxId+'>livebox</a></span></td></tr>';
+	$('#table_infoseqlogic tbody').append(trm);
+
+	jeedom.eqLogic.byId({
+		id: _eqLogic.configuration.boxId,
+		success: function(boxResult) {
+			//console.log('id:'+boxResult.id+' name:'+boxResult.name)
+			jeedom.object.byId({
+				id: boxResult.object_id,
+				success: function(roomResult) {
+					//console.log('id:'+roomResult.id+' name:'+roomResult.name)
+					document.getElementById("boxName").textContent = '['+roomResult.name+'] '+boxResult.name
+				}
+			})
+		}
+	})
+}
+
 // fonction executée par jeedom lors de l'affichage des details d'un eqlogic
 function printEqLogic(_eqLogic) {
 	if (!isset(_eqLogic)) {
@@ -79,6 +98,7 @@ function printEqLogic(_eqLogic) {
 		$('#div_passBox').show();
 	}
 	if (_eqLogic.configuration.type=="cli") {
+		printEqLogicHelperBox("{{Livebox}}","boxId",_eqLogic);
 		printEqLogicHelper("{{Type}}","deviceType",_eqLogic);
 		printEqLogicHelper("{{Adresse MAC}}","macAddress",_eqLogic);
 		$('#div_cron').hide();
