@@ -80,7 +80,39 @@ Compatibilité avec PHP 8
 # Version du 01/04/2024
 
 - Les commandes action et info relatives au WiFi (2.4GHz, 5GHz, 6GHz) ont été corrigées et fonctionnent avec la Livebox 6 (pas encore de retour pour la Livebox 7)
-- Ajout de commandes d'activation wifi pour l'ensemble des bandes
+- Ajout de commandes d'activation/désactivation wifi pour l'ensemble des bandes
 - Ajout d'un paramètre de configuration pour permettre de personnaliser entierement les widgets (sinon à chaque enregistrement une configuration par défaut est réappliquée)
 - Ajout d'une commande softwareVersion (que vous pouvez historiser dans le menu avancé de la commande)
-- Corrige le blocage et deblocage d'un device
+- Corrige le blocage et deblocage d'un client
+
+# Version du 05/04/2024
+
+- Corrige l'affichage durée avec core jeedom 4.4
+
+# Version du 08/04/2024
+
+- Supprime les commandes d'activation/désactivation wifi pour l'ensemble des bandes sur LB2
+- Changements mineurs (messages de log, optimisations, contrôles, indentations)
+
+# Version du 12/04/2024
+
+- Ajout de l'affichage de l'adresse Mac sur LB3
+- Changemenent pour la librairie CURL
+- Ajout de la fonctionnalité permettant de piloter des livebox à distance
+- Ajout de la fonctionnalité permettant d'avoir plusieurs livebox
+- Corrige le fonctionnement sur LB2
+- Ajout du nom de la livebox associée à chaque client dans le panel (et page santé)
+- Corrige le masquage des équipements désactivés dans le panel (et page santé)
+
+# Version du 13/04/2024
+
+- Ajout d'une fonction de debug avancée de la librairie CURL
+
+# Version du 14/04/2024
+
+- Ajout de l'affichage de la livebox associée à chaque client
+
+# Version du 16/04/2024
+
+- Ajout de la gestion d'un même client sur plusieurs livebox
+- Ajout du logo Chromecast
