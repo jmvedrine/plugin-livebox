@@ -29,7 +29,7 @@ class livebox extends eqLogic {
 	/* * ***********************Methode static*************************** */
 
 	public static function cron() {
-		log::add('livebox', 'debug','cron');
+		log::add('livebox','debug','cron');
 		foreach (eqLogic::byType('livebox', true) as $eqLogic) {
 			$autorefresh = $eqLogic->getConfiguration('autorefresh');
 			if ($autorefresh != '') {
@@ -39,11 +39,11 @@ class livebox extends eqLogic {
 						try {
 							$eqLogic->refresh();
 						} catch (Exception $exc) {
-							log::add('livebox', 'error', __('Error in ', __FILE__) . $eqLogic->getHumanName() . ' : ' . $exc->getMessage());
+							log::add('livebox','error',__('Error in ',__FILE__) . $eqLogic->getHumanName() . ' : ' . $exc->getMessage());
 						}
 					}
 				} catch (Exception $exc) {
-					log::add('livebox', 'error', __('Expression cron non valide pour ', __FILE__) . $eqLogic->getHumanName() . ' : ' . $autorefresh);
+					log::add('livebox','error',__('Expression cron non valide pour ',__FILE__) . $eqLogic->getHumanName() . ' : ' . $autorefresh);
 				}
 			}
 		}
@@ -96,20 +96,26 @@ class livebox extends eqLogic {
 		$eqLogicClient = new livebox();
 		$mac = $client['Key'];
 		$defaultRoom = intval(config::byKey('defaultParentObject','livebox','',true));
-		$name= (isset($client["Name"]) && $client["Name"]) ? $client["Name"] : $mac;
+		$name = (isset($client["Name"]) && $client["Name"]) ? $client["Name"] : $mac;
 		if($defaultRoom) {
 			if(self::nameExists($name, $defaultRoom)) {
-				log::add('livebox', 'debug', "Nom en double dans la même pièce ".$name." renommé en LB_".$name.'_'.$mac);
-				$name = 'LB_'.$name.'_'.$mac;
+				$old_name = $name;
+				$name = $name . '_' . $mac . '_' . livebox::byId($boxId)->getObject()->getName() . '_' . livebox::byId($boxId)->getName();
+				log::add('livebox','info','Nom en double dans la même pièce ' . $old_name . ' renommé en ' .$name);
 			}
 			$eqLogicClient->setObject_id($defaultRoom);
 		} else {
 			if(self::nameExists($name)) {
-				log::add('livebox', 'debug', "Nom en double ".$name." renommé en LB_".$name.'_'.$mac);
-				$name = 'LB_'.$name.'_'.$mac;
+				$old_name = $name;
+				$name = $name . '_' . $mac . '_' . livebox::byId($boxId)->getObject()->getName() . '_' . livebox::byId($boxId)->getName();
+				log::add('livebox','info','Nom en double ' . $old_name . ' renommé en ' .$name);
 			}
 		}
-		log::add('livebox', 'info', "Trouvé Client ".$name."(".$mac."):".json_encode($client));
+		if(log::convertLogLevel(log::getLogLevel('livebox')) == 'debug') {
+			log::add('livebox','debug','Trouvé Client ' . $name . '(' . $mac . '):' . json_encode($client));
+		} else {
+			log::add('livebox','info','Trouvé Client ' . $name . '(' . $mac . ')');
+		}
 		$eqLogicClient->setName($name);
 		$eqLogicClient->setIsEnable(1);
 		$eqLogicClient->setIsVisible(0);
@@ -124,7 +130,7 @@ class livebox extends eqLogic {
 	}
 
 	public static function syncLivebox($what='all') {
-		log::add('livebox', 'info', "syncLivebox");
+		log::add('livebox','info','syncLivebox');
 
 		if($what == 'all' || $what == 'clients') {
 			$eqLogics = eqLogic::byType('livebox');
@@ -140,7 +146,8 @@ class livebox extends eqLogic {
 								$ignoredClients=config::byKey('ignoredClients','livebox',[],true);
 								$mac = $client['Key'];
 								if(!in_array($mac,$ignoredClients)) {
-									$lbcli = livebox::byLogicalId($mac, 'livebox');
+									//$lbcli = livebox::byLogicalId($mac,'livebox');
+									$lbcli = livebox::getClientBox($mac,$eqLogic->getId());
 									if (!is_object($lbcli)) {
 										livebox::createClient($client, $eqLogic->getId());
 										event::add('jeedom::alert', array(
@@ -170,12 +177,12 @@ class livebox extends eqLogic {
 				}
 			}
 			if(count($ignoredNew)) {
-				log::add('livebox', 'debug', "ignoredNew :".json_encode($ignoredNew));
+				log::add('livebox','debug','ignoredNew :'.json_encode($ignoredNew));
 				$ignoredBefore=config::byKey('ignoredClients','livebox',[],true);
 				if($ignoredBefore==null) $ignoredBefore=[];
-				log::add('livebox', 'debug', "ignoredBefore :".json_encode($ignoredBefore));
+				log::add('livebox','debug','ignoredBefore :'.json_encode($ignoredBefore));
 				$ignoredClients = array_unique(array_merge($ignoredBefore,$ignoredNew),SORT_REGULAR);
-				log::add('livebox', 'debug', "ignoredClients :".json_encode($ignoredClients));
+				log::add('livebox','debug','ignoredClients :'.json_encode($ignoredClients));
 				config::save('ignoredClients',$ignoredClients,'livebox');
 			}
 		}
@@ -290,7 +297,7 @@ class livebox extends eqLogic {
 						}
 					}
 					$msg = __('La Livebox ne répond pas à la demande de cookie.',__FILE__)." ".$this->getName()." : ".curl_error ($session) . " (" . curl_errno($session) . ")";
-					log::add('livebox','debug', $msg);
+					log::add('livebox','error', $msg);
 					throw new Exception(__('La Livebox ne répond pas à la demande de cookie.', __FILE__));
 					return false;
 				}
@@ -305,7 +312,7 @@ class livebox extends eqLogic {
 
 			$obj = json_decode($json);
 			if ( ! isset($obj->data->contextID) ) {
-				log::add('livebox','debug','unable to get contextID');
+				log::add('livebox','error','unable to get contextID');
 				throw new Exception(__('Le compte est incorrect.', __FILE__));
 				return false;
 			}
@@ -594,7 +601,7 @@ class livebox extends eqLogic {
 		} else {
 			$json = json_decode($content, true);
 			if ( $json["status"] == "" && $page !== 'tv' && $page !== 'changewifi' && $page !== 'changeguestwifi' && $page !== 'getschedule' ) {
-				log::add('livebox','debug','getPage '.$page.' => Demande non traitée par la Livebox.');
+				log::add('livebox','warning','getPage '.$page.' => Demande non traitée par la Livebox.');
 				return false;
 			}
 			return $json;
@@ -1703,6 +1710,7 @@ class livebox extends eqLogic {
 	}
 
 	public function refresh() {
+		log::add('livebox','debug','refresh');
 		if ( $this->getIsEnable() && $this->getConfiguration('type') == 'box') {
 			if ( $this->getCookiesInfo() ) {
 				$this->refreshInfo();
@@ -1737,9 +1745,9 @@ class livebox extends eqLogic {
 		//Schedule
 		$scheduleclient = $this->getPage("getschedule", array('mac' => $lbcli->getConfiguration('macAddress')));
 		if ( $scheduleclient !== false ) {
-			//log::add('livebox', 'debug', "Client ". $lbcli->getName() . " get schedule ".print_r($scheduleclient, true));
+			//log::add('livebox','debug','Client ' . $lbcli->getName() . ' get schedule ' . print_r($scheduleclient, true));
 			if (isset($scheduleclient["data"]["scheduleInfo"]["override"])) {
-				log::add('livebox', 'debug', "Client ". $lbcli->getName() . " schedule override ".$scheduleclient["data"]["scheduleInfo"]["override"]);
+				log::add('livebox','debug','Client' . $lbcli->getName() . ' schedule override ' . $scheduleclient["data"]["scheduleInfo"]["override"]);
 				$value = __('Inconnu', __FILE__);
 				switch ($scheduleclient["data"]["scheduleInfo"]["override"]) {
 					case 'Enable':
@@ -1758,7 +1766,7 @@ class livebox extends eqLogic {
 				}
 			}
 		} else {
-			log::add('livebox', 'debug', "Client ". $lbcli->getName() . " pas de schedule");
+			log::add('livebox','debug','Client ' . $lbcli->getName() . ' pas de schedule');
 		}
 	}
 
@@ -2182,17 +2190,19 @@ class livebox extends eqLogic {
 						array_push($devicelist, $client["Name"]);
 						$mac = $client['Key'];
 						$activeclients[$mac] = $client['Active'];
-						$lbcli = livebox::byLogicalId($mac, 'livebox');
+						//$lbcli = livebox::byLogicalId($mac,'livebox');
+						$lbcli = livebox::getClientBox($mac,$this->getId());
 						if (!is_object($lbcli) && config::byKey('createClients','livebox',0)) {
 							// Nouveau client.
-							livebox::createClient($client, $this->getId());
-							$lbcli = livebox::byLogicalId($mac, 'livebox');
+							livebox::createClient($client,$this->getId());
+							//$lbcli = livebox::byLogicalId($mac,'livebox');
+							$lbcli = livebox::getClientBox($mac,$this->getId());
 						}
-						if (is_object($lbcli) && $lbcli->getConfiguration('type','') == 'cli') {
+						//if (is_object($lbcli) && $lbcli->getConfiguration('type','') == 'cli') {
+						if (is_object($lbcli)) {
 							if ($lbcli->getIsEnable()){
-								 $this->refreshClientInfo($client, $lbcli);
-							 }
-
+								$this->refreshClientInfo($client,$lbcli);
+							}
 						}
 					}
 				}
@@ -2366,6 +2376,16 @@ class livebox extends eqLogic {
 			}
 		}
 		return($num);
+	}
+
+	public static function getClientBox($_logicalId,$_boxId) {
+		$eqLogics = eqLogic::byLogicalId($_logicalId,'livebox',true);
+		foreach ($eqLogics as $eqLogic) {
+			if($eqLogic->getConfiguration('boxId','') == $_boxId) {
+				return $eqLogic;
+			}
+		}
+		return false;
 	}
 
 	public function getIsEnable($_default = 0) {
