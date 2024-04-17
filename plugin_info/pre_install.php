@@ -16,7 +16,7 @@
  */
 require_once dirname(__FILE__) . '/../../../core/php/core.inc.php';
 
-function elmtouch_pre_update(){
+function livebox_pre_update(){
   $update=update::byTypeAndLogicalId('plugin','livebox');
   $ver=$update->getLocalVersion();
   $conf=$update->getConfiguration();
