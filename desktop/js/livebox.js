@@ -3,6 +3,29 @@
 	$('#md_modal').load('index.php?v=d&plugin=livebox&modal=health').dialog('open');
 });
 
+document.querySelector('.eqLogicAction[data-action=createCommunityPost]')?.addEventListener('click', function(event) {
+	jeedom.plugin.createCommunityPost({
+		type: eqType,
+		error: function(error) {
+			domUtils.hideLoading()
+			jeedomUtils.showAlert({
+			  message: error.message,
+			  level: 'danger'
+			})
+		},
+		success: function(data) {
+			let element = document.createElement('a');
+			element.setAttribute('href', data.url);
+			element.setAttribute('target', '_blank');
+			element.style.display = 'none';
+			document.body.appendChild(element);
+			element.click();
+			document.body.removeChild(element);
+		}
+	});
+	return;
+});
+
 $('#in_searchEqlogic2').off('keyup').keyup(function () {
   var search = $(this).value().toLowerCase();
   search = search.normalize('NFD').replace(/[\u0300-\u036f]/g, "")

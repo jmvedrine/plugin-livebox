@@ -28,6 +28,20 @@ class livebox extends eqLogic {
 	const MAX_PAGESJAUNES = 5;		   // Nombre maximum de requêtes à Pages Jaunes
 	/* * ***********************Methode static*************************** */
 
+	public static function getConfigForCommunity() {
+		$update=update::byTypeAndLogicalId('plugin',__CLASS__);
+		$ver=$update->getLocalVersion();
+		$conf=$update->getConfiguration();
+		$CommunityInfo="== Jeedom ".jeedom::version()." sur ".trim(shell_exec("lsb_release -d -s")).'/'.trim(shell_exec('dpkg --print-architecture')).'/'.trim(shell_exec('arch')).'/'.trim(shell_exec('getconf LONG_BIT'))."bits aka '".jeedom::getHardwareName()." et ".__CLASS__." (".$conf['version'].") ".$ver." (avant:".config::byKey('previousVersion',__CLASS__,'inconnu',true).')';
+		$eqLogics = eqLogic::byType('livebox');
+		foreach ($eqLogics as $eqLogic) {
+			if($eqLogic->getConfiguration('type','') == 'box') {
+				$CommunityInfo .= ' Box : '.$eqLogic->getConfiguration('productClass',''). ' '.$eqLogic->getConfiguration('manufacturer','').' '.$eqLogic->getConfiguration('modelName','');
+			}
+		}
+		return $CommunityInfo;
+    }
+
 	public static function cron() {
 		log::add('livebox','debug','cron');
 		foreach (eqLogic::byType('livebox', true) as $eqLogic) {
