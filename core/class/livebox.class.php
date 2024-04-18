@@ -37,6 +37,7 @@ class livebox extends eqLogic {
 		foreach ($eqLogics as $eqLogic) {
 			if($eqLogic->getConfiguration('type','') == 'box') {
 				$CommunityInfo .= ' Box : '.$eqLogic->getConfiguration('productClass',''). ' '.$eqLogic->getConfiguration('manufacturer','').' '.$eqLogic->getConfiguration('modelName','');
+				$CommunityInfo .= ' Version harware : '.$eqLogic->getConfiguration('hardwareVersion',''). ' Version software : '.$eqLogic->getConfiguration('softwareVersion','');
 			}
 		}
 		return $CommunityInfo;

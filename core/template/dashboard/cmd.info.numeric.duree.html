@@ -1,6 +1,6 @@
 <div class="cmd cmd-widget #history#" data-type="info" data-subtype="numeric" data-cmd_id="#id#" data-cmd_uid="#uid#" data-version="#version#" data-eqLogic_id="#eqLogic_id#">
 	<div class="content-xs">
-		<span class="cmdName #hide_name#">#name_display# </span> <strong class="state"></strong>
+		<span class="cmdName #hide_name#">#name_display# </span> <span class="value"></span>
 	</div>
 	<script>
     jeedom.cmd.addUpdateFunction('#id#', function(_options) {
@@ -17,7 +17,7 @@
 			if (s) txt += s + 's ';
 			var cmd = $('.cmd[data-cmd_id=#id#]')
 			cmd.attr('title','Date de valeur : '+_options.valueDate+'<br/>Date de collecte : '+_options.collectDate)
-			cmd.find('.state').empty().append(txt +' (' + _options.value +' s)');
+			cmd.find('.value').empty().append(txt +' (' + _options.value +' s)');
 			if(_options.alertLevel){
 				if(_options.alertLevel == 'warning'){
 					cmd.find('.content-xs').addClass('label label-warning')
