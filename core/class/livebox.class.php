@@ -2121,7 +2121,7 @@ class livebox extends eqLogic {
 						if($favorite == 1 || $noDeroulantWidget) {// Pas de lien sur les favoris
 							$callsTable .= " class=\"tdLboxR\">$callerName</td>";
 						} else {
-							$callsTable .= " class=\"tdLboxL\"><a class='btn-sm bt_plus' title='Ajouter $callerName $callNum en favori' onclick='addfavorite(\"" .$callNum . "\",\"" . $callerName . "\")'><i class='icon icon_green fas fa-heart '></i></a> $callerName</td>";
+							$callsTable .= " class=\"tdLboxL\"><a class=\"btn-sm bt_plus\" title=\"Ajouter $callerName $callNum en favori\" onclick=\\'addfavorite(\"$callNum\",\"$callerName\")\\'><i class=\"icon icon_green fas fa-heart\"></i></a>$callerName</td>";
 						}
 						$callsTable .= "<td class=\"tdLboxL\">".$this->fmt_numtel($callNum,$callerName,$favorite)."</td><td class=\"tdLboxL\">".$this->fmt_date($call["timestamp"])."</td><td class=\"tdLboxR\">".$this->fmt_duree($call["duree"])."</td><td class=\"tdLboxL\">".$call["icon"]."</td></tr>";
 						if($firstmissed == 0 && $call['in'] == 1 && $call['missed'] == 1) {
