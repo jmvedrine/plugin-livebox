@@ -116,3 +116,21 @@ Compatibilité avec PHP 8
 
 - Ajout de la gestion d'un même client sur plusieurs livebox
 - Ajout du logo Chromecast
+
+# Version du 17/04/2024
+
+- Ajout du bouton assistance avec le core jeedom 4.4 permettant de créer un post community quasi automatiquement
+- Changement des widgets durée et liste déroulante avec les fonctions jeedom.cmd.addUpdateFunction (impose un core jeedom 4.3.1) et jeedom.cmd.refreshValue pour l'affichage des informations des widgets en core jeedom 4.4
+
+# Version du 17/04/2024
+
+- Ajout de la version HW et SW dans le message préparé par le bouton assistance
+
+# Version du 20/04/2024
+
+- Corrige l'affichage des listes déroulantes avec core jeedom 4.3
+
+# Version du 21/04/2024
+
+- Corrige l'affichage durée avec core jeedom 4.3
+- Corrige l'affichage durée en mobile avec core jeedom 4.4

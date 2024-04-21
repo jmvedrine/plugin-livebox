@@ -748,10 +748,6 @@ class livebox extends eqLogic {
 						$cmd->setType('info');
 						$cmd->setSubType('numeric');
 						$cmd->setIsHistorized(1);
-						if (version_compare(jeedom::version(), "4.4", "<")) {
-							$cmd->setTemplate('dashboard', 'livebox::duree');
-							$cmd->setTemplate('mobile', 'livebox::duree');
-						}
 						$cmd->save();
 					}
 
@@ -1463,10 +1459,6 @@ class livebox extends eqLogic {
 				$cmd->setUnite('s');
 				$cmd->setType('info');
 				$cmd->setSubType('numeric');
-				if (version_compare(jeedom::version(), "4.4", "<")) {
-					$cmd->setTemplate('dashboard', 'livebox::duree');
-					$cmd->setTemplate('mobile', 'livebox::duree');
-				}
 				$cmd->setIsHistorized(0);
 				$cmd->save();
 			}
@@ -2608,6 +2600,11 @@ class liveboxCmd extends cmd
 				if (version_compare(jeedom::version(), "4.4", ">")) {
 					$this->setDisplay('forceReturnLineBefore', 1);
 					$this->setDisplay('forceReturnLineAfter', 1);
+					$this->setTemplate('dashboard', 'livebox::duree');
+					$this->setTemplate('mobile', 'livebox::duree');
+				} elseif (version_compare(jeedom::version(), "4.4", "<")) {
+					$this->setTemplate('dashboard', 'livebox::duree-v43');
+					$this->setTemplate('mobile', 'livebox::duree-v43');
 				}
 				break;
 			case 'ipwan':
@@ -2638,6 +2635,11 @@ class liveboxCmd extends cmd
 				if (version_compare(jeedom::version(), "4.4", ">")) {
 					$this->setDisplay('forceReturnLineBefore', 1);
 					$this->setDisplay('forceReturnLineAfter', 1);
+					$this->setTemplate('dashboard', 'livebox::duree');
+					$this->setTemplate('mobile', 'livebox::duree');
+				} elseif (version_compare(jeedom::version(), "4.4", "<")) {
+					$this->setTemplate('dashboard', 'livebox::duree-v43');
+					$this->setTemplate('mobile', 'livebox::duree-v43');
 				}
 				break;
 			case 'softwareVersion':
