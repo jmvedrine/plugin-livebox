@@ -98,7 +98,7 @@ Compatibilité avec PHP 8
 
 - Ajout de l'affichage de l'adresse Mac sur LB3
 - Changemenent pour la librairie CURL
-- Ajout de la fonctionnalité permettant de piloter des livebox à distance
+- Ajout de la fonctionnalité permettant de piloter des livebox à distance en https (nécessite une configuration dans la livebox)
 - Ajout de la fonctionnalité permettant d'avoir plusieurs livebox
 - Corrige le fonctionnement sur LB2
 - Ajout du nom de la livebox associée à chaque client dans le panel (et page santé)
@@ -132,7 +132,8 @@ Compatibilité avec PHP 8
 
 # Version du 21/04/2024
 
+- Ajout du paramètre d'historisation pour tous les paramètres dans l'onglet des commandes
 - Corrige l'affichage durée avec core jeedom 4.3
 - Corrige l'affichage durée en mobile avec core jeedom 4.4
 - Corrige l'alignement des options dans l'onglet des commandes
-- Ajout du paramètre d'historisation pour tous les paramètres dans l'onglet des commandes
+- Corrige la mise à jour des équipements livebox lors de la mise à jour du plugin et affiche le protocole par defaut en core jeedom 4.4

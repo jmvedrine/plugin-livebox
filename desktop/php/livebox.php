@@ -11,6 +11,8 @@ foreach ($eqLogics as $eqLogic) {
     if ($eqLogic->getConfiguration('type') == '') {
         $eqLogic->setConfiguration('type', 'box');
         $eqLogic->setConfiguration('autorefresh', '* * * * *');
+        $eqLogic->setConfiguration('protocol', 'http');
+        $eqLogic->setConfiguration('port', '80');
         $eqLogic->save();
     }
     $type=$eqLogic->getConfiguration('type','');
@@ -205,7 +207,7 @@ foreach ($eqLogics as $eqLogic) {
                     <label class="col-lg-2 control-label">{{Protocole de la Livebox}}<sup><i class="fas fa-question-circle tooltips" title="{{Sélectionner le protocole : HTTPS pour un accès distant, HTTP sinon}}"></i></sup></label>
                     <div class="col-lg-3">
                         <select class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="protocol">
-                            <option value="http" selected>HTTP</option>
+                            <option value="http">HTTP</option>
                             <option value="https">HTTPS</option>
                         </select>
                     </div>
@@ -219,7 +221,7 @@ foreach ($eqLogics as $eqLogic) {
                 <div class="form-group" id="div_portBox" style="display: none;">
                     <label class="col-lg-2 control-label">{{Port de la Livebox}}<sup><i class="fas fa-question-circle tooltips" title="{{Indiquer le port personnalisé pour un accès distant, le port 80 sinon}}"></i></sup></label>
                     <div class="col-lg-3">
-                        <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="port" placeholder="{{80}}"/>
+                        <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="port"/>
                     </div>
                 </div>
                 <div class="form-group" id="div_adminBox" style="display: none;">
