@@ -747,7 +747,7 @@ class livebox extends eqLogic {
 						$cmd->setUnite('s');
 						$cmd->setType('info');
 						$cmd->setSubType('numeric');
-						$cmd->setIsHistorized(1);
+						$cmd->setIsHistorized(0);
 						$cmd->save();
 					}
 

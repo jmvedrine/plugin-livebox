@@ -134,3 +134,5 @@ Compatibilité avec PHP 8
 
 - Corrige l'affichage durée avec core jeedom 4.3
 - Corrige l'affichage durée en mobile avec core jeedom 4.4
+- Corrige l'alignement des options dans l'onglet des commandes
+- Ajout du paramètre d'historisation pour tous les paramètres dans l'onglet des commandes
