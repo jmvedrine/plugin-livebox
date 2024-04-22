@@ -119,7 +119,7 @@ Compatibilité avec PHP 8
 
 # Version du 17/04/2024
 
-- Ajout du bouton assistance avec le core jeedom 4.4 permettant de créer un post community quasi automatiquement
+- Ajout du bouton assistance permettant de créer un post community quasi automatiquement (nécéssite le core jeedom 4.4)
 - Changement des widgets durée et liste déroulante avec les fonctions jeedom.cmd.addUpdateFunction (impose un core jeedom 4.3.1) et jeedom.cmd.refreshValue pour l'affichage des informations des widgets en core jeedom 4.4
 
 # Version du 17/04/2024
@@ -137,3 +137,7 @@ Compatibilité avec PHP 8
 - Corrige l'affichage durée en mobile avec core jeedom 4.4
 - Corrige l'alignement des options dans l'onglet des commandes
 - Corrige la mise à jour des équipements livebox lors de la mise à jour du plugin et affiche le protocole par defaut en core jeedom 4.4
+
+# Version du 21/04/2024
+
+- Ajout de paramètres affichés dans post community (nécéssite le core jeedom 4.4)

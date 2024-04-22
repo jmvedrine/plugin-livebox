@@ -29,17 +29,22 @@ class livebox extends eqLogic {
 	/* * ***********************Methode static*************************** */
 
 	public static function getConfigForCommunity() {
-		$update=update::byTypeAndLogicalId('plugin',__CLASS__);
-		$ver=$update->getLocalVersion();
-		$conf=$update->getConfiguration();
-		$CommunityInfo="== Jeedom ".jeedom::version()." sur ".trim(shell_exec("lsb_release -d -s")).'/'.trim(shell_exec('dpkg --print-architecture')).'/'.trim(shell_exec('arch')).'/'.trim(shell_exec('getconf LONG_BIT'))."bits aka '".jeedom::getHardwareName()." et ".__CLASS__." (".$conf['version'].") ".$ver." (avant:".config::byKey('previousVersion',__CLASS__,'inconnu',true).')';
+		$CommunityInfo = '```'."\n";
+		$CommunityInfo .= 'hw : '.jeedom::getHardwareName()."\n";
+		$CommunityInfo .= 'os : '.trim(shell_exec("lsb_release -d -s")).'/'.trim(shell_exec('dpkg --print-architecture')).'/'.trim(shell_exec('arch')).'/'.trim(shell_exec('getconf LONG_BIT')).'bits'."\n";
+		$CommunityInfo .= 'phpversion : '.phpversion()."\n";
+		$CommunityInfo .= 'plugin previous version : '.config::byKey('previousVersion',__CLASS__,'inconnu',true)."\n";
+		$CommunityInfo .= 'plugin loglevel : '.log::convertLogLevel(log::getLogLevel(__CLASS__))."\n";
 		$eqLogics = eqLogic::byType('livebox');
 		foreach ($eqLogics as $eqLogic) {
 			if($eqLogic->getConfiguration('type','') == 'box') {
-				$CommunityInfo .= ' Box : '.$eqLogic->getConfiguration('productClass',''). ' '.$eqLogic->getConfiguration('manufacturer','').' '.$eqLogic->getConfiguration('modelName','');
-				$CommunityInfo .= ' Version harware : '.$eqLogic->getConfiguration('hardwareVersion',''). ' Version software : '.$eqLogic->getConfiguration('softwareVersion','');
+				$CommunityInfo .= 'box : '.$eqLogic->getConfiguration('productClass','').' / '.$eqLogic->getConfiguration('modelName','').' ('.$eqLogic->getConfiguration('manufacturer','').')'."\n";
+				$CommunityInfo .= ' hardware version : '.$eqLogic->getConfiguration('hardwareVersion','')."\n";
+				$CommunityInfo .= ' software version : '.$eqLogic->getConfiguration('softwareVersion','')."\n";
+				$CommunityInfo .= ' protocol : '.$eqLogic->getConfiguration('protocol','')."\n";
 			}
 		}
+		$CommunityInfo .= '```'."\n";
 		return $CommunityInfo;
     }
 

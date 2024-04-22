@@ -18,7 +18,7 @@ require_once dirname(__FILE__) . '/../../../core/php/core.inc.php';
 
 function livebox_pre_update(){
   $update=update::byTypeAndLogicalId('plugin','livebox');
-  $ver=$update->getLocalVersion();
-  $conf=$update->getConfiguration();
-  config::save('previousVersion',$conf['version'].'/'.$ver,'livebox');
+  if (is_object($update)) {
+    config::save('previousVersion',$update->getLocalVersion() . ' (' . $update->getConfiguration('version') . ')','livebox');
+  }
 }
