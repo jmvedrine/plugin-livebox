@@ -86,6 +86,9 @@ function printEqLogicHelperBox(label,name,_eqLogic){
 			//console.log('id:'+boxResult.id+' name:'+boxResult.name)
 			jeedom.object.byId({
 				id: boxResult.object_id,
+				error: function(roomResult) {
+					document.getElementById("boxName").textContent = boxResult.name
+				},
 				success: function(roomResult) {
 					//console.log('id:'+roomResult.id+' name:'+roomResult.name)
 					document.getElementById("boxName").textContent = '['+roomResult.name+'] '+boxResult.name

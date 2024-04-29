@@ -120,14 +120,14 @@ class livebox extends eqLogic {
 		if($defaultRoom) {
 			if(self::nameExists($name, $defaultRoom)) {
 				$old_name = $name;
-				$name = $name . '_' . $mac . '_' . livebox::byId($boxId)->getObject()->getName() . '_' . livebox::byId($boxId)->getName();
+				$name = $name . '_' . str_replace(array('][','[',']'),array('-','',''),livebox::byId($boxId)->getHumanName());
 				log::add('livebox','info','Nom en double dans la même pièce ' . $old_name . ' renommé en ' .$name);
 			}
 			$eqLogicClient->setObject_id($defaultRoom);
 		} else {
 			if(self::nameExists($name)) {
 				$old_name = $name;
-				$name = $name . '_' . $mac . '_' . livebox::byId($boxId)->getObject()->getName() . '_' . livebox::byId($boxId)->getName();
+				$name = $name . '_' . str_replace(array('][','[',']'),array('-','',''),livebox::byId($boxId)->getHumanName());
 				log::add('livebox','info','Nom en double ' . $old_name . ' renommé en ' .$name);
 			}
 		}
@@ -1304,8 +1304,6 @@ class livebox extends eqLogic {
 					$cmd->setSubType('string');
 					$cmd->setIsVisible(0);
 					$cmd->setIsHistorized(0);
-					$cmd->setTemplate('dashboard', 'livebox::deroulant');
-					$cmd->setTemplate('mobile', 'livebox::deroulant');
 					$cmd->save();
 				}
 
@@ -1320,8 +1318,6 @@ class livebox extends eqLogic {
 					$cmd->setSubType('string');
 					$cmd->setIsVisible(0);
 					$cmd->setIsHistorized(0);
-					$cmd->setTemplate('dashboard', 'livebox::deroulant');
-					$cmd->setTemplate('mobile', 'livebox::deroulant');
 					$cmd->save();
 				}
 
@@ -1336,8 +1332,6 @@ class livebox extends eqLogic {
 					$cmd->setSubType('string');
 					$cmd->setIsVisible(0);
 					$cmd->setIsHistorized(0);
-					$cmd->setTemplate('dashboard', 'livebox::deroulant');
-					$cmd->setTemplate('mobile', 'livebox::deroulant');
 					$cmd->save();
 				}
 
@@ -1351,8 +1345,6 @@ class livebox extends eqLogic {
 					$cmd->setType('info');
 					$cmd->setSubType('string');
 					$cmd->setIsHistorized(0);
-					$cmd->setTemplate('dashboard', 'livebox::deroulant');
-					$cmd->setTemplate('mobile', 'livebox::deroulant');
 					$cmd->save();
 				}
 
@@ -2567,15 +2559,23 @@ class liveboxCmd extends cmd
 				break;
 			case 'missedcallstable':
 				$this->setOrder(61);
+				$this->setTemplate('dashboard', 'livebox::deroulant');
+				$this->setTemplate('mobile', 'livebox::deroulant');
 				break;
 			case 'incallstable':
 				$this->setOrder(62);
+				$this->setTemplate('dashboard', 'livebox::deroulant');
+				$this->setTemplate('mobile', 'livebox::deroulant');
 				break;
 			case 'outcallstable':
 				$this->setOrder(63);
+				$this->setTemplate('dashboard', 'livebox::deroulant');
+				$this->setTemplate('mobile', 'livebox::deroulant');
 				break;
 			case 'callstable':
 				$this->setOrder(64);
+				$this->setTemplate('dashboard', 'livebox::deroulant');
+				$this->setTemplate('mobile', 'livebox::deroulant');
 				break;
 			case (preg_match('/numerotelephone*/',$this->getLogicalId()) ? true : false):
 				$this->setOrder(65);
