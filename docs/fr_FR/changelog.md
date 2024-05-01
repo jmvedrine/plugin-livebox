@@ -65,6 +65,8 @@ Ajout de styles spécifiques à ce plugin pour les listes d'appels. Auparavant l
 
 Compatibilité avec PHP 8
 
+# Version du 23/03/2024 (passage en stable)
+
 # Version du 25/03/2024
 
 - Ajout de la configuration de la fréquence d'actualisation (cron) sur l'équipement livebox
@@ -85,9 +87,13 @@ Compatibilité avec PHP 8
 - Ajout d'une commande softwareVersion (que vous pouvez historiser dans le menu avancé de la commande)
 - Corrige le blocage et deblocage d'un client
 
+# Version du 04/04/2024 (passage en stable)
+
 # Version du 05/04/2024
 
 - Corrige l'affichage durée avec core jeedom 4.4
+
+# Version du 07/04/2024 (passage en stable)
 
 # Version du 08/04/2024
 
@@ -138,6 +144,16 @@ Compatibilité avec PHP 8
 - Corrige l'alignement des options dans l'onglet des commandes
 - Corrige la mise à jour des équipements livebox lors de la mise à jour du plugin et affiche le protocole par defaut en core jeedom 4.4
 
-# Version du 21/04/2024
+# Version du 22/04/2024
 
-- Ajout de paramètres affichés dans post community (nécéssite le core jeedom 4.4)
+- Ajout de paramètres affichés et reformatés dans post community (nécéssite le core jeedom 4.4)
+
+# Version du 29/04/2024
+
+- Corrige le cas ou l'équipement Livebox n'est pas dans une pièce (objet parent)
+
+# Version du 01/05/2024
+
+- Mise à jour de la documentation
+
+# Version du 01/05/2024 (passage en stable)
