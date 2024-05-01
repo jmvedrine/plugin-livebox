@@ -11,6 +11,8 @@ foreach ($eqLogics as $eqLogic) {
     if ($eqLogic->getConfiguration('type') == '') {
         $eqLogic->setConfiguration('type', 'box');
         $eqLogic->setConfiguration('autorefresh', '* * * * *');
+        $eqLogic->setConfiguration('protocol', 'http');
+        $eqLogic->setConfiguration('port', '80');
         $eqLogic->save();
     }
     $type=$eqLogic->getConfiguration('type','');
@@ -39,6 +41,16 @@ foreach ($eqLogics as $eqLogic) {
                 <br />
                 <span>{{Santé}}</span>
             </div>
+<?php
+    $jeedomVersion=jeedom::version() ?? '0';
+    $displayInfo=version_compare($jeedomVersion, '4.4.0', '>=');
+    if($displayInfo){
+        echo '<div class="cursor eqLogicAction warning" data-action="createCommunityPost" title="{{Ouvrir une demande d\'aide sur le forum communautaire}}">';
+        echo '<i class="fas fa-ambulance"></i>';
+        echo '<br><span>{{Community}}</span>';
+        echo '</div>';
+	}
+?>
     </div>
         <legend><i class="fas fa-table"></i>{{Mes Livebox}}
         </legend>
@@ -191,10 +203,25 @@ foreach ($eqLogics as $eqLogic) {
                         <a class="btn btn-default" id="bt_goCarte" title='{{Accéder à la Livebox}}'><i class="fas fa-cogs"></i></a>
                     </div>
                 </div>
+                <div class="form-group" id="div_protocolBox" style="display: none;">
+                    <label class="col-lg-2 control-label">{{Protocole de la Livebox}}<sup><i class="fas fa-question-circle tooltips" title="{{Sélectionner le protocole : HTTPS pour un accès distant, HTTP sinon}}"></i></sup></label>
+                    <div class="col-lg-3">
+                        <select class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="protocol">
+                            <option value="http">HTTP</option>
+                            <option value="https">HTTPS</option>
+                        </select>
+                    </div>
+                </div>
                 <div class="form-group" id="div_ipBox" style="display: none;">
-                    <label class="col-lg-2 control-label">{{IP de la Livebox}}</label>
+                    <label class="col-lg-2 control-label">{{IP de la Livebox}}<sup><i class="fas fa-question-circle tooltips" title="{{Indiquer le nom de domaine pour un accès distant, l'adresse IP sinon}}"></i></sup></label>
                     <div class="col-lg-3">
                         <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="ip"/>
+                    </div>
+                </div>
+                <div class="form-group" id="div_portBox" style="display: none;">
+                    <label class="col-lg-2 control-label">{{Port de la Livebox}}<sup><i class="fas fa-question-circle tooltips" title="{{Indiquer le port personnalisé pour un accès distant, le port 80 sinon}}"></i></sup></label>
+                    <div class="col-lg-3">
+                        <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="port"/>
                     </div>
                 </div>
                 <div class="form-group" id="div_adminBox" style="display: none;">

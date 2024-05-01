@@ -3,6 +3,29 @@
 	$('#md_modal').load('index.php?v=d&plugin=livebox&modal=health').dialog('open');
 });
 
+document.querySelector('.eqLogicAction[data-action=createCommunityPost]')?.addEventListener('click', function(event) {
+	jeedom.plugin.createCommunityPost({
+		type: eqType,
+		error: function(error) {
+			domUtils.hideLoading()
+			jeedomUtils.showAlert({
+			  message: error.message,
+			  level: 'danger'
+			})
+		},
+		success: function(data) {
+			let element = document.createElement('a');
+			element.setAttribute('href', data.url);
+			element.setAttribute('target', '_blank');
+			element.style.display = 'none';
+			document.body.appendChild(element);
+			element.click();
+			document.body.removeChild(element);
+		}
+	});
+	return;
+});
+
 $('#in_searchEqlogic2').off('keyup').keyup(function () {
   var search = $(this).value().toLowerCase();
   search = search.normalize('NFD').replace(/[\u0300-\u036f]/g, "")
@@ -30,13 +53,17 @@ $('.eqLogicAttr[data-l1key=configuration][data-l2key=type]').on('change',functio
 	if ($(this).value() == 'box') {
 		$('#div_cron').show();
 		$('#div_goCarte').show();
+		$('#div_protocolBox').show();
 		$('#div_ipBox').show();
+		$('#div_portBox').show();
 		$('#div_adminBox').show();
 		$('#div_passBox').show();
 	} else {
 		$('#div_cron').hide();
 		$('#div_goCarte').hide();
+		$('#div_protocolBox').hide();
 		$('#div_ipBox').hide();
+		$('#div_portBox').hide();
 		$('#div_adminBox').hide();
 		$('#div_passBox').hide();
 	}
@@ -47,6 +74,28 @@ function printEqLogicHelper(label,name,_eqLogic){
 	
 	$('#table_infoseqlogic tbody').append(trm);
 	$('#table_infoseqlogic tbody tr:last').setValues(_eqLogic, '.eqLogicAttr');
+}
+
+function printEqLogicHelperBox(label,name,_eqLogic){
+	var trm = '<tr><td class="col-sm-3"><span style="font-size : 1em;">'+label+'</span></td><td><span class="label label-default" style="font-size : 1em;"> <a id=boxName href=index.php?v=d&p=livebox&m=livebox&id='+_eqLogic.configuration.boxId+'>livebox</a></span></td></tr>';
+	$('#table_infoseqlogic tbody').append(trm);
+
+	jeedom.eqLogic.byId({
+		id: _eqLogic.configuration.boxId,
+		success: function(boxResult) {
+			//console.log('id:'+boxResult.id+' name:'+boxResult.name)
+			jeedom.object.byId({
+				id: boxResult.object_id,
+				error: function(roomResult) {
+					document.getElementById("boxName").textContent = boxResult.name
+				},
+				success: function(roomResult) {
+					//console.log('id:'+roomResult.id+' name:'+roomResult.name)
+					document.getElementById("boxName").textContent = '['+roomResult.name+'] '+boxResult.name
+				}
+			})
+		}
+	})
 }
 
 // fonction executée par jeedom lors de l'affichage des details d'un eqlogic
@@ -68,16 +117,21 @@ function printEqLogic(_eqLogic) {
 		printEqLogicHelper("{{Adresse MAC}}","BaseMAC",_eqLogic);
 		$('#div_cron').show();
 		$('#div_goCarte').show();
+		$('#div_protocolBox').show();
 		$('#div_ipBox').show();
+		$('#div_portBox').show();
 		$('#div_adminBox').show();
 		$('#div_passBox').show();
 	}
 	if (_eqLogic.configuration.type=="cli") {
+		printEqLogicHelperBox("{{Livebox}}","boxId",_eqLogic);
 		printEqLogicHelper("{{Type}}","deviceType",_eqLogic);
 		printEqLogicHelper("{{Adresse MAC}}","macAddress",_eqLogic);
 		$('#div_cron').hide();
 		$('#div_goCarte').hide();
+		$('#div_protocolBox').hide();
 		$('#div_ipBox').hide();
+		$('#div_portBox').hide();
 		$('#div_adminBox').hide();
 		$('#div_passBox').hide();
 	}
@@ -157,15 +211,15 @@ function addCmdToTable(_cmd) {
         tr += '<span class="subType" subType="' + init(_cmd.subType) + '"></span>';
         tr += '</td>';
         tr += '<td>';
-        tr += '<span><label class="checkbox-inline"><input type="checkbox" class="cmdAttr checkbox-inline" data-l1key="isVisible" checked/> {{Afficher}}</label></span>';
-		if (_cmd.subType == 'numeric' || _cmd.subType == 'binary') {
-			tr += '<span><label class="checkbox-inline"><input type="checkbox" class="cmdAttr checkbox-inline" data-l1key="isHistorized"/> {{Historiser}}</label></span>';
-		}
-		if (_cmd.subType == 'numeric') {
-			tr += '<input class="tooltips cmdAttr form-control input-sm" data-l1key="unite" placeholder="Unité" title="{{Unité}}" style="width:30%;max-width:80px;margin-top:7px;">'
-		}
+        tr += '<label class="checkbox-inline"><input type="checkbox" class="cmdAttr" data-l1key="isVisible" checked/>{{Afficher}}</label>';
+        //if (_cmd.subType == 'numeric' || _cmd.subType == 'binary') {
+        tr += '<label class="checkbox-inline"><input type="checkbox" class="cmdAttr" data-l1key="isHistorized"/>{{Historiser}}</label>';
+        //}
+        //if (_cmd.subType == 'numeric') {
+        //  tr += '<input class="tooltips cmdAttr form-control input-sm" data-l1key="unite" placeholder="Unité" title="{{Unité}}" style="width:30%;max-width:80px;margin-top:7px;">'
+        //}
         tr += '</td>';
-//		tr += '<td><i class="fas fa-minus-circle pull-right cmdAction cursor" data-action="remove"></i></td>';		
+        //tr += '<td><i class="fas fa-minus-circle pull-right cmdAction cursor" data-action="remove"></i></td>';
         tr += '<td>';
         tr += '<span class="cmdAttr" data-l1key="htmlstate"></span>'; 
         tr += '</td>';	
@@ -199,7 +253,7 @@ function addCmdToTable(_cmd) {
         tr += '<span class="subType" subType="' + init(_cmd.subType) + '"></span>';
         tr += '</td>';
         tr += '<td>';
-        tr += '<span><input type="checkbox" class="cmdAttr" data-l1key="isVisible" checked/> {{Afficher}}<br/></span>';
+        tr += '<label class="checkbox-inline"><input type="checkbox" class="cmdAttr" data-l1key="isVisible" checked/>{{Afficher}}</label>';
         tr += '</td>';
         tr += '<td>';
         tr += '<span class="cmdAttr" data-l1key="htmlstate"></span>'; 
@@ -241,7 +295,7 @@ $('#bt_cronGenerator').on('click', function(){
 
 $('#bt_goCarte').on('click', function() {
     $('#md_modal').dialog({title: "{{Accèder à l'interface de la livebox}}"});
-	window.open('http://'+$('.eqLogicAttr[data-l2key=ip]').value()+'/');
+	window.open($('.eqLogicAttr[data-l2key=protocol]').value()+'://'+$('.eqLogicAttr[data-l2key=ip]').value()+':'+$('.eqLogicAttr[data-l2key=port]').value()+'/');
 });
 
 $('#bt_showPassword').on('click', function() {

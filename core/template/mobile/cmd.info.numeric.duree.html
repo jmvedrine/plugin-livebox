@@ -1,10 +1,11 @@
-<div class="tooltips cmd cmd-widget #history#" data-type="info" data-subtype="numeric" data-cmd_id="#id#" data-cmd_uid="#uid#" data-version="#version#" data-eqLogic_id="#eqLogic_id#" style="display: block;">
+<div class="cmd cmd-widget #history#" data-type="info" data-subtype="numeric" data-cmd_id="#id#" data-cmd_uid="#uid#" data-version="#version#" data-eqLogic_id="#eqLogic_id#">
 	<div class="content-xs">
-		<span class="cmdName #hide_name#">#name_display# </span> <strong class="state"></strong>
+		<span class="cmdName #hide_name#">#name_display#</span> <strong class="state"></strong>
 	</div>
 	<script>
-		jeedom.cmd.update['#id#'] = function(_options){
-			var duree = _options.display_value;
+    jeedom.cmd.addUpdateFunction('#id#', function(_options) {
+        if (is_numeric(_options.value)) {
+			var duree = _options.value;
 			var j = Math.floor(duree/86400); duree %= 86400;
 			var h = Math.floor(duree/3600); duree %= 3600;
 			var m = Math.floor(duree/60);
@@ -16,7 +17,7 @@
 			if (s) txt += s + 's ';
 			var cmd = $('.cmd[data-cmd_id=#id#]')
 			cmd.attr('title','Date de valeur : '+_options.valueDate+'<br/>Date de collecte : '+_options.collectDate)
-			cmd.find('.state').empty().append(txt +' (' + _options.display_value +'#unite#)');
+			cmd.find('.state').empty().append(txt+' ('+_options.value+' s)');
 			if(_options.alertLevel){
 				if(_options.alertLevel == 'warning'){
 					cmd.find('.content-xs').addClass('label label-warning')
@@ -30,6 +31,7 @@
 				}
 			}
 		}
-		jeedom.cmd.update['#id#']({display_value:'#state#',valueDate:'#valueDate#',collectDate:'#collectDate#',alertLevel:'#alertLevel#'});
+	})
+    jeedom.cmd.refreshValue([{ cmd_id: '#id#', value: '#value#', display_value: '#state#', valueDate: '#valueDate#', collectDate: '#collectDate#', alertLevel: '#alertLevel#', unit: '#unite#' }])
 	</script>
 </div>

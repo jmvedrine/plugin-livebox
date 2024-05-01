@@ -56,13 +56,13 @@
         }
       });
     }
-
-		jeedom.cmd.update['#id#'] = function(_options){
-		var cmd = $('.cmd[data-cmd_id=#id#]')
-		var valueH = is_numeric('#hauteurMax#') ? parseFloat('#hauteurMax#'):150;
-			cmd.find('.cmdInfo#uid#').html(_options.display_value).css({"max-height":valueH+'px'});
-			cmd.attr('title','Date de valeur : '+_options.valueDate+'<br/>Date de collecte : '+_options.collectDate);
-		}
-		jeedom.cmd.update['#id#']({display_value:'#state#',valueDate:'#valueDate#',collectDate:'#collectDate#'});
-	</script>
+	
+    jeedom.cmd.addUpdateFunction('#id#', function(_options) {
+        var cmd = $('.cmd[data-cmd_uid=#uid#]')
+        var valueH = is_numeric('#hauteurMax#') ? parseFloat('#hauteurMax#'):150;
+        cmd.find('.cmdInfo#uid#').html(_options.display_value).css({"max-height":valueH+'px'});
+        cmd.attr('title','Date de valeur : ' + _options.valueDate + '<br/>Date de collecte : ' + _options.collectDate);
+    })
+    jeedom.cmd.refreshValue([{ cmd_id: '#id#', value: '#value#', display_value: '#state#', valueDate: '#valueDate#', collectDate: '#collectDate#', alertLevel: '#alertLevel#', unit: '#unite#', raw_unit: '#raw_unite#'}])
+    </script>
 </div>

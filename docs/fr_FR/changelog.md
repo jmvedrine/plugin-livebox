@@ -65,6 +65,8 @@ Ajout de styles spécifiques à ce plugin pour les listes d'appels. Auparavant l
 
 Compatibilité avec PHP 8
 
+# Version du 23/03/2024 (passage en stable)
+
 # Version du 25/03/2024
 
 - Ajout de la configuration de la fréquence d'actualisation (cron) sur l'équipement livebox
@@ -80,7 +82,78 @@ Compatibilité avec PHP 8
 # Version du 01/04/2024
 
 - Les commandes action et info relatives au WiFi (2.4GHz, 5GHz, 6GHz) ont été corrigées et fonctionnent avec la Livebox 6 (pas encore de retour pour la Livebox 7)
-- Ajout de commandes d'activation wifi pour l'ensemble des bandes
+- Ajout de commandes d'activation/désactivation wifi pour l'ensemble des bandes
 - Ajout d'un paramètre de configuration pour permettre de personnaliser entierement les widgets (sinon à chaque enregistrement une configuration par défaut est réappliquée)
 - Ajout d'une commande softwareVersion (que vous pouvez historiser dans le menu avancé de la commande)
-- Corrige le blocage et deblocage d'un device
+- Corrige le blocage et deblocage d'un client
+
+# Version du 04/04/2024 (passage en stable)
+
+# Version du 05/04/2024
+
+- Corrige l'affichage durée avec core jeedom 4.4
+
+# Version du 07/04/2024 (passage en stable)
+
+# Version du 08/04/2024
+
+- Supprime les commandes d'activation/désactivation wifi pour l'ensemble des bandes sur LB2
+- Changements mineurs (messages de log, optimisations, contrôles, indentations)
+
+# Version du 12/04/2024
+
+- Ajout de l'affichage de l'adresse Mac sur LB3
+- Changemenent pour la librairie CURL
+- Ajout de la fonctionnalité permettant de piloter des livebox à distance en https (nécessite une configuration dans la livebox)
+- Ajout de la fonctionnalité permettant d'avoir plusieurs livebox
+- Corrige le fonctionnement sur LB2
+- Ajout du nom de la livebox associée à chaque client dans le panel (et page santé)
+- Corrige le masquage des équipements désactivés dans le panel (et page santé)
+
+# Version du 13/04/2024
+
+- Ajout d'une fonction de debug avancée de la librairie CURL
+
+# Version du 14/04/2024
+
+- Ajout de l'affichage de la livebox associée à chaque client
+
+# Version du 16/04/2024
+
+- Ajout de la gestion d'un même client sur plusieurs livebox
+- Ajout du logo Chromecast
+
+# Version du 17/04/2024
+
+- Ajout du bouton assistance permettant de créer un post community quasi automatiquement (nécéssite le core jeedom 4.4)
+- Changement des widgets durée et liste déroulante avec les fonctions jeedom.cmd.addUpdateFunction (impose un core jeedom 4.3.1) et jeedom.cmd.refreshValue pour l'affichage des informations des widgets en core jeedom 4.4
+
+# Version du 17/04/2024
+
+- Ajout de la version HW et SW dans le message préparé par le bouton assistance
+
+# Version du 20/04/2024
+
+- Corrige l'affichage des listes déroulantes avec core jeedom 4.3
+
+# Version du 21/04/2024
+
+- Ajout du paramètre d'historisation pour tous les paramètres dans l'onglet des commandes
+- Corrige l'affichage durée avec core jeedom 4.3
+- Corrige l'affichage durée en mobile avec core jeedom 4.4
+- Corrige l'alignement des options dans l'onglet des commandes
+- Corrige la mise à jour des équipements livebox lors de la mise à jour du plugin et affiche le protocole par defaut en core jeedom 4.4
+
+# Version du 22/04/2024
+
+- Ajout de paramètres affichés et reformatés dans post community (nécéssite le core jeedom 4.4)
+
+# Version du 29/04/2024
+
+- Corrige le cas ou l'équipement Livebox n'est pas dans une pièce (objet parent)
+
+# Version du 01/05/2024
+
+- Mise à jour de la documentation
+
+# Version du 01/05/2024 (passage en stable)
