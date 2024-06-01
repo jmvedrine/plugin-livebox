@@ -54,6 +54,8 @@ function livebox_update() {
 				$eqLogic->setConfiguration('port', '80');
 			}
 			$eqLogic->save();
+		} else if ($eqLogic->getConfiguration('type') == 'cli') {
+			$eqLogic->save();
 		}
 	}
 }

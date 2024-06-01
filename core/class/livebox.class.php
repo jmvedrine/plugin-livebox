@@ -1637,6 +1637,20 @@ class livebox extends eqLogic {
 				$cmd->save();
 			}
 
+			$cmd = $this->getCmd(null, 'interface');
+			if ( ! is_object($cmd)) {
+				$cmd = new liveboxCmd();
+				$cmd->setName(__('Interface', __FILE__));
+				$cmd->setEqLogic_id($this->getId());
+				$cmd->setLogicalId('interface');
+				$cmd->setType('info');
+				$cmd->setSubType('string');
+				$cmd->setGeneric_type('GENERIC_INFO');
+				$cmd->setIsVisible(0);
+				$cmd->setIsHistorized(0);
+				$cmd->save();
+			}
+
 			$cmd = $this->getCmd(null, 'access');
 			if ( ! is_object($cmd)) {
 				$cmd = new liveboxCmd();
@@ -1745,6 +1759,10 @@ class livebox extends eqLogic {
 		$clicmd = $lbcli->getCmd(null, 'macaddress');
 		if (is_object($clicmd) && isset($client['Key'])) {
 				$lbcli->checkAndUpdateCmd('macaddress', $client['Key']);
+		}
+		$clicmd = $lbcli->getCmd(null, 'interface');
+		if (is_object($clicmd) && isset($client['Layer2Interface'])) {
+				$lbcli->checkAndUpdateCmd('interface', $client['Layer2Interface']);
 		}
 		//Schedule
 		$scheduleclient = $this->getPage("getschedule", array('mac' => $lbcli->getConfiguration('macAddress')));
@@ -2664,7 +2682,14 @@ class liveboxCmd extends cmd
 
 			// cli
 			case 'present':
+				$this->setOrder(0);
+				break;
+			case 'ip':
 				$this->setOrder(1);
+				if (version_compare(jeedom::version(), "4.4", ">")) {
+					$this->setDisplay('forceReturnLineBefore', 1);
+					$this->setDisplay('forceReturnLineAfter', 1);
+				}
 				break;
 			case 'macaddress':
 				$this->setOrder(2);
@@ -2673,7 +2698,7 @@ class liveboxCmd extends cmd
 					$this->setDisplay('forceReturnLineAfter', 1);
 				}
 				break;
-			case 'ip':
+			case 'interface':
 				$this->setOrder(3);
 				if (version_compare(jeedom::version(), "4.4", ">")) {
 					$this->setDisplay('forceReturnLineBefore', 1);

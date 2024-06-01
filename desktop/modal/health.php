@@ -28,6 +28,7 @@ $eqLogics = livebox::byType('livebox');
 			<th>{{Livebox}}</th>
 			<th>{{Adresse MAC}}</th>
 			<th>{{IP}}</th>
+			<th>{{Interface}}</th>
 			<th>{{Type}}</th>
 			<th>{{Présent}}</th>
 			<th>{{Première connexion}}</th>
@@ -58,6 +59,16 @@ foreach ($eqLogics as $eqLogic) {
 			 $value = $clicmd->execCmd();
 		}
 		echo '<td><span class="label label-info" style="font-size : 1em;">' . $value . '</span></td>';
+	}
+	if ($eqLogic->getConfiguration('type')=='cli') {
+		$clicmd = $eqLogic->getCmd('info', 'interface');
+		$value = '';
+		if (is_object($clicmd)) {
+			 $value = $clicmd->execCmd();
+		}
+		echo '<td><span class="label label-info" style="font-size : 1em;">' . $value . '</span></td>';
+	} else {
+		echo '<td></td>';
 	}
 	if ($eqLogic->getConfiguration('type')=='box') {
 		echo '<td><span class="label label-info" style="font-size : 1em;">' . $eqLogic->getConfiguration('productClass') . '</span></td>';
