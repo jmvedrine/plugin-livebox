@@ -1561,7 +1561,7 @@ class livebox extends eqLogic {
 				$cmd->setLogicalId('lastlogin');
 				$cmd->setType('info');
 				$cmd->setSubType('string');
-				$cmd->setGeneric_type( 'GENERIC_INFO');
+				$cmd->setGeneric_type('GENERIC_INFO');
 				$cmd->setIsVisible(0);
 				$cmd->setIsHistorized(0);
 				$cmd->save();
@@ -1575,7 +1575,7 @@ class livebox extends eqLogic {
 				$cmd->setLogicalId('firstseen');
 				$cmd->setType('info');
 				$cmd->setSubType('string');
-				$cmd->setGeneric_type( 'GENERIC_INFO');
+				$cmd->setGeneric_type('GENERIC_INFO');
 				$cmd->setIsVisible(0);
 				$cmd->setIsHistorized(0);
 				$cmd->save();
@@ -1589,7 +1589,7 @@ class livebox extends eqLogic {
 				$cmd->setLogicalId('lastchanged');
 				$cmd->setType('info');
 				$cmd->setSubType('string');
-				$cmd->setGeneric_type( 'GENERIC_INFO');
+				$cmd->setGeneric_type('GENERIC_INFO');
 				$cmd->setIsVisible(0);
 				$cmd->setIsHistorized(0);
 				$cmd->save();
@@ -1602,7 +1602,7 @@ class livebox extends eqLogic {
 				$cmd->setEqLogic_id($this->getId());
 				$cmd->setLogicalId('present');
 				$cmd->setType('info');
-				$cmd->setGeneric_type( 'GENERIC_INFO');
+				$cmd->setGeneric_type('GENERIC_INFO');
 				$cmd->setSubType('binary');
 				$cmd->setIsVisible(1);
 				$cmd->setIsHistorized(1);
@@ -1617,7 +1617,7 @@ class livebox extends eqLogic {
 				$cmd->setLogicalId('ip');
 				$cmd->setType('info');
 				$cmd->setSubType('string');
-				$cmd->setGeneric_type( 'GENERIC_INFO');
+				$cmd->setGeneric_type('GENERIC_INFO');
 				$cmd->setIsVisible(1);
 				$cmd->setIsHistorized(0);
 				$cmd->save();
@@ -1631,8 +1631,8 @@ class livebox extends eqLogic {
 				$cmd->setLogicalId('macaddress');
 				$cmd->setType('info');
 				$cmd->setSubType('string');
-				$cmd->setGeneric_type( 'GENERIC_INFO');
-				$cmd->setIsVisible(1);
+				$cmd->setGeneric_type('GENERIC_INFO');
+				$cmd->setIsVisible(0);
 				$cmd->setIsHistorized(0);
 				$cmd->save();
 			}
@@ -1659,7 +1659,7 @@ class livebox extends eqLogic {
 				$cmd->setLogicalId('access');
 				$cmd->setType('info');
 				$cmd->setSubType('string');
-				$cmd->setGeneric_type( 'SWITCH_STATE');
+				$cmd->setGeneric_type('SWITCH_STATE');
 				$cmd->setIsVisible(1);
 				$cmd->setIsHistorized(1);
 				$cmd->save();
@@ -1674,7 +1674,7 @@ class livebox extends eqLogic {
 				$cmd->setLogicalId('block');
 				$cmd->setType('action');
 				$cmd->setSubType('other');
-				$cmd->setGeneric_type( 'SWITCH_ON');
+				$cmd->setGeneric_type('SWITCH_ON');
 				$cmd->setValue($cmdId);
 				$cmd->setIsVisible(1);
 				$cmd->save();
@@ -1688,7 +1688,7 @@ class livebox extends eqLogic {
 				$cmd->setLogicalId('authorize');
 				$cmd->setType('action');
 				$cmd->setSubType('other');
-				$cmd->setGeneric_type( 'SWITCH_OFF');
+				$cmd->setGeneric_type('SWITCH_OFF');
 				$cmd->setValue($cmdId);
 				$cmd->setIsVisible(1);
 				$cmd->save();
@@ -1702,7 +1702,7 @@ class livebox extends eqLogic {
 				$cmd->setLogicalId('schedule');
 				$cmd->setType('action');
 				$cmd->setSubType('other');
-				$cmd->setGeneric_type( 'SWITCH_OFF');
+				$cmd->setGeneric_type('SWITCH_OFF');
 				$cmd->setValue($cmdId);
 				$cmd->setIsVisible(1);
 				$cmd->save();
@@ -1739,8 +1739,8 @@ class livebox extends eqLogic {
 	function refreshClientInfo($client, $lbcli) {
 		$clicmd = $lbcli->getCmd(null, 'lastlogin');
 		if (is_object($clicmd) && isset($client["LastConnection"]) && $client["LastConnection"] !== '') {
-				$value = livebox::format_time($client['LastConnection']);
-				$lbcli->checkAndUpdateCmd('lastlogin', $value);
+			$value = livebox::format_time($client['LastConnection']);
+			$lbcli->checkAndUpdateCmd('lastlogin', $value);
 		}
 		$clicmd = $lbcli->getCmd(null, 'firstseen');
 		if (is_object($clicmd) && isset($client["FirstSeen"]) && $client["FirstSeen"] !== '') {
@@ -1749,20 +1749,20 @@ class livebox extends eqLogic {
 		}
 		$clicmd = $lbcli->getCmd(null, 'lastchanged');
 		if (is_object($clicmd) && isset($client["LastChanged"]) && $client["LastChanged"] !== '') {
-				$value = livebox::format_time($client['LastChanged']);
-				$lbcli->checkAndUpdateCmd('lastchanged', $value);
+			$value = livebox::format_time($client['LastChanged']);
+			$lbcli->checkAndUpdateCmd('lastchanged', $value);
 		}
 		$clicmd = $lbcli->getCmd(null, 'ip');
 		if (is_object($clicmd) && isset($client["IPAddress"])) {
-				$lbcli->checkAndUpdateCmd('ip', $client['IPAddress']);
+			$lbcli->checkAndUpdateCmd('ip', $client['IPAddress']);
 		}
 		$clicmd = $lbcli->getCmd(null, 'macaddress');
 		if (is_object($clicmd) && isset($client['Key'])) {
-				$lbcli->checkAndUpdateCmd('macaddress', $client['Key']);
+			$lbcli->checkAndUpdateCmd('macaddress', $client['Key']);
 		}
 		$clicmd = $lbcli->getCmd(null, 'interface');
 		if (is_object($clicmd) && isset($client['Layer2Interface'])) {
-				$lbcli->checkAndUpdateCmd('interface', $client['Layer2Interface']);
+			$lbcli->checkAndUpdateCmd('interface', $client['Layer2Interface']);
 		}
 		//Schedule
 		$scheduleclient = $this->getPage("getschedule", array('mac' => $lbcli->getConfiguration('macAddress')));
